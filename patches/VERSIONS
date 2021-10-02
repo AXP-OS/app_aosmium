@@ -1,0 +1,36 @@
+Source: https://github.com/GrapheneOS/Vanadium
+	Last updated:
+		2023/11/28
+		5f773e037df45039ea3e160dbd2c55a7b5f08724
+	Deleted
+		*-Vanadium-branding.patch
+		*-Vanadium-branding-for-WebView.patch
+		*-Vanadium-string-rebranding.patch
+		*-redirect-settings-help-icon.patch
+		*-remove-Google-prefix-from-storage-settings-label.patch
+		*-add-back-trichrome_chrome_apk-targets.patch
+		*-add-trichrome-browser-apk-targets.patch
+		*-update-trichrome_library_apk-expectation-file.patch
+		*-update-dependencies.patch
+		*-Rolling-all-public-GMSCore-libraries.patch
+		*-Clean-up-logic-in-BuildInfo.targetsAtLeastT.patch
+		*-Update-to-Android-T-SDK.patch
+		*-set-original-package-to-org.chromium.chrome.patch
+		*-Support-for-extended-version-name-and-increments.patch
+		*-use-vanadium.app-for-component-updates.patch
+		*-use-grapheneos.network-when-verifying-DNS-over-HTTPS.patch
+		*-Android-U-Add-SDK-34-packages-to-CIPD.patch
+		*-Make-compile_resources-only-use-main-Android-SDK-jar.patch
+		*-Android-U-Deleting-line-in-test-asserting-we-aren-t-.patch
+		*-Android-U-rolling-DEPS-entries-to-start-using-Androi.patch
+		*-Use-GrapheneOS-connectivity-check-as-well-for-Help-a.patch
+
+Source: https://github.com/LineageOS/android_external_chromium-webview_patches
+	Last updated:
+		2023/08/22
+		54a6f96e4439f860bd3509aba8a866d6f9b71a58
+
+Source: https://github.com/uazo/cromite
+	Last updated:
+		2023/10/04
+		82f169f55830f0b010040dbf95e972614a5e1a17

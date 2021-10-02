@@ -1,0 +1,42 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Micay <danielmicay@gmail.com>
+Date: Thu, 10 Dec 2020 10:09:18 -0500
+Subject: [PATCH] disable WebView variations support
+
+---
+ .../com/android/webview/chromium/WebViewChromiumAwInit.java | 6 ------
+ .../webview/chromium/WebViewChromiumFactoryProvider.java    | 4 ----
+ 2 files changed, 10 deletions(-)
+
+diff --git a/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumAwInit.java b/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumAwInit.java
+index 4ad96ad497a8d..238f017a213c2 100644
+--- a/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumAwInit.java
++++ b/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumAwInit.java
+@@ -201,12 +201,6 @@ public class WebViewChromiumAwInit {
+ 
+             AwBrowserProcess.configureChildProcessLauncher();
+ 
+-            // finishVariationsInitLocked() must precede native initialization so the seed is
+-            // available when AwFeatureListCreator::SetUpFieldTrials() runs.
+-            if (!FastVariationsSeedSafeModeAction.hasRun()) {
+-                finishVariationsInitLocked();
+-            }
+-
+             AwBrowserProcess.start();
+             AwBrowserProcess.handleMinidumpsAndSetMetricsConsent(true /* updateMetricsConsent */);
+ 
+diff --git a/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProvider.java b/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProvider.java
+index 3dd72a9fdeb86..96380c4c20140 100644
+--- a/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProvider.java
++++ b/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProvider.java
+@@ -488,10 +488,6 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
+                 }
+             }
+ 
+-            if (!FastVariationsSeedSafeModeAction.hasRun()) {
+-                mAwInit.startVariationsInit();
+-            }
+-
+             mShouldDisableThreadChecking = shouldDisableThreadChecking(ctx);
+ 
+             setSingleton(this);
