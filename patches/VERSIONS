@@ -1,0 +1,16 @@
+Source: https://github.com/GrapheneOS/Vanadium
+	Last updated:
+		2024/11/12
+		3debcd7c6d4417f22d6c0db0deaf02c4c3de638b
+	Deleted
+		see rm-vanadium.sh
+
+Source: https://github.com/LineageOS/android_external_chromium-webview_patches
+	Last updated:
+		2023/08/22
+		54a6f96e4439f860bd3509aba8a866d6f9b71a58
+
+Source: https://github.com/uazo/cromite
+	Last updated:
+		2023/10/04
+		82f169f55830f0b010040dbf95e972614a5e1a17

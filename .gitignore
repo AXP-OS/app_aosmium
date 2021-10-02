@@ -1,0 +1,6 @@
+src/
+depot_tools/
+_gclient*/
+.gclient*
+.cipd/
+.gcs_entries
