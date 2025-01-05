@@ -151,9 +151,9 @@ export -f applyPatch;
 if [ $gsync -eq 1 ]; then
 	#Apply all available patches safely
 	echo "Applying patches"
-	find ../patches/0001-Vanadium/ -name "*.patch" -exec bash -c 'applyPatch "$0"' {} \;;
-	find ../patches/0002-LineageOS/ -name "*.patch" -exec bash -c 'applyPatch "$0"' {} \;;
-	find ../patches/0003-Cromite/ -name "*.patch" -exec bash -c 'applyPatch "$0"' {} \;;
+	find ../patches/0001-Vanadium/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
+	find ../patches/0002-LineageOS/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
+	find ../patches/0003-Cromite/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
 
 	#Icon rebranding
 	echo "Icon rebranding"
