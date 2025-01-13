@@ -5,17 +5,18 @@ set -e
 chromium_version="131.0.6778.260"
 chromium_code="6778260"
 chromium_code_config="2024041800"
-chromium_rebrand_name="Mulch"
+chromium_rebrand_name="AXP.OS"
 chromium_rebrand_color="#7B3F00"
-chromium_packageid_webview="us.spotco.mulch_wv"
-chromium_packageid_standalone="us.spotco.mulch"
-chromium_packageid_libtrichrome="us.spotco.mulch_tcl"
-chromium_packageid_config="us.spotco.mulch_config"
+chromium_packageid_webview="org.axpos.webview_wv"
+chromium_packageid_standalone="org.axpos.webview"
+chromium_packageid_libtrichrome="org.axpos.webview_tcl"
+chromium_packageid_config="org.axpos.webview_config"
 #unzip -p chromium.apk META-INF/[SIGNER].RSA | keytool -printcert | grep "SHA256:" | sed 's/.*SHA256:* //' | sed 's/://g' |  tr '[:upper:]' '[:lower:]'
-chromium_cert_trichrome="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
-chromium_cert_config="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
+#chromium_cert_trichrome="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
+#chromium_cert_config="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
 clean=0
 gsync=0
+pause=0
 supported_archs=(arm arm64 x86 x64)
 
 usage() {
@@ -26,6 +27,7 @@ usage() {
     echo "    -a <arch> Build specified arch"
     echo "    -c Clean"
     echo "    -h Show this message"
+    echo "    -p pause before starting the build"
     echo "    -r <release> Specify chromium release"
     echo "    -s Sync"
     echo
@@ -59,7 +61,7 @@ build() {
     fi
 }
 
-while getopts ":a:chr:s" opt; do
+while getopts ":a:chpr:s" opt; do
     case $opt in
         a) for arch in ${supported_archs[@]}; do
                [ "$OPTARG" '==' "$arch" ] && build_arch="$OPTARG"
@@ -76,6 +78,7 @@ while getopts ":a:chr:s" opt; do
            chromium_version=${version[0]}
            chromium_code=${version[1]}
            ;;
+        p) pause=1 ;;
         s) gsync=1 ;;
         :)
           echo "Option -$OPTARG requires an argument"
@@ -183,6 +186,10 @@ if [ $gsync -eq 1 ]; then
 	#Prepare the filter lists
 	#python vanadium/android_config/filter_lists/filter_list_download.py --output vanadium/android_config/filter_lists/filter_lists.txt --urls https://easylist.to/easylist/easylist.txt https://easylist.to/easylist/easyprivacy.txt https://divested.dev/hosts-domains-wildcards https://filters.adtidy.org/extension/ublock/filters/11.txt https://filters.adtidy.org/extension/ublock/filters/17.txt https://filters.adtidy.org/extension/ublock/filters/18.txt https://filters.adtidy.org/extension/ublock/filters/19.txt https://filters.adtidy.org/extension/ublock/filters/20.txt https://filters.adtidy.org/extension/ublock/filters/21.txt https://filters.adtidy.org/extension/ublock/filters/22.txt https://filters.adtidy.org/extension/ublock/filters/2.txt https://filters.adtidy.org/extension/ublock/filters/3.txt https://filters.adtidy.org/extension/ublock/filters/4.txt https://malware-filter.gitlab.io/phishing-filter/phishing-filter.txt https://malware-filter.gitlab.io/urlhaus-filter/urlhaus-filter-ag-online.txt https://ublockorigin.github.io/uAssets/filters/annoyances-cookies.txt https://ublockorigin.github.io/uAssets/filters/badware.txt https://ublockorigin.github.io/uAssets/filters/filters.txt https://ublockorigin.github.io/uAssets/filters/lan-block.txt https://ublockorigin.github.io/uAssets/filters/privacy.txt https://ublockorigin.github.io/uAssets/filters/quick-fixes.txt https://ublockorigin.github.io/uAssets/filters/unbreak.txt
 	#wc -l vanadium/android_config/filter_lists/filter_lists.txt
+fi
+
+if [ $pause -eq 1 ]; then
+  read -p "Check-point: Press ENTER to start the build or Ctrl+C to abort"
 fi
 
 # Build args
