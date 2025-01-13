@@ -2,8 +2,8 @@
 
 set -e
 
-chromium_version="131.0.6778.200"
-chromium_code="6778200"
+chromium_version="131.0.6778.260"
+chromium_code="6778260"
 chromium_code_config="2024041800"
 chromium_rebrand_name="Mulch"
 chromium_rebrand_color="#7B3F00"

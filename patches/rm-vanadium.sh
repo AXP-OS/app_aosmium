@@ -1,3 +1,4 @@
+#!/bin/bash
 rm -fv *-Vanadium-branding.patch
 rm -fv *-Vanadium-branding-for-WebView.patch
 rm -fv *-Vanadium-string-rebranding.patch
@@ -96,3 +97,4 @@ rm -fv *-Use-fstack-protector-strong-with-shadow-call-stack-w.patch
 rm -fv *-config-Explicitly-declare-queries-to-config-package-.patch
 rm -fv *-add-support-for-german-specific-language-content-fil.patch
 rm -fv *-config-Compile-the-config-holder-app-with-forceQuery.patch
+rm -fv *-Reduce-user-agent-and-client-hints-for-webview.patch
