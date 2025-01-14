@@ -37,7 +37,12 @@ jobs:
 
     - name: Checkout Vanadium
       shell: bash
-      run: git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} vanadium
+      id: vanco
+      run: |
+        git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} vanadium
+        latestVanadium=$(git ls-remote --tags ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
+        webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
+        echo "WV_VER=$WV_VER" >> $GITHUB_ENV
 
     - name: set up JDK
       uses: actions/setup-java@v3
@@ -64,37 +69,13 @@ jobs:
         cd webview
         ./build-webview.sh -V ../vanadium -a arm64
 
-    - name: Store WebViews in repo
+    - name: Push changes and APKs
       shell: bash
       run: |
-        for arch in arm arm64;do
-            WVURI="https://${{vars.LOCAL_ORG_DOMAIN}}:${{vars.LOCAL_ORG_PORT}}/api/v1/repos/${{ github.ref }}/contents/prebuilt%2F${arch}%2Fwebview-unsigned.apk"
-            # check if exists
-            SHA=$(curl -sX 'GET' \
-              "$WVURI" \
-              -H "Authorization: token ${{secrets.LOCAL_TOKEN_REPO_RW}}" \
-              -H 'accept: application/json' \
-              -H 'Content-Type: application/json' | jq -jr .sha || true)
-            echo "sha? >$SHA<"
-            if [ "${#SHA}" -eq 40 ];then
-              PAYLOAD=$(jq -n --arg content "$(base64 prebuilt/$arch/webview-unsigned.apk)" --arg sha "$SHA" '{content: $content, sha: $sha}')
-              # update if it exists
-              RESP=$(curl -sX 'PUT' \
-                "$WVURI" \
-                -H "Authorization: token ${{secrets.LOCAL_TOKEN_REPO_RW}}" \
-                -H 'accept: application/json' \
-                -H 'Content-Type: application/json' \
-                -d "$PAYLOAD")
-              echo "RET1:$?"
-            else
-              # create if not exists
-              RESP=$(curl -sX 'POST' \
-                "$WVURI" \
-                -H "Authorization: token ${{secrets.LOCAL_TOKEN_REPO_RW}}" \
-                -H 'accept: application/json' \
-                -H 'Content-Type: application/json' \
-                -d "$PAYLOAD")
-              echo "RET2:$?"
-            fi
-        done
+        cd webview
+        git add -A
+        git config user.name "gitea-actions[bot]"
+        git config user.email "<sherlock@binbash.rocks>"
+        git commit -m "add ${{ steps.vanco.outputs.WV_VER }}"
+        git push
 
