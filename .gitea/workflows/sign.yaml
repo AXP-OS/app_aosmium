@@ -1,0 +1,118 @@
+#####################################################################################
+# documentation:
+# - https://docs.gitea.com/usage/actions/overview
+# - https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+#####################################################################################
+
+name: Sign APK
+
+on:
+  push:
+    paths:
+      - 'prebuilt/*/webview-unsigned.apk'
+      - push-trigger.txt
+  workflow_dispatch:  # button shown only when in default branch
+
+# NOT implemented in Gitea!
+#permissions:
+#  contents: write # allow creating releases
+
+jobs:
+  build:
+    runs-on: docker-node-latest
+
+    steps:
+
+    - name: Prep container
+      shell: bash
+      run: apt-get update && apt-get -y install git-lfs
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+        lfs: true
+
+    - name: set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '18'
+        distribution: 'temurin'
+
+    - name: Setup Android SDK
+      # https://github.com/android-actions/setup-android
+      uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 12266719
+        packages: "build-tools;35.0.0"
+
+    # https://github.com/r0adkll/sign-android-release/issues/84#issuecomment-1885690080
+    - name: "Get & set app and build variables"
+      shell: bash
+      run: |
+        #see: https://maven.google.com/web/index.html#com.android.tools.build:aapt2
+        wget -q -O aapt.zip https://dl.google.com/android/maven2/com/android/tools/build/aapt2/8.3.2-10880808/aapt2-8.3.2-10880808-linux.jar
+        unzip aapt.zip aapt2 && chmod +x aapt2
+        APPV32=$(./aapt2 dump badging prebuilt/arm/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        APPV64=$(./aapt2 dump badging prebuilt/arm64/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        OVER=v$(date +%Y.%m.%d)
+        
+        [ -z "$APPV32" ] && echo "ERROR: empty APPV32 detected" && exit 3
+        [ -z "$APPV64" ] && echo "ERROR: empty APPV64 detected" && exit 3
+        [ -z "$OVER" ] && echo "ERROR: empty OVER detected" && exit 3
+
+        if [ "$APPV32" != "$APPV64" ];then
+            echo "WARNING: arm/arm64 versions differ ($APPV32/$APPV64) and due to this they will be BOTH set to: >$OVER<"
+            APPV32="$OVER"
+            APPV64="$OVER"
+        else
+            OVER="$APPV64"
+            
+        fi
+
+        echo "APP_VERSION=${OVER}" >> $GITHUB_ENV
+        echo "APP64_VERSION=${APPV64}" >> $GITHUB_ENV
+        echo "APP64_VERSION=${APPV64}" >> $GITHUB_ENV
+        git_sha_short=$(git rev-parse --short "$GITHUB_SHA")
+        echo "git_sha_short=$git_sha_short" >> $GITHUB_ENV
+        echo "APP32 version is: $APPV32 ($git_sha_short)"
+        echo "APP64 version is: $APPV64 ($git_sha_short)"
+
+        mkdir apks        
+        mv prebuilt/arm/web*.apk apks/webview32.apk
+        mv prebuilt/arm64/web*.apk apks/webview64.apk
+
+    # https://github.com/marketplace/actions/sign-android-releases-apk
+    - name: Sign APK
+      id: signAPK
+      uses: NoCrypt/sign-android@main
+      with:
+        releaseDir: apks
+        signingKey: ${{ secrets.APK_SIGNING_KEY_64 }}
+        keyAlias: ${{ secrets.APK_ALIAS }}
+        keyStorePassword: ${{ secrets.APK_KEY_STORE_PASSWORD }}
+        keyPassword: ${{ secrets.APK_KEY_PASSWORD }}
+      env:
+        BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
+
+    - name: Prep release
+      run: |
+        cd apks
+        sha512sum webview32-signed.apk > webview32-signed.apk.sha512
+        sha512sum webview64-signed.apk > webview64-signed.apk.sha512
+
+    - name: Generate release
+      uses: https://gitea.com/actions/gitea-release-action@v1
+      # https://github.com/akkuman/gitea-release-action
+      with:
+        token: "${{ secrets.LOCAL_TOKEN_REPO_RW }}"
+        tag_name: ${{ env.APP_VERSION }}
+        prerelease: false
+        name: "${{ env.APP_VERSION }}"
+        #body:
+        files: |
+            ${{ steps.signAPK.outputs.signedFile0 }}
+            ${{ steps.signAPK.outputs.signedFile0 }}.sha512
+            ${{ steps.signAPK.outputs.signedFile1 }}
+            ${{ steps.signAPK.outputs.signedFile1 }}.sha512
+
+
