@@ -2,14 +2,13 @@
 
 Mulch
 =====
-The DivestOS WebView
+The [AXP.OS](https://axpos.org/) WebView
 
 Use
 ---
 - This repository contains the compile scripts, patches, and prebuilt WebView providers
 - The WebView here is not meant to be used as is, but compiled into an OS
-- Standalone versions of Mulch for all systems are available here: https://divestos.org/pages/our_apps#mulch
-- Can be updated out of band via F-Droid repo: https://divestos.org/pages/our_apps#repos
+- Standalone versions of Mulch might be build as well
 - Integration configs:
     - Bare: https://gitlab.com/divested-mobile/divestos-build/-/blob/master/Patches/Common/config_webview_packages.xml
     - With signature: https://gitlab.com/divested-mobile/divestos-build/-/blob/dc853bfdaecc73a273de252cf555c9a3b6a38864/Patches/Common/config_webview_packages.xml
@@ -22,12 +21,12 @@ Goals
 
 Notes
 -----
-- This repo will only keep one version at a time
-- This repo will be reinitialized often
-- x86 and x86_64 will track from LineageOS due to excessive compile times
+- x86 and x86_64 will not be provided
 
 Credits
 -------
+- Tad / DivestOS who puts an incredible amount of work into creating, building and maintaining Mulch until Dec 2024
+    - Upstream: https://gitlab.com/divested-mobile/mulch
 - Nearly all of the patches are from GrapheneOS's Vanadium browser
     - License: GPL-2.0-only with exceptions
     - Upstream: https://github.com/GrapheneOS/Vanadium
