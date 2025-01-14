@@ -24,8 +24,8 @@ jobs:
     runs-on: docker-node-latest
     container:
       volumes:
-        - /home/androidsource/do-not-touch/webview_mulch:/webview
-        - /home/androidsource/do-not-touch/vanadium:/vanadium
+        - ${{ vars.WEBVIEW_LOCAL_PATH }}:/workspace/AXP.OS/webview_mulch/webview
+        - ${{ vars.VANADIUM_LOCAL_PATH }}:/workspace/AXP.OS/webview_mulch/vanadium
     steps:
 
     - name: Prep container
