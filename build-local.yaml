@@ -1,0 +1,83 @@
+#####################################################################################
+# documentation:
+# - https://docs.gitea.com/usage/actions/overview
+# - https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+#####################################################################################
+
+name: Build WebView
+
+on:
+  push:
+    branches:
+      - ci
+#    paths:
+#      - 'prebuilt/*/webview-unsigned.apk'
+#      - push-trigger.txt
+  workflow_dispatch:  # button shown only when in default branch
+
+# NOT implemented in Gitea!
+#permissions:
+#  contents: write # allow creating releases
+
+jobs:
+  build:
+    runs-on: sfxdevsrv
+
+    steps:
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+        lfs: true
+        path: ${{ vars.WEBVIEW_LOCAL_PATH }}
+
+    - name: Checkout Vanadium
+      shell: bash
+      id: vanco
+      run: |
+        if [ ! -d "${{ vars.VANADIUM_LOCAL_PATH }}" ];then
+           git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} ${{ vars.VANADIUM_LOCAL_PATH }}
+        else
+           cd ${{ vars.VANADIUM_LOCAL_PATH }}
+           git add -A
+           git reset --hard
+        fi
+        latestVanadium=$(git ls-remote --tags ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
+        webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
+        echo "WV_VER=$WV_VER" >> $GITHUB_ENV        
+
+#    - name: set up JDK
+#      uses: actions/setup-java@v3
+#      with:
+#        java-version: '18'
+#        distribution: 'temurin'
+
+    - name: Setup Android SDK
+      # https://github.com/android-actions/setup-android
+      uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 12266719
+        packages: "build-tools;35.0.0"
+
+    - name: "Build WebView32"
+      shell: bash
+      run: |
+        cd ${{ vars.WEBVIEW_LOCAL_PATH }}
+        ./build-webview.sh -V ${{ vars.VANADIUM_LOCAL_PATH }} -a arm
+
+    - name: "Build WebView64"
+      shell: bash
+      run: |
+        cd ${{ vars.WEBVIEW_LOCAL_PATH }}
+        ./build-webview.sh -V ${{ vars.VANADIUM_LOCAL_PATH }}" -a arm64
+
+    - name: Push changes and APKs
+      shell: bash
+      run: |
+        cd ${{ vars.WEBVIEW_LOCAL_PATH }}
+        git add -A
+        git config user.name "gitea-actions[bot]"
+        git config user.email "<sherlock@binbash.rocks>"
+        git commit -m "add ${{ steps.vanco.outputs.WV_VER }}"
+        git push        
+
