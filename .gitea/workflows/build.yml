@@ -35,11 +35,9 @@ jobs:
         lfs: true
         path: webview
 
-    - uses: actions/checkout@v4
-      with:
-        github-server-url: ${{ vars.VANADIUM_REPO_SERVER }}
-        repository: ${{ vars.VANADIUM_REPO_NAME }}
-        path: vanadium
+    - name: Checkout Vanadium
+      shell: bash
+      run: git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} vanadium
 
     - name: set up JDK
       uses: actions/setup-java@v3
