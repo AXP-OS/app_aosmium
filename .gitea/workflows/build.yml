@@ -68,7 +68,7 @@ jobs:
         cd webview
         ./build-webview.sh -V ../vanadium -a arm64
 
-    - name: Store WebViews in LFS
+    - name: Store WebViews in repo
       shell: bash
       run: |
         for arch in arm arm64;do
