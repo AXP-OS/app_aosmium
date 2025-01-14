@@ -7,9 +7,9 @@
 name: Build WebView
 
 on:
-  #push:
-  #  branches:
-  #    - ci
+  push:
+    branches:
+      - ci
 #    paths:
 #      - 'prebuilt/*/webview-unsigned.apk'
 #      - push-trigger.txt
@@ -22,7 +22,10 @@ on:
 jobs:
   build:
     runs-on: docker-node-latest
-
+    container:
+      volumes:
+        - ${{ vars.WEBVIEW_LOCAL_PATH }}:webview
+        - ${{ vars.VANADIUM_LOCAL_PATH }}:vanadium
     steps:
 
     - name: Prep container
@@ -39,7 +42,13 @@ jobs:
       shell: bash
       id: vanco
       run: |
-        git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} vanadium
+        if [ ! -d "vanadium/.git" ];then 
+           git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} vanadium
+        else
+           cd vanadium
+           git add -A git reset --hard
+        fi
+
         latestVanadium=$(git ls-remote --tags ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
         webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
         echo "WV_VER=$WV_VER" >> $GITHUB_ENV
