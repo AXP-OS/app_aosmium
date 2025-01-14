@@ -7,9 +7,9 @@
 name: Build WebView
 
 on:
-  push:
-    branches:
-      - ci
+  #push:
+  #  branches:
+  #    - ci
 #    paths:
 #      - 'prebuilt/*/webview-unsigned.apk'
 #      - push-trigger.txt
