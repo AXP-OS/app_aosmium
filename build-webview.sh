@@ -2,8 +2,15 @@
 
 set -e
 
-chromium_version="131.0.6778.260"
-chromium_code="6778260"
+# grab latest published Vanadium tag
+latestVanadium=$(git ls-remote --tags https://github.com/GrapheneOS/Vanadium.git "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
+relatedChromium=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
+relatedChromiumCode=$(echo "${relatedChromium}" | cut -d '.' -f 3-4 | tr -d '.')
+
+# set version based on Vanadium
+chromium_version="$latestVanadium"
+chromium_code="$latestVanadiumCode"
+
 chromium_code_config="2024041800"
 chromium_rebrand_name="AXP.OS"
 chromium_rebrand_color="#7B3F00"
@@ -30,6 +37,7 @@ usage() {
     echo "    -p pause before starting the build"
     echo "    -r <release> Specify chromium release"
     echo "    -s Sync"
+    echo "    -V <path> to vanadium directory"
     echo
     echo "  Example:"
     echo "    build_webview -c -s -r $chromium_version:$chromium_code"
@@ -61,7 +69,20 @@ build() {
     fi
 }
 
-while getopts ":a:chpr:s" opt; do
+copy_vanadium_patches(){
+    cpwd="$PWD"
+    cd $vanadiumPath
+    git checkout $latestVanadium
+    git fetch --all
+    if [ -d "$cpwd/patches/0001-Vanadium/" ];then rm -r "$cpwd/patches/0001-Vanadium/";fi
+    mkdir $cpwd/patches/0001-Vanadium/
+    cp patches/* $cpwd/patches/0001-Vanadium/
+    cd $cpwd/patches/0001-Vanadium/
+    bash ../rm-vanadium.sh
+    cd $cpwd
+}
+
+while getopts ":a:chpr:sV:" opt; do
     case $opt in
         a) for arch in ${supported_archs[@]}; do
                [ "$OPTARG" '==' "$arch" ] && build_arch="$OPTARG"
@@ -90,6 +111,10 @@ while getopts ":a:chpr:s" opt; do
           echo
           usage
           ;;
+	V)
+	  vanadiumPath="$OPTARG"
+	  [ ! -d "$vanadiumPath" ] && echo -e "ERROR: cannot find specified path >$vanadiumPath< !\nDo you have cloned Vanadium?" && exit 4
+	  ;;
     esac
 done
 shift $((OPTIND-1))
@@ -99,6 +124,8 @@ if [ ! -d depot_tools ]; then
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 fi
 export PATH="$(pwd -P)/depot_tools:$PATH"
+
+copy_vanadium_patches
 
 if [ ! -d src ]; then
     echo "Initial source download"

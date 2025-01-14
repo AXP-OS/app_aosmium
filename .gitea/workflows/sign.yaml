@@ -100,15 +100,14 @@ jobs:
         sha512sum webview32-signed.apk > webview32-signed.apk.sha512
         sha512sum webview64-signed.apk > webview64-signed.apk.sha512
 
-    - name: Generate release
+    - name: Generate pre-release
       uses: https://gitea.com/actions/gitea-release-action@v1
       # https://github.com/akkuman/gitea-release-action
       with:
         token: "${{ secrets.LOCAL_TOKEN_REPO_RW }}"
         tag_name: ${{ env.APP_VERSION }}
-        prerelease: false
-        name: "${{ env.APP_VERSION }}"
-        #body:
+        prerelease: true
+        name: "!UNTESTED PRE-RELEASE! ${{ env.APP_VERSION }}"
         files: |
             ${{ steps.signAPK.outputs.signedFile0 }}
             ${{ steps.signAPK.outputs.signedFile0 }}.sha512

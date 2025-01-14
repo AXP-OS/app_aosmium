@@ -4,3 +4,4 @@ _gclient*/
 .gclient*
 .cipd/
 .gcs_entries
+old_src*
