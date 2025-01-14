@@ -33,13 +33,13 @@ jobs:
       with:
         submodules: true
         lfs: true
-	path: webview
+        path: webview
 
     - uses: actions/checkout@v4
       with:
         submodules: true
         lfs: true
-	repository: ${{ vars.VANADIUM_REPO_URL }}
+        repository: ${{ vars.VANADIUM_REPO_URL }}
         path: vanadium
 
     - name: set up JDK
@@ -58,7 +58,7 @@ jobs:
     - name: "Build WebView32"
       shell: bash
       run: |
-	cd webview
+        cd webview
         ./build-webview.sh -V ../vanadium -a arm
 
     - name: "Build WebView64"
@@ -70,34 +70,34 @@ jobs:
     - name: Store WebViews in LFS
       shell: bash
       run: |
-	for arch in arm arm64;do
-	  WVURI="https://${{vars.LOCAL_ORG_DOMAIN}}:${{vars.LOCAL_ORG_PORT}}/api/v1/repos/${{ github.ref }}/contents/prebuilt%2F${arch}%2Fwebview-unsigned.apk"
-          # check if exists
-          SHA=$(curl -sX 'GET' \
-            "$WVURI" \
-            -H "Authorization: token ${{secrets.LOCAL_TOKEN_REPO_RW}}" \
-            -H 'accept: application/json' \
-            -H 'Content-Type: application/json' | jq -jr .sha || true)
-          echo "sha? >$SHA<"
-          if [ "${#SHA}" -eq 40 ];then
-            PAYLOAD=$(jq -n --arg content "$(base64 prebuilt/$arch/webview-unsigned.apk)" --arg sha "$SHA" '{content: $content, sha: $sha}')
-            # update if it exists
-            RESP=$(curl -sX 'PUT' \
-	      "$WVURI" \
+        for arch in arm arm64;do
+            WVURI="https://${{vars.LOCAL_ORG_DOMAIN}}:${{vars.LOCAL_ORG_PORT}}/api/v1/repos/${{ github.ref }}/contents/prebuilt%2F${arch}%2Fwebview-unsigned.apk"
+            # check if exists
+            SHA=$(curl -sX 'GET' \
+              "$WVURI" \
               -H "Authorization: token ${{secrets.LOCAL_TOKEN_REPO_RW}}" \
               -H 'accept: application/json' \
-              -H 'Content-Type: application/json' \
-              -d "$PAYLOAD")
-            echo "RET1:$?"
-          else
-            # create if not exists
-            RESP=$(curl -sX 'POST' \
-	      "$WVURI" \
-              -H "Authorization: token ${{secrets.LOCAL_TOKEN_REPO_RW}}" \
-              -H 'accept: application/json' \
-              -H 'Content-Type: application/json' \
-              -d "$PAYLOAD")
-            echo "RET2:$?"
-          fi
-	done
+              -H 'Content-Type: application/json' | jq -jr .sha || true)
+            echo "sha? >$SHA<"
+            if [ "${#SHA}" -eq 40 ];then
+              PAYLOAD=$(jq -n --arg content "$(base64 prebuilt/$arch/webview-unsigned.apk)" --arg sha "$SHA" '{content: $content, sha: $sha}')
+              # update if it exists
+              RESP=$(curl -sX 'PUT' \
+                "$WVURI" \
+                -H "Authorization: token ${{secrets.LOCAL_TOKEN_REPO_RW}}" \
+                -H 'accept: application/json' \
+                -H 'Content-Type: application/json' \
+                -d "$PAYLOAD")
+              echo "RET1:$?"
+            else
+              # create if not exists
+              RESP=$(curl -sX 'POST' \
+                "$WVURI" \
+                -H "Authorization: token ${{secrets.LOCAL_TOKEN_REPO_RW}}" \
+                -H 'accept: application/json' \
+                -H 'Content-Type: application/json' \
+                -d "$PAYLOAD")
+              echo "RET2:$?"
+            fi
+        done
 
