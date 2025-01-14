@@ -39,7 +39,8 @@ jobs:
       with:
         submodules: true
         lfs: true
-        repository: ${{ vars.VANADIUM_REPO_URL }}
+        github-server-url: ${{ vars.VANADIUM_REPO_SERVER }}
+        repository: ${{ vars.VANADIUM_REPO_NAME }}
         path: vanadium
 
     - name: set up JDK
