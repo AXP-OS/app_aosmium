@@ -37,8 +37,6 @@ jobs:
 
     - uses: actions/checkout@v4
       with:
-        submodules: true
-        lfs: true
         github-server-url: ${{ vars.VANADIUM_REPO_SERVER }}
         repository: ${{ vars.VANADIUM_REPO_NAME }}
         path: vanadium
