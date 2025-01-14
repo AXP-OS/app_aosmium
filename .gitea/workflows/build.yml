@@ -24,8 +24,8 @@ jobs:
     runs-on: docker-node-latest
     container:
       volumes:
-        - /home/androidsource/do-not-touch/webview_mulch:./webview
-        - /home/androidsource/do-not-touch/vanadium:./vanadium
+        - /home/androidsource/do-not-touch/webview_mulch:/webview
+        - /home/androidsource/do-not-touch/vanadium:/vanadium
     steps:
 
     - name: Prep container
