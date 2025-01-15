@@ -7,6 +7,9 @@ latestVanadium=$(git ls-remote --tags https://github.com/GrapheneOS/Vanadium.git
 relatedChromium=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
 relatedChromiumCode=$(echo "${relatedChromium}" | cut -d '.' -f 3-4 | tr -d '.')
 
+echo "Latest available Vanadium version: $latestVanadium"
+echo "Related Chromium version: $relatedChromium"
+
 # set version based on Vanadium
 chromium_version="$latestVanadium"
 chromium_code="$latestVanadiumCode"
