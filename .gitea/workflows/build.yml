@@ -32,22 +32,31 @@ jobs:
       shell: bash
       run: apt-get update && apt-get -y install git-lfs
 
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
-        lfs: true
-        path: webview
-
-    - name: Checkout Vanadium
+    - name: Checkout WebView repos
       shell: bash
       id: vanco
       run: |
+        if [ ! -d "webview/.git" ];then 
+            git clone ${{ github.server_url }}/${{ github.repository }} webview
+            git lfs pull
+        else
+          cd webview
+          git add -A
+          git reset --hard
+          git pull --rebase
+          cd ..
+        fi
+        echo "webview commit: $(git log -1)"
+
         if [ ! -d "vanadium/.git" ];then 
            git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} vanadium
         else
            cd vanadium
-           git add -A git reset --hard
+           git add -A
+           git reset --hard
+           cd ..
         fi
+        echo "vanadium commit: $(git log -1)"
 
         latestVanadium=$(git ls-remote --tags ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
         webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
