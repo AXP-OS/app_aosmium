@@ -51,11 +51,13 @@ jobs:
           cd vanadium
           git add -A
           git reset --hard
+          git fetch --all
           echo "vanadium commit: $(git log -1)"
           cd ..
         fi
-
-        latestVanadium=$(git ls-remote --tags ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
+        
+        cd vanadium
+        latestVanadium=$(git tag | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
         webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
         echo "WV_VER=$WV_VER" >> $GITHUB_ENV
 
@@ -76,13 +78,13 @@ jobs:
       shell: bash
       run: |
         cd webview
-        ./build-webview.sh -V ../vanadium -a arm
+        ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm
 
     - name: "Build WebView64"
       shell: bash
       run: |
         cd webview
-        ./build-webview.sh -V ../vanadium -a arm64
+        ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm64
 
     - name: Push changes and APKs
       shell: bash
