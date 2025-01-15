@@ -35,20 +35,15 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
+        clean: false  # avoid deleting chromium sources on later runs
+        fetch-depth: 1
         lfs: true
         path: webview
-
-    - name: Prep container
-      shell: bash
-      run: |
-        ls -la 
-        exit 123
 
     - name: Checkout WebView repos
       shell: bash
       id: vanco
       run: |
-        find ${{ github.workspace }}/vanadium -maxdepth 2 -type d
         if [ ! -d "${{ github.workspace }}/vanadium/.git" ];then
           echo "Cloning Vanadium as ${{ github.workspace }}/vanadium is not a repo"
           git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} ${{ github.workspace }}/vanadium
