@@ -31,7 +31,7 @@ jobs:
 
     - name: Prep container
       shell: bash
-      run: apt-get update && apt-get -y install git-lfs
+      run: apt-get update && apt-get -y install git-lfs curl lsb-release python3 file gperf
 
     - uses: actions/checkout@v4
       with:
@@ -75,6 +75,10 @@ jobs:
       with:
         cmdline-tools-version: 12266719
         packages: "build-tools;35.0.0"
+
+    - name: "Install build dependencies"
+      shell: bash
+      run: cd webview/src && ./build/install-build-deps.sh
 
     - name: "Build WebView32"
       shell: bash
