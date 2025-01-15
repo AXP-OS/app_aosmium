@@ -30,7 +30,11 @@ jobs:
 
     - name: Prep container
       shell: bash
-      run: apt-get update && apt-get -y install git-lfs
+      run: |
+        ls -la
+        exit 123
+        
+        apt-get update && apt-get -y install git-lfs
 
     - uses: actions/checkout@v4
       with:
