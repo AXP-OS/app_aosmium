@@ -23,6 +23,7 @@ jobs:
   build:
     runs-on: docker-node-latest
     container:
+      options: --user root  # we need all privileges within the container
       volumes:
         - /home/androidsource/do-not-touch/webview_mulch:/workspace/AXP.OS/webview_mulch/webview
         - /home/androidsource/do-not-touch/vanadium:/workspace/AXP.OS/webview_mulch/vanadium
