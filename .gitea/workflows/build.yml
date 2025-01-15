@@ -40,6 +40,7 @@ jobs:
             git clone ${{ github.server_url }}/${{ github.repository }} webview
             git lfs pull
         else
+          git config --global --add safe.directory${{ github.workspace }}/webview
           cd webview
           git add -A
           git reset --hard
@@ -51,10 +52,11 @@ jobs:
         if [ ! -d "vanadium/.git" ];then 
            git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} vanadium
         else
-           cd vanadium
-           git add -A
-           git reset --hard
-           cd ..
+          git config --global --add safe.directory ${{ github.workspace }}/vanadium
+          cd vanadium
+          git add -A
+          git reset --hard
+          cd ..
         fi
         echo "vanadium commit: $(git log -1)"
 
