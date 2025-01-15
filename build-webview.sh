@@ -148,6 +148,10 @@ if [ $gsync -eq 1 ]; then
     find src -name index.lock -delete
     yes | gclient sync -D -R -f -r $chromium_version
 fi
+
+# fix permission denied errors:
+find src/ -type d -name bin -exec chmod -R +x {} \;
+
 cd src
 
 applyPatchReal() {
