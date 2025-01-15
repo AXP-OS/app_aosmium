@@ -31,7 +31,7 @@ jobs:
     - name: Prep container
       shell: bash
       run: |
-        ls -la
+        ls -la webview
         exit 123
         
         apt-get update && apt-get -y install git-lfs
