@@ -30,17 +30,19 @@ jobs:
 
     - name: Prep container
       shell: bash
-      run: |
-        ls -la webview
-        exit 123
-        
-        apt-get update && apt-get -y install git-lfs
+      run: apt-get update && apt-get -y install git-lfs
 
     - uses: actions/checkout@v4
       with:
         submodules: true
         lfs: true
         path: webview
+
+    - name: Prep container
+      shell: bash
+      run: |
+        ls -la 
+        exit 123
 
     - name: Checkout WebView repos
       shell: bash
