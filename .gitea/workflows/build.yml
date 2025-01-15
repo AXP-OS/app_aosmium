@@ -80,13 +80,13 @@ jobs:
       shell: bash
       run: |
         cd webview
-        sudo ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm
+        ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm
 
     - name: "Build WebView64"
       shell: bash
       run: |
         cd webview
-        sudo ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm64
+        ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm64
 
     - name: Push changes and APKs
       shell: bash
