@@ -1,5 +1,12 @@
 #!/bin/bash
-
+#########################################################################################
+#
+# Helper script for fetching, patching and building the AXP.OS WebView (fka Mulch)
+#
+# Copyright (c) 2020-2024 Divested Computing Group
+# Copyright (c) 2025 AXP.OS <steadfasterX |AT| binbash #DOT# rocks>
+#
+#########################################################################################
 set -e
 
 # grab latest published Vanadium tag
@@ -75,8 +82,8 @@ build() {
 copy_vanadium_patches(){
     cpwd="$PWD"
     cd $vanadiumPath
-    git checkout $latestVanadium
     git fetch --all
+    #git checkout $latestVanadium
     if [ -d "$cpwd/patches/0001-Vanadium/" ];then rm -r "$cpwd/patches/0001-Vanadium/";fi
     mkdir $cpwd/patches/0001-Vanadium/
     cp patches/* $cpwd/patches/0001-Vanadium/
