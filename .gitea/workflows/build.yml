@@ -78,7 +78,7 @@ jobs:
 
     - name: "Install build dependencies"
       shell: bash
-      run: cd webview/src && ./build/install-build-deps.sh
+      run: cd webview/src && ./build/install-build-deps.sh --no-prompt
 
     - name: "Build WebView32"
       shell: bash
