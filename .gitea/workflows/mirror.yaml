@@ -8,8 +8,6 @@ name: "Mirror repo to ${{ vars.MIRROR_ORG_NAME }}"
 run-name: Initiated by ${{ gitea.actor }}
 on:
   push:
-    branches:
-      - main
   workflow_dispatch:  # button shown only when in default branch
 
 jobs:
