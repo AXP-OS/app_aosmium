@@ -1,7 +1,7 @@
 # this file will be sourced by the ci/cd workflow and allows to overwrite the defaults in the build script
 
 # increase the following counter for just triggering a build with default options:
-trigger=8
+trigger=9
 
 # overwrite Vanadium version to be used. if unset or empty the latest available will be used
 # must be a valid tag (e.g. "132.0.6834.79.1")
