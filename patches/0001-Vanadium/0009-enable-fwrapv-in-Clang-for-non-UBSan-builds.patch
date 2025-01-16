@@ -8,10 +8,10 @@ Subject: [PATCH] enable -fwrapv in Clang for non-UBSan builds
  1 file changed, 4 insertions(+)
 
 diff --git a/build/config/compiler/BUILD.gn b/build/config/compiler/BUILD.gn
-index 779334a0338ab..e65366f547e44 100644
+index 3029bbb1101df..345faddef7534 100644
 --- a/build/config/compiler/BUILD.gn
 +++ b/build/config/compiler/BUILD.gn
-@@ -383,6 +383,10 @@ config("compiler") {
+@@ -388,6 +388,10 @@ config("compiler") {
        }
      }
  
