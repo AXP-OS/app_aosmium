@@ -75,7 +75,7 @@ build() {
     ninja -C out/$1 system_webview_apk chrome_public_apk # vanadium_config_apk
     if [ "$?" -eq 0 ]; then
         [ "$1" '==' "x64" ] && android_arch="x86_64" || android_arch=$1
-        cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview.apk
+        cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
     fi
 }
 
