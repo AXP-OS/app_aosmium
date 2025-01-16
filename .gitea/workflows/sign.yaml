@@ -101,13 +101,13 @@ jobs:
         echo "SHA32=$(cat webview32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_ENV
         echo "SHA64=$(cat webview64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_ENV
 
-    - name: Generate pre-release
+    - name: Generate pre-release on mirror
       uses: https://gitea.com/actions/gitea-release-action@v1
-      # https://github.com/akkuman/gitea-release-action
       with:
-        token: "${{ secrets.LOCAL_TOKEN_REPO_RW }}"
+        token: "${{ secrets.MIRROR_TOKEN_REPO_RW }}"
         tag_name: ${{ env.APP_VERSION }}
         prerelease: true
+        server_url: ${{ vars.MIRROR_ORG_DOMAIN }}
         name: "!UNTESTED PRE-RELEASE! ${{ env.APP_VERSION }}"
         body: |
           # The AXP.OS WebView
@@ -123,5 +123,28 @@ jobs:
             ${{ steps.signAPK.outputs.signedFile0 }}.sha512
             ${{ steps.signAPK.outputs.signedFile1 }}
             ${{ steps.signAPK.outputs.signedFile1 }}.sha512
+
+#    - name: Generate pre-release
+#      uses: https://gitea.com/actions/gitea-release-action@v1
+#      # https://github.com/akkuman/gitea-release-action
+#      with:
+#        token: "${{ secrets.LOCAL_TOKEN_REPO_RW }}"
+#        tag_name: ${{ env.APP_VERSION }}
+#        prerelease: true
+#        name: "!UNTESTED PRE-RELEASE! ${{ env.APP_VERSION }}"
+#        body: |
+#          # The AXP.OS WebView
+#
+#          |APK|sha512|
+#          |-|-|
+#          |webview32-signed.apk|${{ env.SHA32 }}|
+#          |webview64-signed.apk|${{ env.SHA64 }}|
+#
+#          [Signature](${{ vars.SIGNATURE_LINK }})
+#        files: |
+#            ${{ steps.signAPK.outputs.signedFile0 }}
+#            ${{ steps.signAPK.outputs.signedFile0 }}.sha512
+#            ${{ steps.signAPK.outputs.signedFile1 }}
+#            ${{ steps.signAPK.outputs.signedFile1 }}.sha512
 
 
