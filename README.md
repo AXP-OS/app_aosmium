@@ -7,9 +7,9 @@ The [AXP.OS](https://axpos.org/) WebView
 - This repository contains the compile scripts, patches, and prebuilt WebView providers
 - The WebView here is not meant to be used as is, but compiled into an OS
 - Standalone versions might be build as well
-- Integration configs:
-    - Bare: https://gitlab.com/divested-mobile/divestos-build/-/blob/master/Patches/Common/config_webview_packages.xml
-    - With signature: https://gitlab.com/divested-mobile/divestos-build/-/blob/dc853bfdaecc73a273de252cf555c9a3b6a38864/Patches/Common/config_webview_packages.xml
+- Integration config:
+    - easily by using [EXTENDROM](https://github.com/sfX-android/android_vendor_extendrom) (`EXTENDROM_PACKAGES="AXP.OS_WebView64"` or `"AXP.OS_WebView32"`)
+    - manually by adding [its signature](https://github.com/sfX-android/android_vendor_extendrom/blob/main/extra/webview_axp.os.sig.xml) to your overlay of `frameworks/base/core/res/res/xml/config_webview_packages.xml`
 
 ## Automation
 
