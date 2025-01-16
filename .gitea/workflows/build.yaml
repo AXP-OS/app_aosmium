@@ -42,6 +42,9 @@ jobs:
       shell: bash
       id: vanco
       run: |
+        git config --global user.name "gitea-actions[bot]"
+        git config --global user.email "<sherlock@binbash.rocks>"
+
         if [ ! -d "${{ github.workspace }}/vanadium/.git" ];then
           echo "Cloning Vanadium as ${{ github.workspace }}/vanadium is not a repo"
           git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} ${{ github.workspace }}/vanadium
@@ -59,10 +62,6 @@ jobs:
         latestVanadium=$(git tag | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
         webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
         echo "WV_VER=$webview_ver" >> $GITHUB_ENV
-
-        cd ../webview
-        git config user.name "gitea-actions[bot]"
-        git config user.email "<sherlock@binbash.rocks>"
 
     - name: set up JDK
       uses: actions/setup-java@v3
