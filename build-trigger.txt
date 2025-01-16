@@ -8,8 +8,8 @@ trigger=1
 #vanadium_version=""
 
 # by default the out/ directory will not be removed. if you want a clean build set this to 1
-#clean=1
+clean=1
 
 # sync the sources and apply patches?
 # should be set with the above clean var to 1
-#gsync=1
+gsync=1
