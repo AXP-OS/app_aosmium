@@ -108,6 +108,7 @@ jobs:
         tag_name: ${{ env.APP_VERSION }}
         prerelease: true
         server_url: ${{ vars.MIRROR_ORG_DOMAIN }}
+        repository: ${{ vars.MIRROR_ORG_NAME }}/${{ github.event.repository.name }}
         name: "!UNTESTED PRE-RELEASE! ${{ env.APP_VERSION }}"
         body: |
           # The AXP.OS WebView
