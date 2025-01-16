@@ -21,18 +21,18 @@ CI/CD has been implemented in 2 workflows:
 ### Building
 
 _Building_ will be triggered when:
-- `build-trigger.txt` changes
+- `trigger-build.txt` changes
 
-[build-trigger.txt](build-trigger.txt) can be used as a workflow trigger only but also to _configure_ the build process itself (see the inline comments).
+[trigger-build.txt](trigger-build.txt) can be used as a workflow trigger only but also to _configure_ the build process itself (see the inline comments).
 
 ### Signing + Release
 
 _Signing_ will be triggered when:
 - `prebuilt/*/webview-unsigned.apk` changes
-- `sign-trigger.txt` changes
+- `trigger-release.txt` changes
 - a _build_ finished (as that will change the apk's)
 
-increasing the counter in [sign-trigger.txt](sign-trigger.txt) is usually **not** needed (as it runs anyways on apk pushes and one can trigger a workflow manually within the actions tab) but kept as an alternative method to force the signing + release process.
+increasing the counter in [trigger-release.txt](trigger-release.txt) is usually **not** needed (as it runs anyways on apk pushes and one can trigger a workflow manually within the actions tab) but kept as an alternative method to force the signing + release process.
 
 Notes:
 1. Releases will be set to **pre-release** as every build needs to be (mannually) tested first
