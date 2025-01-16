@@ -104,7 +104,7 @@ jobs:
     - name: Generate pre-release on MIRROR
       uses: https://gitea.com/actions/gitea-release-action@v1
       with:
-        token: "token ${{ secrets.MIRROR_TOKEN_REPO_RW }}"
+        token: "${{ secrets.MIRROR_TOKEN_REPO_RW }}"
         tag_name: ${{ env.APP_VERSION }}
         prerelease: true
         server_url: https://${{ vars.MIRROR_ORG_DOMAIN }}
