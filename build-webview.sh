@@ -41,6 +41,7 @@ clean=${clean:-0}
 gsync=${gsync:-0}
 pause=0
 supported_archs=(arm arm64 x86 x64)
+build_targets=${build_targets:-system_webview_apk}
 
 usage() {
     echo "Usage:"
@@ -78,7 +79,7 @@ build() {
     build_args+=' android_default_version_code="'$code'"'
 
     gn gen "out/$1" --args="$build_args"
-    ninja -C out/$1 system_webview_apk chrome_public_apk # vanadium_config_apk
+    ninja -C out/$1 $build_targets
     if [ "$?" -eq 0 ]; then
         [ "$1" '==' "x64" ] && android_arch="x86_64" || android_arch=$1
         cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
