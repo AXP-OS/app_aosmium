@@ -101,13 +101,13 @@ jobs:
         echo "SHA32=$(cat webview32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_ENV
         echo "SHA64=$(cat webview64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_ENV
 
-    - name: Generate pre-release on mirror
+    - name: Generate pre-release on MIRROR
       uses: https://gitea.com/actions/gitea-release-action@v1
       with:
         token: "${{ secrets.MIRROR_TOKEN_REPO_RW }}"
         tag_name: ${{ env.APP_VERSION }}
         prerelease: true
-        server_url: ${{ vars.MIRROR_ORG_DOMAIN }}
+        server_url: https://${{ vars.MIRROR_ORG_DOMAIN }}
         repository: ${{ vars.MIRROR_ORG_NAME }}/${{ github.event.repository.name }}
         name: "!UNTESTED PRE-RELEASE! ${{ env.APP_VERSION }}"
         body: |
