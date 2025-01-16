@@ -9,7 +9,7 @@ name: Build WebView
 on:
   push:
     paths:
-      - build-trigger.txt
+      - trigger-build.txt
   workflow_dispatch:  # button shown only when in default branch
 
 # NOT implemented in Gitea!
@@ -58,7 +58,7 @@ jobs:
         cd vanadium
         latestVanadium=$(git tag | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
         webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
-        echo "WV_VER=$WV_VER" >> $GITHUB_ENV
+        echo "WV_VER=$webview_ver" >> $GITHUB_ENV
 
     - name: set up JDK
       uses: actions/setup-java@v3
@@ -81,19 +81,22 @@ jobs:
       shell: bash
       run: |
         cd webview
-        source build-trigger.txt
+        source trigger-build.txt
         ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm
 
     - name: "Build WebView64"
       shell: bash
       run: |
         cd webview
-        source build-trigger.txt
+        source trigger-build.txt
         ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm64
 
     - name: Push changes and APKs
       shell: bash
       run: |
+        source trigger-build.txt
+        [ -z "${{ env.WV_VER }}" ] && echo "version var empty" && exit 3
+        [ "$skip_push" == "true" ] && echo "skipping repo push" && exit 0
         cd webview
         git add -A
         git config user.name "gitea-actions[bot]"
