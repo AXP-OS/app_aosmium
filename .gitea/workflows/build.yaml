@@ -98,6 +98,6 @@ jobs:
         git add -A
         git config user.name "gitea-actions[bot]"
         git config user.email "<sherlock@binbash.rocks>"
-        git commit -m "add ${{ steps.vanco.outputs.WV_VER }}"
+        git commit -m "add ${{ env.WV_VER }}"
         git push
 
