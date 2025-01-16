@@ -81,12 +81,14 @@ jobs:
       shell: bash
       run: |
         cd webview
+        source build-trigger.txt
         ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm
 
     - name: "Build WebView64"
       shell: bash
       run: |
         cd webview
+        source build-trigger.txt
         ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm64
 
     - name: Push changes and APKs
