@@ -60,6 +60,10 @@ jobs:
         webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
         echo "WV_VER=$webview_ver" >> $GITHUB_ENV
 
+        cd ../webview
+        git config user.name "gitea-actions[bot]"
+        git config user.email "<sherlock@binbash.rocks>"
+
     - name: set up JDK
       uses: actions/setup-java@v3
       with:
@@ -80,8 +84,6 @@ jobs:
     - name: "Build WebView32"
       shell: bash
       run: |
-        git config user.name "gitea-actions[bot]"
-        git config user.email "<sherlock@binbash.rocks>"
         cd webview
         source trigger-build.txt
         ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm
@@ -89,8 +91,6 @@ jobs:
     - name: "Build WebView64"
       shell: bash
       run: |
-        git config user.name "gitea-actions[bot]"
-        git config user.email "<sherlock@binbash.rocks>"
         cd webview
         source trigger-build.txt
         ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm64
