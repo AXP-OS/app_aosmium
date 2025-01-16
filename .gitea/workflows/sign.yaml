@@ -10,7 +10,7 @@ on:
   push:
     paths:
       - 'prebuilt/*/webview-unsigned.apk'
-      - push-trigger.txt
+      - sign-trigger.txt
   workflow_dispatch:  # button shown only when in default branch
 
 # NOT implemented in Gitea!
