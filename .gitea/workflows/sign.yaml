@@ -10,7 +10,7 @@ on:
   push:
     paths:
       - 'prebuilt/*/webview-unsigned.apk'
-      - sign-trigger.txt
+      - trigger-release.txt
   workflow_dispatch:  # button shown only when in default branch
 
 # NOT implemented in Gitea!
@@ -91,14 +91,15 @@ jobs:
         keyAlias: ${{ secrets.APK_ALIAS }}
         keyStorePassword: ${{ secrets.APK_KEY_STORE_PASSWORD }}
         keyPassword: ${{ secrets.APK_KEY_PASSWORD }}
-      env:
-        BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
 
     - name: Prep release
       run: |
         cd apks
         sha512sum webview32-signed.apk > webview32-signed.apk.sha512
         sha512sum webview64-signed.apk > webview64-signed.apk.sha512
+
+        echo "SHA32=$(cat webview32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_ENV
+        echo "SHA64=$(cat webview64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_ENV
 
     - name: Generate pre-release
       uses: https://gitea.com/actions/gitea-release-action@v1
@@ -108,6 +109,15 @@ jobs:
         tag_name: ${{ env.APP_VERSION }}
         prerelease: true
         name: "!UNTESTED PRE-RELEASE! ${{ env.APP_VERSION }}"
+        body: |
+          # The AXP.OS WebView
+
+          |APK|sha512|
+          |-|-|
+          |webview32-signed.apk|${{ env.SHA32 }}|
+          |webview64-signed.apk|${{ env.SHA64 }}|
+
+          [Signature](${{ vars.SIGNATURE_LINK }})
         files: |
             ${{ steps.signAPK.outputs.signedFile0 }}
             ${{ steps.signAPK.outputs.signedFile0 }}.sha512
