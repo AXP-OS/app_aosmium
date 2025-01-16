@@ -41,7 +41,7 @@ clean=${clean:-0}
 gsync=${gsync:-0}
 pause=0
 supported_archs=(arm arm64 x86 x64)
-build_targets=${build_targets:-system_webview_apk}
+build_targets="${build_targets:-system_webview_apk}"
 
 usage() {
     echo "Usage:"
