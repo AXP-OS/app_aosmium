@@ -19,6 +19,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.LOCAL_TOKEN_RO }}
 
     - name: "Create/Sync repos with configured mirror"
       # https://github.com/k8scat/action-mirror-git
