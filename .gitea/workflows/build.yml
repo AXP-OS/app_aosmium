@@ -8,11 +8,8 @@ name: Build WebView
 
 on:
   push:
-    branches:
-      - ci
-#    paths:
-#      - 'prebuilt/*/webview-unsigned.apk'
-#      - push-trigger.txt
+    paths:
+      - build-trigger.txt
   workflow_dispatch:  # button shown only when in default branch
 
 # NOT implemented in Gitea!
