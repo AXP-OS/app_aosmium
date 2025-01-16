@@ -12,7 +12,7 @@ set -e
 
 # grab latest published Vanadium tag
 real_latestVanadium=$(git ls-remote --tags https://github.com/GrapheneOS/Vanadium.git "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
-latestVanadium="${vanadium_version:-$real_latestVanadium}
+latestVanadium="${vanadium_version:-$real_latestVanadium}"
 relatedChromium=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
 relatedChromiumCode=$(echo "${relatedChromium}" | cut -d '.' -f 3-4 | tr -d '.')
 
