@@ -6,24 +6,30 @@
 # Copyright (c) 2020-2024 Divested Computing Group
 # Copyright (c) 2025 AXP.OS <steadfasterX |AT| binbash #DOT# rocks>
 #
+# License: GPLv2
 #########################################################################################
 set -e
 
 # grab latest published Vanadium tag
-latestVanadium=$(git ls-remote --tags https://github.com/GrapheneOS/Vanadium.git "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
+real_latestVanadium=$(git ls-remote --tags https://github.com/GrapheneOS/Vanadium.git "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
+latestVanadium="${vanadium_version:-$real_latestVanadium}
 relatedChromium=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
 relatedChromiumCode=$(echo "${relatedChromium}" | cut -d '.' -f 3-4 | tr -d '.')
 
 echo "Latest available Vanadium version: $latestVanadium"
 echo "Related Chromium version: $relatedChromium"
 
-# set version based on Vanadium
-chromium_version="$latestVanadium"
-chromium_code="$latestVanadiumCode"
+# set version based on Vanadium or user input
+chromium_version="${chromium_version:-$relatedChromium}"
+chromium_code="${chromium_code:-$relatedChromiumCode}"
+
+echo "Using Vanadium version: $latestVanadium"
+echo "Using Chromium version: $chromium_version"
+echo "Using Chromium code: $chromium_code"
 
 chromium_code_config="2024041800"
 chromium_rebrand_name="AXP.OS"
-chromium_rebrand_color="#7B3F00"
+chromium_rebrand_color="#333333" # Dark Charcoal
 chromium_packageid_webview="org.axpos.webview_wv"
 chromium_packageid_standalone="org.axpos.webview"
 chromium_packageid_libtrichrome="org.axpos.webview_tcl"
@@ -31,8 +37,8 @@ chromium_packageid_config="org.axpos.webview_config"
 #unzip -p chromium.apk META-INF/[SIGNER].RSA | keytool -printcert | grep "SHA256:" | sed 's/.*SHA256:* //' | sed 's/://g' |  tr '[:upper:]' '[:lower:]'
 #chromium_cert_trichrome="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
 #chromium_cert_config="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
-clean=0
-gsync=0
+clean=${clean:-0}
+gsync=${gsync:-0}
 pause=0
 supported_archs=(arm arm64 x86 x64)
 
@@ -83,7 +89,7 @@ copy_vanadium_patches(){
     cpwd="$PWD"
     cd $vanadiumPath
     git fetch --all
-    #git checkout $latestVanadium
+    git checkout $latestVanadium
     if [ -d "$cpwd/patches/0001-Vanadium/" ];then rm -r "$cpwd/patches/0001-Vanadium/";fi
     mkdir $cpwd/patches/0001-Vanadium/
     cp patches/* $cpwd/patches/0001-Vanadium/
