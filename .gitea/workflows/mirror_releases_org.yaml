@@ -22,7 +22,7 @@ jobs:
     - name: test
       shell: bash
       run: |
-        sleep 30
+        sleep 30m
         curl -v https://code.binbash.rocks:8443
 
     - uses: actions/checkout@v4
