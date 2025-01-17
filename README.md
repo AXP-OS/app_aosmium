@@ -16,7 +16,7 @@ The [AXP.OS](https://axpos.org/) WebView
 CI/CD has been implemented in 2 workflows:
 1. building: [.gitea/workflows/build.yaml](.gitea/workflows/build.yaml)
 1. signing: [.gitea/workflows/sign.yaml](.gitea/workflows/sign.yaml)
-   - release
+   - release (see the [Release](ci#release) topic!)
 
 ### Building
 
@@ -27,6 +27,8 @@ _Building_ will be triggered when:
 
 ### Signing + Release
 
+#### Signing
+
 _Signing_ will be triggered when:
 - `prebuilt/*/webview-unsigned.apk` changes
 - `trigger-release.txt` changes
@@ -34,9 +36,13 @@ _Signing_ will be triggered when:
 
 increasing the counter in [trigger-release.txt](trigger-release.txt) is usually **not** needed (as it runs anyways on apk pushes and one can trigger a workflow manually within the actions tab) but kept as an alternative method to force the signing + release process.
 
-Notes:
+#### Release
+
+Releases will be created automatically during the _Signing_ workflow above.
+
 1. Releases will be set to **pre-release** as every build needs to be (mannually) tested first
 1. Pre-releases need to be set as stable _manually_
+1. The signed releases will be created on the Codeberg mirror only and are available [here](https://codeberg.org/AXP-OS_releases/webview_mulch/releases)
 
 ### CI/CD Signature
 
