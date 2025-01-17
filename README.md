@@ -16,7 +16,7 @@ The [AXP.OS](https://axpos.org/) WebView
 CI/CD has been implemented in 2 workflows:
 1. building: [.gitea/workflows/build.yaml](.gitea/workflows/build.yaml)
 1. signing: [.gitea/workflows/sign.yaml](.gitea/workflows/sign.yaml)
-   - release (see the [Release](ci#release) topic!)
+   - release (see the [Release](README.md#release) topic!)
 
 ### Building
 
