@@ -22,7 +22,6 @@ jobs:
     - name: test
       shell: bash
       run: |
-        ip a
         sleep 30
         curl -v https://code.binbash.rocks:8443
 
