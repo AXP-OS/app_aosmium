@@ -1,0 +1,109 @@
+#####################################################################################
+# documentation:
+# - https://docs.gitea.com/usage/actions/overview
+# - https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+#####################################################################################
+
+name: Build WebView
+
+on:
+  push:
+    paths:
+      - trigger-build.txt
+  workflow_dispatch:  # button shown only when in default branch
+
+# NOT implemented in Gitea!
+#permissions:
+#  contents: write # allow creating releases
+
+jobs:
+  build:
+    runs-on: docker-node-latest
+    container:
+      #options: --user root  # we need all privileges within the container
+      volumes:
+        - /home/androidsource/do-not-touch/webview_mulch:/workspace/AXP.OS/webview_mulch/webview
+        - /home/androidsource/do-not-touch/vanadium:/workspace/AXP.OS/webview_mulch/vanadium
+    steps:
+
+    - name: Prep container
+      shell: bash
+      run: apt-get update && apt-get -y install git-lfs curl lsb-release python3 file gperf sudo gcc-multilib
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+        clean: false  # avoid deleting chromium sources on later runs
+        fetch-depth: 1
+        lfs: true
+        path: webview
+
+    - name: Checkout WebView repos
+      shell: bash
+      id: vanco
+      run: |
+        git config --global user.name "gitea-actions[bot]"
+        git config --global user.email "<sherlock@binbash.rocks>"
+
+        if [ ! -d "${{ github.workspace }}/vanadium/.git" ];then
+          echo "Cloning Vanadium as ${{ github.workspace }}/vanadium is not a repo"
+          git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} ${{ github.workspace }}/vanadium
+        else
+          git config --global --add safe.directory ${{ github.workspace }}/vanadium
+          cd vanadium
+          git add -A
+          git reset --hard
+          git fetch --all
+          echo "vanadium commit: $(git log -1)"
+          cd ..
+        fi
+        
+        cd vanadium
+        latestVanadium=$(git tag | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
+        webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
+        echo "WV_VER=$webview_ver" >> $GITHUB_ENV
+
+    - name: set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '18'
+        distribution: 'temurin'
+
+    - name: Setup Android SDK
+      # https://github.com/android-actions/setup-android
+      uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 12266719
+        packages: "build-tools;35.0.0"
+
+    - name: "Install build dependencies"
+      shell: bash
+      run: cd webview/src && ./build/install-build-deps.sh --no-prompt
+
+    - name: "Build WebView32"
+      shell: bash
+      run: |
+        cd webview
+        source trigger-build.txt
+        ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm
+
+    - name: "Build WebView64"
+      shell: bash
+      run: |
+        cd webview
+        source trigger-build.txt
+        ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm64
+
+    - name: Push changes and APKs
+      shell: bash
+      run: |
+        cd webview
+        source trigger-build.txt
+        [ -z "${{ env.WV_VER }}" ] && echo "version var empty" && exit 3
+        [ "$skip_push" == "true" ] && echo "skipping repo push" && exit 0
+        git add -A
+        git config user.name "gitea-actions[bot]"
+        git config user.email "<sherlock@binbash.rocks>"
+        git commit -m "add ${{ env.WV_VER }}"
+        git push
+

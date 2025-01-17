@@ -1,12 +1,35 @@
 #!/bin/bash
-
+#########################################################################################
+#
+# Helper script for fetching, patching and building the AXP.OS WebView (fka Mulch)
+#
+# Copyright (c) 2020-2024 Divested Computing Group
+# Copyright (c) 2025 AXP.OS <steadfasterX |AT| binbash #DOT# rocks>
+#
+# License: GPLv2
+#########################################################################################
 set -e
 
-chromium_version="131.0.6778.260"
-chromium_code="6778260"
+# grab latest published Vanadium tag
+real_latestVanadium=$(git ls-remote --tags https://github.com/GrapheneOS/Vanadium.git "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
+latestVanadium="${vanadium_version:-$real_latestVanadium}"
+relatedChromium=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
+relatedChromiumCode=$(echo "${relatedChromium}" | cut -d '.' -f 3-4 | tr -d '.')
+
+echo "Latest available Vanadium version: $latestVanadium"
+echo "Related Chromium version: $relatedChromium"
+
+# set version based on Vanadium or user input
+chromium_version="${chromium_version:-$relatedChromium}"
+chromium_code="${chromium_code:-$relatedChromiumCode}"
+
+echo "Using Vanadium version: $latestVanadium"
+echo "Using Chromium version: $chromium_version"
+echo "Using Chromium code: $chromium_code"
+
 chromium_code_config="2024041800"
 chromium_rebrand_name="AXP.OS"
-chromium_rebrand_color="#7B3F00"
+chromium_rebrand_color="#333333" # Dark Charcoal
 chromium_packageid_webview="org.axpos.webview_wv"
 chromium_packageid_standalone="org.axpos.webview"
 chromium_packageid_libtrichrome="org.axpos.webview_tcl"
@@ -14,10 +37,11 @@ chromium_packageid_config="org.axpos.webview_config"
 #unzip -p chromium.apk META-INF/[SIGNER].RSA | keytool -printcert | grep "SHA256:" | sed 's/.*SHA256:* //' | sed 's/://g' |  tr '[:upper:]' '[:lower:]'
 #chromium_cert_trichrome="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
 #chromium_cert_config="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
-clean=0
-gsync=0
+clean=${clean:-0}
+gsync=${gsync:-0}
 pause=0
 supported_archs=(arm arm64 x86 x64)
+build_targets="${build_targets:-system_webview_apk}"
 
 usage() {
     echo "Usage:"
@@ -30,6 +54,7 @@ usage() {
     echo "    -p pause before starting the build"
     echo "    -r <release> Specify chromium release"
     echo "    -s Sync"
+    echo "    -V <path> to vanadium directory"
     echo
     echo "  Example:"
     echo "    build_webview -c -s -r $chromium_version:$chromium_code"
@@ -54,14 +79,27 @@ build() {
     build_args+=' android_default_version_code="'$code'"'
 
     gn gen "out/$1" --args="$build_args"
-    ninja -C out/$1 system_webview_apk chrome_public_apk # vanadium_config_apk
+    ninja -C out/$1 $build_targets
     if [ "$?" -eq 0 ]; then
         [ "$1" '==' "x64" ] && android_arch="x86_64" || android_arch=$1
-        cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview.apk
+        cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
     fi
 }
 
-while getopts ":a:chpr:s" opt; do
+copy_vanadium_patches(){
+    cpwd="$PWD"
+    cd $vanadiumPath
+    git fetch --all
+    git checkout $latestVanadium
+    if [ -d "$cpwd/patches/0001-Vanadium/" ];then rm -r "$cpwd/patches/0001-Vanadium/";fi
+    mkdir $cpwd/patches/0001-Vanadium/
+    cp patches/* $cpwd/patches/0001-Vanadium/
+    cd $cpwd/patches/0001-Vanadium/
+    bash ../rm-vanadium.sh
+    cd $cpwd
+}
+
+while getopts ":a:chpr:sV:" opt; do
     case $opt in
         a) for arch in ${supported_archs[@]}; do
                [ "$OPTARG" '==' "$arch" ] && build_arch="$OPTARG"
@@ -90,6 +128,10 @@ while getopts ":a:chpr:s" opt; do
           echo
           usage
           ;;
+	V)
+	  vanadiumPath="$OPTARG"
+	  [ ! -d "$vanadiumPath" ] && echo -e "ERROR: cannot find specified path >$vanadiumPath< !\nDo you have cloned Vanadium?" && exit 4
+	  ;;
     esac
 done
 shift $((OPTIND-1))
@@ -111,6 +153,10 @@ if [ $gsync -eq 1 ]; then
     find src -name index.lock -delete
     yes | gclient sync -D -R -f -r $chromium_version
 fi
+
+# fix permission denied errors:
+find src/ -type d -name bin -exec chmod -R +x {} \;
+
 cd src
 
 applyPatchReal() {
@@ -152,6 +198,8 @@ export -f applyPatch;
 
 # Apply our changes
 if [ $gsync -eq 1 ]; then
+    copy_vanadium_patches
+
 	#Apply all available patches safely
 	echo "Applying patches"
 	find ../patches/0001-Vanadium/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
