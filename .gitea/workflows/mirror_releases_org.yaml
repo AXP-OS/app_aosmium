@@ -18,6 +18,12 @@ jobs:
     runs-on: docker-node-latest
 
     steps:
+
+    - name: test
+      shell: bash
+      run: |
+        curl -v https://code.binbash.rocks:8443
+
     - uses: actions/checkout@v4
       with:
         token: ${{ secrets.LOCAL_TOKEN_RO }}
