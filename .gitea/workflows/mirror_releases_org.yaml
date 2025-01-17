@@ -1,0 +1,53 @@
+#####################################################################################
+# Mirror this repo to e.g. Codeberg
+# - create repo if needed
+# - sync otherwise
+#####################################################################################
+
+name: "Mirror RELEASE repo to ${{ vars.MIRROR_RELEASE_ORG_NAME }}"
+run-name: Initiated by ${{ gitea.actor }}
+on:
+  push:
+    branches:
+      - main
+      - ci
+  workflow_dispatch:  # button shown only when in default branch
+
+jobs:
+  build:
+    runs-on: docker-node-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.LOCAL_TOKEN_RO }}
+
+    - name: "Create/Sync repos with configured mirror"
+      # https://github.com/k8scat/action-mirror-git
+      uses: k8scat/action-mirror-git@v0.1.3
+      with:
+        source_protocol: https
+        source_host: ${{ vars.LOCAL_ORG_DOMAIN }}
+        source_port: ${{ vars.LOCAL_ORG_PORT }}
+        source_username: "${{ vars.LOCAL_ORG_NAME }}"
+        source_token: ${{ secrets.LOCAL_TOKEN_RO }}
+        dest_protocol: https
+        dest_host: ${{ vars.MIRROR_ORG_DOMAIN }}
+        dest_username: "${{ vars.MIRROR_RELEASE_ORG_NAME }}"
+        dest_token: ${{ secrets.MIRROR_TOKEN_RW }}
+        mirror_repos: ${{ github.event.repository.name }}
+        dest_create_repo_script: |
+          curl \
+            -H 'Content-Type: application/json' \
+            -H "Authorization: token ${INPUT_DEST_TOKEN}" \
+            -d "{\"name\":\"${REPO_NAME}\",\"private\":false}" \
+            '${{ vars.MIRROR_API_CREATE_REPO_RELEASE }}'
+
+    - name: "Sync LFS"
+      uses: valtech-sd/git-sync@v9
+      with:
+        source_repo: "https://tok:${{ secrets.LOCAL_TOKEN_RO }}@${{ vars.LOCAL_ORG_DOMAIN }}:${{ vars.LOCAL_ORG_PORT }}/${{ vars.LOCAL_ORG_NAME }}/${{ github.event.repository.name }}"
+        source_branch: "${{ github.event.ref }}"
+        destination_repo: "https://tok:${{ secrets.MIRROR_TOKEN_RW }}@${{ vars.MIRROR_ORG_DOMAIN }}/${{ vars.MIRROR_RELEASE_ORG_NAME }}/${{ github.event.repository.name }}"
+        destination_branch: "${{ github.event.ref }}"
