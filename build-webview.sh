@@ -142,8 +142,6 @@ if [ ! -d depot_tools ]; then
 fi
 export PATH="$(pwd -P)/depot_tools:$PATH"
 
-copy_vanadium_patches
-
 if [ ! -d src ]; then
     echo "Initial source download"
     fetch android
@@ -200,6 +198,8 @@ export -f applyPatch;
 
 # Apply our changes
 if [ $gsync -eq 1 ]; then
+    copy_vanadium_patches
+
 	#Apply all available patches safely
 	echo "Applying patches"
 	find ../patches/0001-Vanadium/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
