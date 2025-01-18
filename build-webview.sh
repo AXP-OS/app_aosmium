@@ -157,8 +157,6 @@ fi
 # fix permission denied errors:
 find src/ -type d -name bin -exec chmod -R +x {} \;
 
-cd src
-
 applyPatchReal() {
 	currentWorkingPatch=$1;
 	firstLine=$(head -n1 "$currentWorkingPatch");
@@ -198,8 +196,9 @@ export -f applyPatch;
 
 # Apply our changes
 if [ $gsync -eq 1 ]; then
-    copy_vanadium_patches
+ copy_vanadium_patches
 
+ cd src
 	#Apply all available patches safely
 	echo "Applying patches"
 	find ../patches/0001-Vanadium/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
