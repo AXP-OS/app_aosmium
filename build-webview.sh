@@ -29,7 +29,7 @@ echo "Using Chromium code: $chromium_code"
 
 chromium_code_config="2024041800"
 chromium_rebrand_name="AXP.OS"
-chromium_rebrand_color="#333333" # Dark Charcoal
+chromium_rebrand_color="#222222" # Eerie Black
 chromium_packageid_webview="org.axpos.webview_wv"
 chromium_packageid_standalone="org.axpos.webview"
 chromium_packageid_libtrichrome="org.axpos.webview_tcl"
