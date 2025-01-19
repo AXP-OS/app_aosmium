@@ -151,6 +151,9 @@ fi
 if [ $gsync -eq 1 ]; then
     echo "Syncing"
     find src -name index.lock -delete
+    cd src
+    git am --abort
+    cd ..
     yes | gclient sync -D -R -f -r $chromium_version
 fi
 
