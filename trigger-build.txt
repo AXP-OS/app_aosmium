@@ -23,4 +23,4 @@ export build_targets="system_webview_apk chrome_public_apk"
 
 # after a successful build the workflow will push changes to this repo
 # if you do not want to auto-push set skip_push=true
-#export skip_push=true
+export skip_push=true
