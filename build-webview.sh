@@ -194,11 +194,14 @@ applyPatch() {
 }
 export -f applyPatch;
 
+cd src
+
 # Apply our changes
 if [ $gsync -eq 1 ]; then
+ cd ..
  copy_vanadium_patches
-
  cd src
+
 	#Apply all available patches safely
 	echo "Applying patches"
 	find ../patches/0001-Vanadium/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
