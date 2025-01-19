@@ -92,6 +92,7 @@ jobs:
       run: |
         cd webview
         source trigger-build.txt
+        export clean=0 gsync=0
         ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm64
 
     - name: Push changes and APKs
