@@ -1,6 +1,7 @@
 # this file will be sourced by the ci/cd workflow and allows to overwrite the defaults in the build script
 
-# increase the following counter for just triggering a build with default options:
+# increase the following counter for just triggering a build with default options.
+# (alternatively go into the actions tab select the build.yaml and simply start a build)
 trigger=15
 
 # overwrite Vanadium version to be used. if unset or empty the latest available will be used
@@ -14,11 +15,11 @@ trigger=15
 export build_targets="system_webview_apk chrome_public_apk"
 
 # by default the out/ directory will not be removed. if you want a clean build set this to 1
-export clean=1
+#export clean=1
 
 # sync the sources and apply patches?
 # should be set with the above clean var to 1
-export gsync=1
+#export gsync=1
 
 # after a successful build the workflow will push changes to this repo
 # if you do not want to auto-push set skip_push=true
