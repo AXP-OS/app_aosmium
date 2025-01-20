@@ -769,4 +769,3 @@ diff --git a/content/browser/storage_partition_impl.cc b/content/browser/storage
      GetGeneratedCodeCacheContext()->Initialize(code_cache_path,
                                                 settings.size_in_bytes());
    }
---
