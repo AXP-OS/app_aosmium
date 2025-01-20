@@ -201,16 +201,20 @@ applyPatch() {
 				if git apply --check "$@" --3way &> /dev/null; then
                     echo "Applying (as 3way): $currentWorkingPatch"
 					applyPatchReal "$@" --3way;
-				else
+                else
+	 				echo "Applying (last resort): $currentWorkingPatch"
+    			    applyPatchReal "$@"
+	 			fi
+                if [ $? -ne 0 ];then
 					echo -e "\e[0;31mERROR: Cannot apply: $currentWorkingPatch\e[0m"
                     exit 3
-				fi;
-			fi;
-		fi;
+				fi
+			fi
+		fi
 	else
 		echo -e "\e[0;31mERROR: Patch doesn't exist: $currentWorkingPatch\e[0m"
         exit 3
-	fi;
+	fi
 }
 export -f applyPatch;
 
