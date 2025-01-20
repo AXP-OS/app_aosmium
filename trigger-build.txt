@@ -23,4 +23,4 @@ export gsync=1
 
 # after a successful build the workflow will push changes to this repo
 # if you do not want to auto-push set skip_push=true
-export skip_push=true
+#export skip_push=true
