@@ -171,9 +171,9 @@ applyPatchReal() {
             echo "Applied (git am): $currentWorkingPatch"
 			git format-patch -1 HEAD --zero-commit --no-signature --output="$currentWorkingPatch"
         else
-		    echo "Applying (git am): $currentWorkingPatch - FAILED"
-		    git am --abort 2>>/dev/null|| true
-		    echo "Applying (am - patch fallback): $currentWorkingPatch"
+		    echo "Applying (git am): $currentWorkingPatch - fallback"
+		    git am --abort 2>/dev/null|| true
+		    echo "Applying (patch fallback): $currentWorkingPatch"
 		    patch -r - --no-backup-if-mismatch --forward --ignore-whitespace --verbose -p1 < $currentWorkingPatch \
       			&& git add -A > /dev/null\
       		    	&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f3-100)"
