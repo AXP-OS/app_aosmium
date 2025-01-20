@@ -177,14 +177,24 @@ applyPatchReal() {
 		    patch -r - --no-backup-if-mismatch --forward --ignore-whitespace --verbose -p1 < $currentWorkingPatch \
       			&& git add -A > /dev/null\
       		    	&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f3-100)"
-                [ $? -ne 0 ] && echo "ERROR applying $currentWorkingPatch" && exit 3
+                if [ $? -ne 0 ];then
+                    echo "ERROR applying $currentWorkingPatch"
+                    return 3
+                else
+                    echo "Applying (am - patch fallback): $currentWorkingPatch - SUCCESS"
+                fi
 		fi
 	else
         echo "Applying (as diff): $currentWorkingPatch"
 		git apply "$@" \
             && git add -A > /dev/null\
       		&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f3-100)"
-        [ $? -ne 0 ] && echo "ERROR applying $currentWorkingPatch" && exit 3
+        if [ $? -ne 0 ];then
+            echo "ERROR: applying $currentWorkingPatch (diff)"
+            return 3
+        else
+            echo "Applying (as diff): $currentWorkingPatch - SUCCESS"
+        fi
 	fi
 }
 export -f applyPatchReal;
