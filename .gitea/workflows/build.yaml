@@ -85,13 +85,14 @@ jobs:
       run: |
         cd webview
         source trigger-build.txt
-        ./build.sh -V ${{ github.workspace }}/vanadium -a arm -p
+        ./build.sh -V ${{ github.workspace }}/vanadium -a arm
 
     - name: "Build arm64"
       shell: bash
       run: |
         cd webview
         source trigger-build.txt
+        
         # never do a sync+patch again
         # (as this is handled in the previous step already)
         export clean=0 gsync=0
