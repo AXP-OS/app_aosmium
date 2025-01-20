@@ -2,7 +2,7 @@
 
 # increase the following counter for just triggering a build with default options.
 # (alternatively go into the actions tab select the build.yaml and simply start a build)
-trigger=20
+trigger=21
 
 # overwrite Vanadium version to be used. if unset or empty the latest available will be used
 # must be a valid tag (e.g. "132.0.6834.79.1")
