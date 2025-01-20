@@ -153,8 +153,8 @@ if [ $gsync -eq 1 ]; then
     echo "Syncing"
     find src -name index.lock -delete
     cd src
-    git am --abort || true
-    git add -A || true
+    git am --abort 2>>/dev/null || true
+    git add -A 2>>/dev/null|| true
     git reset --hard
     cd ..
     yes | gclient sync -D -R -f -r $chromium_version
@@ -171,7 +171,7 @@ applyPatchReal() {
 			git format-patch -1 HEAD --zero-commit --no-signature --output="$currentWorkingPatch";
         else
 		    echo "Applying (git am): $currentWorkingPatch - FAILED"
-		    git am --abort || true
+		    git am --abort 2>>/dev/null|| true
 		    echo "Applying (am - patch fallback): $currentWorkingPatch"
 		    patch -r - --no-backup-if-mismatch --forward --ignore-whitespace --verbose -p1 < $currentWorkingPatch \
       			&& git add -A \
