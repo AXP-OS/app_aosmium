@@ -245,10 +245,9 @@ if [ $gsync -eq 1 ]; then
 	#Icon rebranding
 	echo "Icon rebranding"
 	#mkdir -p android_webview/nonembedded/java/res_icon/drawable-xxxhdpi
-	find chrome/android/java/res_chromium_base/mipmap-* -name 'app_icon.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 95 {} \;
-	find chrome/android/java/res_chromium_base/mipmap-* -name 'layered_app_icon.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 95 {} \;
-	find chrome/android/java/res_chromium_base/mipmap-* -name 'layered_app_icon_background.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 95 {} \;
-	cp chrome/android/java/res_chromium_base/mipmap-mdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-mdpi/icon_webview.png
+    find chrome/android/java/res_chromium_base/mipmap-* -type f -name 'app_icon*.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 75 -gamma 0.6 {} \;
+    find chrome/android/java/res_chromium_base/mipmap-* -type f -name 'layered_app_icon*.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 75 -gamma 0.6 {} \;
+    cp chrome/android/java/res_chromium_base/mipmap-mdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-mdpi/icon_webview.png
 	cp chrome/android/java/res_chromium_base/mipmap-hdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-hdpi/icon_webview.png
 	cp chrome/android/java/res_chromium_base/mipmap-xhdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-xhdpi/icon_webview.png
 	cp chrome/android/java/res_chromium_base/mipmap-xxhdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-xxhdpi/icon_webview.png
