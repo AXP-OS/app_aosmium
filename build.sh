@@ -28,12 +28,12 @@ echo "Using Chromium version: $chromium_version"
 echo "Using Chromium code: $chromium_code"
 
 chromium_code_config="2024041800"
-chromium_rebrand_name="${chromium_rebrand_name:-AXP.OS}"
-chromium_rebrand_color="#222222" # Eerie Black
-chromium_packageid_webview="org.axpos.webview_wv"
-chromium_packageid_standalone="org.axpos.webview"
-chromium_packageid_libtrichrome="org.axpos.webview_tcl"
-chromium_packageid_config="org.axpos.webview_config"
+chromium_rebrand_name="AOSmium"
+chromium_rebrand_color="#800080" # Purple icon
+chromium_packageid_webview="org.axpos.aosmium_wv"
+chromium_packageid_standalone="org.axpos.aosmium"
+chromium_packageid_libtrichrome="org.axpos.aosmium_tcl"
+chromium_packageid_config="org.axpos.aosmium_config"
 #unzip -p chromium.apk META-INF/[SIGNER].RSA | keytool -printcert | grep "SHA256:" | sed 's/.*SHA256:* //' | sed 's/://g' |  tr '[:upper:]' '[:lower:]'
 #chromium_cert_trichrome="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
 #chromium_cert_config="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
@@ -54,7 +54,6 @@ usage() {
     echo "    -p pause before starting the build"
     echo "    -r <release> Specify chromium release"
     echo "    -s Sync"
-    echo "    -t <type> required! can be one of: webview|browser"
     echo "    -V <path> to vanadium directory"
     echo
     echo "  Example:"
@@ -83,8 +82,8 @@ build() {
     ninja -C out/$1 $build_targets
     if [ "$?" -eq 0 ]; then
         [ "$1" '==' "x64" ] && android_arch="x86_64" || android_arch=$1
-        [ "$b_wv" == "true" ] && cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
-        [ "$b_brw" == "true" ] && cp out/$1/apks/ChromePublic.apk.apk ../prebuilt/$android_arch/browser-unsigned.apk
+        [[ "$build_targets" ~= "system_webview_apk" ]] && cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
+        [[ "$build_targets" ~= "chrome_public_apk" ]] && cp out/$1/apks/ChromePublic.apk.apk ../prebuilt/$android_arch/browser-unsigned.apk
     fi
 }
 
@@ -120,7 +119,6 @@ while getopts ":a:chpr:sV:" opt; do
            ;;
         p) pause=1 ;;
         s) gsync=1 ;;
-        t) type="$OPTARG" ;;
         :)
           echo "Option -$OPTARG requires an argument"
           echo
@@ -133,17 +131,11 @@ while getopts ":a:chpr:sV:" opt; do
           ;;
 	V)
 	  vanadiumPath="$OPTARG"
-	  [ ! -d "$vanadiumPath" ] && echo -e "ERROR: cannot find specified path >$vanadiumPath< !\nDo you have cloned Vanadium?" && exit 4
+	  [ ! -d "$vanadiumPath" ] && echo -e "ERROR: cannot find specified path >$vanadiumPath< !\nDo you have cloned Vanadium?" && usage
 	  ;;
     esac
 done
 shift $((OPTIND-1))
-
-case $type in
-    webview) b_wv=true;;
-    browser) b_brw=true;;
-    *) echo "unsupported or empty build type >$type<"; usage; exit 4;;
-esac
 
 # Add depot_tools to PATH
 if [ ! -d depot_tools ]; then
@@ -221,9 +213,9 @@ cd src
 
 # Apply our changes
 if [ $gsync -eq 1 ]; then
- cd ..
- copy_vanadium_patches
- cd src
+    cd ..
+    copy_vanadium_patches
+    cd src
 
 	#Apply all available patches safely
 	echo "Applying patches"
