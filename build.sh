@@ -168,20 +168,21 @@ applyPatchReal() {
 	firstLine=$(head -n1 "$currentWorkingPatch");
 	if [[ "$firstLine" = *"Mon Sep 17 00:00:00 2001"* ]] || [[ "$firstLine" = *"Thu Jan  1 00:00:00 1970"* ]]; then
 		if git am "$@"; then
-			git format-patch -1 HEAD --zero-commit --no-signature --output="$currentWorkingPatch";
+            echo "Applied (git am): $currentWorkingPatch"
+			git format-patch -1 HEAD --zero-commit --no-signature --output="$currentWorkingPatch"
         else
 		    echo "Applying (git am): $currentWorkingPatch - FAILED"
 		    git am --abort 2>>/dev/null|| true
 		    echo "Applying (am - patch fallback): $currentWorkingPatch"
 		    patch -r - --no-backup-if-mismatch --forward --ignore-whitespace --verbose -p1 < $currentWorkingPatch \
-      			&& git add -A \
+      			&& git add -A > /dev/null\
       		    	&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f3-100)"
                 [ $? -ne 0 ] && echo "ERROR applying $currentWorkingPatch" && exit 3
 		fi
 	else
         echo "Applying (as diff): $currentWorkingPatch"
 		git apply "$@" \
-            && git add -A \
+            && git add -A > /dev/null\
       		&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f3-100)"
         [ $? -ne 0 ] && echo "ERROR applying $currentWorkingPatch" && exit 3
 	fi
