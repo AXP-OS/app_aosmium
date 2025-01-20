@@ -180,7 +180,9 @@ applyPatchReal() {
 		fi
 	else
         echo "Applying (as diff): $currentWorkingPatch"
-		git apply "$@"
+		git apply "$@" \
+            && git add -A \
+      		&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f3-100)"
         [ $? -ne 0 ] && echo "ERROR applying $currentWorkingPatch" && exit 3
 	fi
 }
