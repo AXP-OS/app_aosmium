@@ -80,20 +80,22 @@ jobs:
       shell: bash
       run: cd webview/src && ./build/install-build-deps.sh --no-prompt
 
-    - name: "Build WebView32"
+    - name: "Build arm"
       shell: bash
       run: |
         cd webview
         source trigger-build.txt
-        ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm
+        ./build.sh -V ${{ github.workspace }}/vanadium -a arm -p
 
-    - name: "Build WebView64"
+    - name: "Build arm64"
       shell: bash
       run: |
         cd webview
         source trigger-build.txt
+        # never do a sync+patch again
+        # (as this is handled in the previous step already)
         export clean=0 gsync=0
-        ./build-webview.sh -V ${{ github.workspace }}/vanadium -a arm64
+        ./build.sh -V ${{ github.workspace }}/vanadium -a arm64
 
     - name: Push changes and APKs
       shell: bash
