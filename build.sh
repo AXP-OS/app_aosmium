@@ -82,8 +82,8 @@ build() {
     ninja -C out/$1 $build_targets
     if [ "$?" -eq 0 ]; then
         [ "$1" '==' "x64" ] && android_arch="x86_64" || android_arch=$1
-        [[ "$build_targets" ~= "system_webview_apk" ]] && cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
-        [[ "$build_targets" ~= "chrome_public_apk" ]] && cp out/$1/apks/ChromePublic.apk.apk ../prebuilt/$android_arch/browser-unsigned.apk
+        [[ "$build_targets" =~ "system_webview_apk" ]] && cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
+        [[ "$build_targets" =~ "chrome_public_apk" ]] && cp out/$1/apks/ChromePublic.apk.apk ../prebuilt/$android_arch/browser-unsigned.apk
     fi
 }
 
