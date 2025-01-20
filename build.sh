@@ -167,7 +167,7 @@ applyPatchReal() {
 	currentWorkingPatch=$1;
 	firstLine=$(head -n1 "$currentWorkingPatch");
 	if [[ "$firstLine" = *"Mon Sep 17 00:00:00 2001"* ]] || [[ "$firstLine" = *"Thu Jan  1 00:00:00 1970"* ]]; then
-		if git am "$@"; then
+		if git am "$@" 2>/dev/null ; then
             echo "Applied (git am): $currentWorkingPatch"
 			git format-patch -1 HEAD --zero-commit --no-signature --output="$currentWorkingPatch"
         else
