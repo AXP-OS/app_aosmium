@@ -28,7 +28,7 @@ echo "Using Chromium version: $chromium_version"
 echo "Using Chromium code: $chromium_code"
 
 chromium_code_config="2024041800"
-chromium_rebrand_name="AXP.OS"
+chromium_rebrand_name="${chromium_rebrand_name:-AXP.OS}"
 chromium_rebrand_color="#222222" # Eerie Black
 chromium_packageid_webview="org.axpos.webview_wv"
 chromium_packageid_standalone="org.axpos.webview"
@@ -45,7 +45,7 @@ build_targets="${build_targets:-system_webview_apk}"
 
 usage() {
     echo "Usage:"
-    echo "  build_webview [ options ]"
+    echo "  build [ options ]"
     echo
     echo "  Options:"
     echo "    -a <arch> Build specified arch"
@@ -54,10 +54,11 @@ usage() {
     echo "    -p pause before starting the build"
     echo "    -r <release> Specify chromium release"
     echo "    -s Sync"
+    echo "    -t <type> required! can be one of: webview|browser"
     echo "    -V <path> to vanadium directory"
     echo
     echo "  Example:"
-    echo "    build_webview -c -s -r $chromium_version:$chromium_code"
+    echo "    build -c -s -r $chromium_version:$chromium_code"
     echo
     exit 1
 }
@@ -82,7 +83,8 @@ build() {
     ninja -C out/$1 $build_targets
     if [ "$?" -eq 0 ]; then
         [ "$1" '==' "x64" ] && android_arch="x86_64" || android_arch=$1
-        cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
+        [ "$b_wv" == "true" ] && cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
+        [ "$b_brw" == "true" ] && cp out/$1/apks/ChromePublic.apk.apk ../prebuilt/$android_arch/browser-unsigned.apk
     fi
 }
 
@@ -118,6 +120,7 @@ while getopts ":a:chpr:sV:" opt; do
            ;;
         p) pause=1 ;;
         s) gsync=1 ;;
+        t) type="$OPTARG" ;;
         :)
           echo "Option -$OPTARG requires an argument"
           echo
@@ -135,6 +138,12 @@ while getopts ":a:chpr:sV:" opt; do
     esac
 done
 shift $((OPTIND-1))
+
+case $type in
+    webview) b_wv=true;;
+    browser) b_brw=true;;
+    *) echo "unsupported or empty build type >$type<"; usage; exit 4;;
+esac
 
 # Add depot_tools to PATH
 if [ ! -d depot_tools ]; then
@@ -166,11 +175,20 @@ applyPatchReal() {
 	if [[ "$firstLine" = *"Mon Sep 17 00:00:00 2001"* ]] || [[ "$firstLine" = *"Thu Jan  1 00:00:00 1970"* ]]; then
 		if git am "$@"; then
 			git format-patch -1 HEAD --zero-commit --no-signature --output="$currentWorkingPatch";
-		fi;
+        else
+		    echo "Applying (git am): $currentWorkingPatch - FAILED"
+		    git am --abort || true
+		    echo "Applying (am - patch fallback): $currentWorkingPatch"
+		    patch -r - --no-backup-if-mismatch --forward --ignore-whitespace --verbose -p1 < $currentWorkingPatch \
+      			&& git add -A \
+      		    	&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f3-100)"
+                [ $? -ne 0 ] && echo "ERROR applying $currentWorkingPatch" && exit 3
+		fi
 	else
-		git apply "$@";
-		echo "Applying (as diff): $currentWorkingPatch";
-	fi;
+        echo "Applying (as diff): $currentWorkingPatch"
+		git apply "$@"
+        [ $? -ne 0 ] && echo "ERROR applying $currentWorkingPatch" && exit 3
+	fi
 }
 export -f applyPatchReal;
 
@@ -184,15 +202,17 @@ applyPatch() {
 				echo "Already applied: $currentWorkingPatch";
 			else
 				if git apply --check "$@" --3way &> /dev/null; then
+                    echo "Applying (as 3way): $currentWorkingPatch"
 					applyPatchReal "$@" --3way;
-					echo "Applied (as 3way): $currentWorkingPatch";
 				else
-					echo -e "\e[0;31mERROR: Cannot apply: $currentWorkingPatch\e[0m";
+					echo -e "\e[0;31mERROR: Cannot apply: $currentWorkingPatch\e[0m"
+                    exit 3
 				fi;
 			fi;
 		fi;
 	else
-		echo -e "\e[0;31mERROR: Patch doesn't exist: $currentWorkingPatch\e[0m";
+		echo -e "\e[0;31mERROR: Patch doesn't exist: $currentWorkingPatch\e[0m"
+        exit 3
 	fi;
 }
 export -f applyPatch;
