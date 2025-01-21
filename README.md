@@ -1,6 +1,6 @@
-AXP.OS WebView
+AXP.OS Browser
 =====
-The [AXP.OS](https://axpos.org/) WebView
+The [AXP.OS](https://axpos.org/) Browser 
 
 ## Use
 

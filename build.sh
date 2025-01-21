@@ -28,12 +28,12 @@ echo "Using Chromium version: $chromium_version"
 echo "Using Chromium code: $chromium_code"
 
 chromium_code_config="2024041800"
-chromium_rebrand_name="AXP.OS"
-chromium_rebrand_color="#222222" # Eerie Black
-chromium_packageid_webview="org.axpos.webview_wv"
-chromium_packageid_standalone="org.axpos.webview"
-chromium_packageid_libtrichrome="org.axpos.webview_tcl"
-chromium_packageid_config="org.axpos.webview_config"
+chromium_rebrand_name="AOSmium"
+chromium_rebrand_color="#800080" # Purple icon
+chromium_packageid_webview="org.axpos.aosmium_wv"
+chromium_packageid_standalone="org.axpos.aosmium"
+chromium_packageid_libtrichrome="org.axpos.aosmium_tcl"
+chromium_packageid_config="org.axpos.aosmium_config"
 #unzip -p chromium.apk META-INF/[SIGNER].RSA | keytool -printcert | grep "SHA256:" | sed 's/.*SHA256:* //' | sed 's/://g' |  tr '[:upper:]' '[:lower:]'
 #chromium_cert_trichrome="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
 #chromium_cert_config="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
@@ -45,7 +45,7 @@ build_targets="${build_targets:-system_webview_apk}"
 
 usage() {
     echo "Usage:"
-    echo "  build_webview [ options ]"
+    echo "  build [ options ]"
     echo
     echo "  Options:"
     echo "    -a <arch> Build specified arch"
@@ -57,7 +57,7 @@ usage() {
     echo "    -V <path> to vanadium directory"
     echo
     echo "  Example:"
-    echo "    build_webview -c -s -r $chromium_version:$chromium_code"
+    echo "    build -c -s -r $chromium_version:$chromium_code"
     echo
     exit 1
 }
@@ -82,7 +82,8 @@ build() {
     ninja -C out/$1 $build_targets
     if [ "$?" -eq 0 ]; then
         [ "$1" '==' "x64" ] && android_arch="x86_64" || android_arch=$1
-        cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
+        [[ "$build_targets" =~ "system_webview_apk" ]] && cp out/$1/apks/SystemWebView.apk ../prebuilt/$android_arch/webview-unsigned.apk
+        [[ "$build_targets" =~ "chrome_public_apk" ]] && cp out/$1/apks/ChromePublic.apk ../prebuilt/$android_arch/browser-unsigned.apk
     fi
 }
 
@@ -130,7 +131,7 @@ while getopts ":a:chpr:sV:" opt; do
           ;;
 	V)
 	  vanadiumPath="$OPTARG"
-	  [ ! -d "$vanadiumPath" ] && echo -e "ERROR: cannot find specified path >$vanadiumPath< !\nDo you have cloned Vanadium?" && exit 4
+	  [ ! -d "$vanadiumPath" ] && echo -e "ERROR: cannot find specified path >$vanadiumPath< !\nDo you have cloned Vanadium?" && usage
 	  ;;
     esac
 done
@@ -152,7 +153,9 @@ if [ $gsync -eq 1 ]; then
     echo "Syncing"
     find src -name index.lock -delete
     cd src
-    git am --abort
+    git am --abort 2>>/dev/null || true
+    git add -A 2>>/dev/null|| true
+    git reset --hard
     cd ..
     yes | gclient sync -D -R -f -r $chromium_version
 fi
@@ -164,13 +167,35 @@ applyPatchReal() {
 	currentWorkingPatch=$1;
 	firstLine=$(head -n1 "$currentWorkingPatch");
 	if [[ "$firstLine" = *"Mon Sep 17 00:00:00 2001"* ]] || [[ "$firstLine" = *"Thu Jan  1 00:00:00 1970"* ]]; then
-		if git am "$@"; then
-			git format-patch -1 HEAD --zero-commit --no-signature --output="$currentWorkingPatch";
-		fi;
+		if git am "$@" 2>/dev/null ; then
+            echo "Applied (git am): $currentWorkingPatch"
+			git format-patch -1 HEAD --zero-commit --no-signature --output="$currentWorkingPatch"
+        else
+		    echo "Applying (git am): $currentWorkingPatch - fallback"
+		    git am --abort 2>/dev/null|| true
+		    echo "Applying (patch fallback): $currentWorkingPatch"
+		    patch -r - --no-backup-if-mismatch --forward --ignore-whitespace --verbose -p1 < $currentWorkingPatch \
+      			&& git add -A > /dev/null\
+      		    	&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f3-100)"
+                if [ $? -ne 0 ];then
+                    echo "ERROR applying $currentWorkingPatch"
+                    return 3
+                else
+                    echo "Applying (am - patch fallback): $currentWorkingPatch - SUCCESS"
+                fi
+		fi
 	else
-		git apply "$@";
-		echo "Applying (as diff): $currentWorkingPatch";
-	fi;
+        echo "Applying (as diff): $currentWorkingPatch"
+		git apply "$@" \
+            && git add -A > /dev/null\
+      		&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f3-100)"
+        if [ $? -ne 0 ];then
+            echo "ERROR: applying $currentWorkingPatch (diff)"
+            return 3
+        else
+            echo "Applying (as diff): $currentWorkingPatch - SUCCESS"
+        fi
+	fi
 }
 export -f applyPatchReal;
 
@@ -184,16 +209,22 @@ applyPatch() {
 				echo "Already applied: $currentWorkingPatch";
 			else
 				if git apply --check "$@" --3way &> /dev/null; then
+                    echo "Applying (as 3way): $currentWorkingPatch"
 					applyPatchReal "$@" --3way;
-					echo "Applied (as 3way): $currentWorkingPatch";
-				else
-					echo -e "\e[0;31mERROR: Cannot apply: $currentWorkingPatch\e[0m";
-				fi;
-			fi;
-		fi;
+                else
+	 				echo "Applying (last resort): $currentWorkingPatch"
+    			    applyPatchReal "$@"
+	 			fi
+                if [ $? -ne 0 ];then
+					echo -e "\e[0;31mERROR: Cannot apply: $currentWorkingPatch\e[0m"
+                    exit 3
+				fi
+			fi
+		fi
 	else
-		echo -e "\e[0;31mERROR: Patch doesn't exist: $currentWorkingPatch\e[0m";
-	fi;
+		echo -e "\e[0;31mERROR: Patch doesn't exist: $currentWorkingPatch\e[0m"
+        exit 3
+	fi
 }
 export -f applyPatch;
 
@@ -201,9 +232,9 @@ cd src
 
 # Apply our changes
 if [ $gsync -eq 1 ]; then
- cd ..
- copy_vanadium_patches
- cd src
+    cd ..
+    copy_vanadium_patches
+    cd src
 
 	#Apply all available patches safely
 	echo "Applying patches"
@@ -214,10 +245,9 @@ if [ $gsync -eq 1 ]; then
 	#Icon rebranding
 	echo "Icon rebranding"
 	#mkdir -p android_webview/nonembedded/java/res_icon/drawable-xxxhdpi
-	find chrome/android/java/res_chromium_base/mipmap-* -name 'app_icon.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 95 {} \;
-	find chrome/android/java/res_chromium_base/mipmap-* -name 'layered_app_icon.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 95 {} \;
-	find chrome/android/java/res_chromium_base/mipmap-* -name 'layered_app_icon_background.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 95 {} \;
-	cp chrome/android/java/res_chromium_base/mipmap-mdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-mdpi/icon_webview.png
+    find chrome/android/java/res_chromium_base/mipmap-* -type f -name 'app_icon*.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 75 -gamma 0.6 {} \;
+    find chrome/android/java/res_chromium_base/mipmap-* -type f -name 'layered_app_icon*.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 75 -gamma 0.6 {} \;
+    cp chrome/android/java/res_chromium_base/mipmap-mdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-mdpi/icon_webview.png
 	cp chrome/android/java/res_chromium_base/mipmap-hdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-hdpi/icon_webview.png
 	cp chrome/android/java/res_chromium_base/mipmap-xhdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-xhdpi/icon_webview.png
 	cp chrome/android/java/res_chromium_base/mipmap-xxhdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-xxhdpi/icon_webview.png
