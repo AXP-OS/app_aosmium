@@ -1,6 +1,5 @@
-AXP.OS Browser
-=====
-The [AXP.OS](https://axpos.org/) Browser 
+AOSmium - The AXP.
+The [AXP.OS](https://axpos.org/) Browser documentation can be found: [here](https://github.com/AXP-OS/build/wiki/Browser)
 
 ## Use
 
@@ -30,7 +29,8 @@ _Building_ will be triggered when:
 #### Signing
 
 _Signing_ will be triggered when:
-- `prebuilt/*/webview-unsigned.apk` changes
+- `prebuilt/*/browser-unsigned.apk` changes
+- ˋprebuilt/*/webview-unsigned.apkˋ changes
 - `trigger-release.txt` changes
 - a _build_ finished (as that will change the apk's)
 
