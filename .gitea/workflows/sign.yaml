@@ -122,9 +122,11 @@ jobs:
         repository: ${{ vars.MIRROR_RELEASE_ORG_NAME }}/${{ github.event.repository.name }}
         name: "!UNTESTED PRE-RELEASE! ${{ env.APP_VERSION }}"
         body: |
-          # The AXP.OS Browser
+          # AOSmium -The AXP.OS Browser
 
-          See: [documentation](https://github.com/AXP-OS/build/wiki/Browser)
+          See:
+          - [Documentation](https://github.com/AXP-OS/build/wiki/Browser)
+          - [Signature](https://github.com/AXP-OS/build/wiki/Signatures#axpos-app-signature)
 
           |APK|sha512|
           |-|-|
