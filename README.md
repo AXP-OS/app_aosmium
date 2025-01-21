@@ -1,5 +1,6 @@
-AOSmium - The AXP.
-The [AXP.OS](https://axpos.org/) Browser documentation can be found: [here](https://github.com/AXP-OS/build/wiki/Browser)
+# AOSmium - The AXP.OS Browser
+
+The [AXP.OS](https://axpos.org/) documentation can be found: [here](https://github.com/AXP-OS/build/wiki/Browser)
 
 ## Use
 
