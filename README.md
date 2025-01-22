@@ -43,7 +43,7 @@ Releases will be created automatically during the _Signing_ workflow above.
 
 1. Releases will be set to **pre-release** as every build needs to be (mannually) tested first
 1. Pre-releases need to be set as stable _manually_
-1. The signed releases will be created on the Codeberg mirror only and are available [here](https://codeberg.org/AXP-OS_releases/webview_mulch/releases)
+1. The signed releases will be created on the Codeberg mirror only and are available [here](https://codeberg.org/AXP-OS_releases/app_aosmium/releases)
 
 ### CI/CD Signature
 
