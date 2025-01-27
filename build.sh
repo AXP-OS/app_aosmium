@@ -106,7 +106,7 @@ install_build_deps(){
     cd $aosmiumPath
 }
 
-while getopts ":a:chpr:sV:" opt; do
+while getopts ":a:chpr:sC:V:" opt; do
     case $opt in
         a) for arch in ${supported_archs[@]}; do
                [ "$OPTARG" '==' "$arch" ] && build_arch="$OPTARG"
