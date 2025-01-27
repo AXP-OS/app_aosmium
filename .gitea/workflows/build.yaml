@@ -22,8 +22,8 @@ jobs:
     container:
       #options: --user root  # we need all privileges within the container
       volumes:
-        - /home/androidsource/do-not-touch/webview_mulch:/workspace/AXP.OS/webview_mulch/webview
-        - /home/androidsource/do-not-touch/vanadium:/workspace/AXP.OS/webview_mulch/vanadium
+        - /home/androidsource/do-not-touch/aosmium:/workspace/AXP.OS/aosmium/webview
+        - /home/androidsource/do-not-touch/vanadium:/workspace/AXP.OS/aosmium/vanadium
     steps:
 
     - name: Prep container
@@ -78,7 +78,9 @@ jobs:
 
     - name: "Install build dependencies"
       shell: bash
-      run: cd webview/src && ./build/install-build-deps.sh --no-prompt
+      run: |
+        ls -1
+        cd webview/src && ./build/install-build-deps.sh --no-prompt
 
     - name: "Build arm"
       shell: bash
