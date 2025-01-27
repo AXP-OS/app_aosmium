@@ -100,6 +100,12 @@ copy_vanadium_patches(){
     cd $cpwd
 }
 
+install_build_deps(){
+    cd src/
+    ./build/install-build-deps.sh --no-prompt
+    cd ..
+}
+
 while getopts ":a:chpr:sV:" opt; do
     case $opt in
         a) for arch in ${supported_archs[@]}; do
@@ -163,6 +169,9 @@ if [ $gsync -eq 1 ]; then
     fi
     yes | gclient sync -D -R -f -r $chromium_version
 fi
+
+# install dependencies
+install_build_deps
 
 # fix permission denied errors:
 find src/ -type d -name bin -exec chmod -R +x {} \;
