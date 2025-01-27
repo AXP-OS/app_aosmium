@@ -82,7 +82,8 @@ jobs:
       run: |
         cd webview
         [ ! -e src/ ] && ln -s ../src
-        cd src && ./build/install-build-deps.sh --no-prompt
+        cd src
+        [ -f ./build/install-build-deps.sh ] && ./build/install-build-deps.sh --no-prompt
 
     - name: "Build arm"
       shell: bash
