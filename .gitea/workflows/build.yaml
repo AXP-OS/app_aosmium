@@ -81,7 +81,7 @@ jobs:
       shell: bash
       run: |
         cd webview
-        if [ ! -L src/ ];then ln -s ../src;fi
+        if [ ! -L src ];then ln -fs ../src;fi
         cd src
         if [ -f ./build/install-build-deps.sh ];then ./build/install-build-deps.sh --no-prompt;fi
 
