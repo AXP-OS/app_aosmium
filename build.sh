@@ -145,22 +145,23 @@ export PATH="$(pwd -P)/depot_tools:$PATH"
 
 if [ ! -d src ]; then
     echo "Initial source download"
-    fetch android
+    fetch --nohooks android
     yes | gclient sync -D -R -r $chromium_version
 fi
 
 if [ $gsync -eq 1 ]; then
     echo "Syncing"
     find src -name index.lock -delete
-    cd src
-    if [ -d .git ];then
+    if [ -d src/.git ];then
+        cd src/
         git am --abort 2>>/dev/null || true
         git add -A 2>>/dev/null|| true
         git reset --hard
+        cd ..
+    else
+        fetch --nohooks android
     fi
-    if [ ! -f .gclient ];then gclient config .;fi
     yes | gclient sync -D -R -f -r $chromium_version
-    cd ..
 fi
 
 # fix permission denied errors:
