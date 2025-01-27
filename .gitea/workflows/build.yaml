@@ -22,8 +22,8 @@ jobs:
     container:
       #options: --user root  # we need all privileges within the container
       volumes:
-        - /home/androidsource/do-not-touch/aosmium:/workspace/AXP.OS/aosmium/webview
-        - /home/androidsource/do-not-touch/vanadium:/workspace/AXP.OS/aosmium/vanadium
+        - /home/androidsource/do-not-touch/aosmium:/workspace/AXP.OS/app_aosmium/webview
+        - /home/androidsource/do-not-touch/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
     steps:
 
     - name: Prep container
