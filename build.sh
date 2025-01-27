@@ -92,7 +92,8 @@ copy_vanadium_patches(){
     cd $vanadiumPath
     git fetch --all
     git checkout $latestVanadium
-    if [ -d "$cpwd/patches/0001-Vanadium/" ];then rm -r "$cpwd/patches/0001-Vanadium/";fi
+    if [ -d "$cpwd/patches/0001-Vanadium/" ];then rm -vr "$cpwd/patches/0001-Vanadium/";fi
+    pwd
     mkdir $cpwd/patches/0001-Vanadium/
     cp patches/* $cpwd/patches/0001-Vanadium/
     cd $cpwd/patches/0001-Vanadium/
@@ -241,6 +242,7 @@ cd src
 # Apply our changes
 if [ $gsync -eq 1 ]; then
     cd ..
+    pwd
     copy_vanadium_patches
     cd src
 
