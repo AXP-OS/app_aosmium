@@ -24,7 +24,7 @@ jobs:
       volumes:
         - /home/androidsource/do-not-touch/docker_vols/aosmium:/workspace/AXP.OS/app_aosmium/webview
         - /home/androidsource/do-not-touch/docker_vols/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
-        - /home/androidsource/do-not-touch/docker_vols/chromium_src:/workspace/AXP.OS/app_aosmium/src
+        - /home/androidsource/do-not-touch/docker_vols/chromium:/workspace/AXP.OS/app_aosmium/src
     steps:
 
     - name: Prep container
