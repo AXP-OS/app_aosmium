@@ -149,25 +149,20 @@ if [ ! -d depot_tools ]; then
 fi
 export PATH="$(pwd -P)/depot_tools:$PATH"
 
-if [ ! -d src ]; then
-    echo "Initial source download"
-    fetch --nohooks android
-    yes | gclient sync -D -R -r $chromium_version
-fi
-
 if [ $gsync -eq 1 ]; then
     echo "Syncing"
-    find src -name index.lock -delete
-    if [ -d src/.git ];then
-        cd src/
+    find src/ -name index.lock -delete
+    cd src/
+    if [ -d .git ];then
         git am --abort 2>>/dev/null || true
         git add -A 2>>/dev/null|| true
         git reset --hard
-        cd ..
+        yes | gclient sync -D -R -f -r $chromium_version
     else
+        echo "Initial source download"
         fetch --nohooks android
+        yes | gclient sync -D -R -r $chromium_version
     fi
-    yes | gclient sync -D -R -f -r $chromium_version
 fi
 
 # install dependencies
