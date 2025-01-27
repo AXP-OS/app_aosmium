@@ -37,7 +37,6 @@ jobs:
         fetch-depth: 1
         lfs: true
         path: webview
-        github-server-url: "https://${{ LOCAL_ORG_DOMAIN }}:${{ LOCAL_ORG_PORT }}"
 
     - name: Checkout WebView repos
       shell: bash
