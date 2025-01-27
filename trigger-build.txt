@@ -2,7 +2,7 @@
 
 # increase the following counter for just triggering a build with default options.
 # (alternatively go into the actions tab select the build.yaml and simply start a build)
-trigger=42
+trigger=43
 
 # overwrite Vanadium version to be used. if unset or empty the latest available will be used
 # must be a valid tag (e.g. "132.0.6834.79.1")
@@ -15,11 +15,11 @@ trigger=42
 export build_targets="system_webview_apk chrome_public_apk"
 
 # by default the out/ directory will not be removed. if you want a clean build set this to 1
-export clean=1
+#export clean=1
 
 # sync the sources and apply patches?
 # should be set with the above clean var to 1
-export gsync=1
+#export gsync=1
 
 # after a successful build the workflow will push changes to this repo
 # if you do not want to auto-push set skip_push=true
