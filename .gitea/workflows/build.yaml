@@ -24,6 +24,7 @@ jobs:
       volumes:
         - /home/androidsource/do-not-touch/docker_vols/aosmium:/workspace/AXP.OS/app_aosmium/webview
         - /home/androidsource/do-not-touch/docker_vols/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
+        - /home/androidsource/do-not-touch/docker_vols/chromium_src:/workspace/AXP.OS/app_aosmium/src
     steps:
 
     - name: Prep container
@@ -79,7 +80,9 @@ jobs:
     - name: "Install build dependencies"
       shell: bash
       run: |
-        cd webview/src && ./build/install-build-deps.sh --no-prompt
+        cd webview
+        [ ! -e src/ ] && ln -s ../src
+        cd src && ./build/install-build-deps.sh --no-prompt
 
     - name: "Build arm"
       shell: bash
