@@ -93,7 +93,7 @@ copy_vanadium_patches(){
     cd $vanadiumPath
     git fetch --all
     git checkout $latestVanadium
-    if [ -d "$aosmiumPath/patches/0001-Vanadium/" ];then rm -vr "$aosmiumPath/patches/0001-Vanadium/";fi
+    if [ -d "$aosmiumPath/patches/0001-Vanadium/" ];then rm -r "$aosmiumPath/patches/0001-Vanadium/";fi
     mkdir $aosmiumPath/patches/0001-Vanadium/
     cp patches/* $aosmiumPath/patches/0001-Vanadium/
     cd $aosmiumPath/patches/0001-Vanadium/
