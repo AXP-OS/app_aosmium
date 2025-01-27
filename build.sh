@@ -156,10 +156,11 @@ if [ $gsync -eq 1 ]; then
     if [ -d .git ];then
         git am --abort 2>>/dev/null || true
         git add -A 2>>/dev/null|| true
-        git reset --hard    
+        git reset --hard
     fi
-    cd ..
+    if [ ! -f .gclient ];then gclient config .;fi
     yes | gclient sync -D -R -f -r $chromium_version
+    cd ..
 fi
 
 # fix permission denied errors:
