@@ -42,6 +42,7 @@ gsync=${gsync:-0}
 pause=0
 supported_archs=(arm arm64 x86 x64)
 build_targets="${build_targets:-system_webview_apk}"
+aosmiumPath="$PWD"
 
 usage() {
     echo "Usage:"
@@ -54,6 +55,7 @@ usage() {
     echo "    -p pause before starting the build"
     echo "    -r <release> Specify chromium release"
     echo "    -s Sync"
+    echo "    -C <path> to chromium directory"
     echo "    -V <path> to vanadium directory"
     echo
     echo "  Example:"
@@ -88,23 +90,20 @@ build() {
 }
 
 copy_vanadium_patches(){
-    cpwd="$PWD"
     cd $vanadiumPath
     git fetch --all
     git checkout $latestVanadium
-    if [ -d "$cpwd/patches/0001-Vanadium/" ];then rm -vr "$cpwd/patches/0001-Vanadium/";fi
-    pwd
-    mkdir $cpwd/patches/0001-Vanadium/
-    cp patches/* $cpwd/patches/0001-Vanadium/
-    cd $cpwd/patches/0001-Vanadium/
+    if [ -d "$aosmiumPath/patches/0001-Vanadium/" ];then rm -vr "$aosmiumPath/patches/0001-Vanadium/";fi
+    mkdir $aosmiumPath/patches/0001-Vanadium/
+    cp patches/* $aosmiumPath/patches/0001-Vanadium/
+    cd $aosmiumPath/patches/0001-Vanadium/
     bash ../rm-vanadium.sh
-    cd $cpwd
 }
 
 install_build_deps(){
-    cd src/
+    cd $chromiumPath/src
     ./build/install-build-deps.sh --no-prompt
-    cd ..
+    cd $aosmiumPath
 }
 
 while getopts ":a:chpr:sV:" opt; do
@@ -136,10 +135,11 @@ while getopts ":a:chpr:sV:" opt; do
           echo
           usage
           ;;
-	V)
-	  vanadiumPath="$OPTARG"
-	  [ ! -d "$vanadiumPath" ] && echo -e "ERROR: cannot find specified path >$vanadiumPath< !\nDo you have cloned Vanadium?" && usage
-	  ;;
+        C) chromiumPath="$OPTARG" ;;
+        V)
+        vanadiumPath="$OPTARG"
+        [ ! -d "$vanadiumPath" ] && echo -e "ERROR: cannot find specified path >$vanadiumPath< !\nDo you have cloned Vanadium?" && usage
+        ;;
     esac
 done
 shift $((OPTIND-1))
@@ -152,8 +152,8 @@ export PATH="$(pwd -P)/depot_tools:$PATH"
 
 if [ $gsync -eq 1 ]; then
     echo "Syncing"
-    find src/ -name index.lock -delete
-    cd src/
+    find $chromiumPath/src -name index.lock -delete
+    cd $chromiumPath/src
     if [ -d .git ];then
         git am --abort 2>>/dev/null || true
         git add -A 2>>/dev/null|| true
@@ -164,13 +164,14 @@ if [ $gsync -eq 1 ]; then
         fetch --nohooks android
         yes | gclient sync -D -R -r $chromium_version
     fi
+    cd $aosmiumPath
 fi
 
 # install dependencies
 install_build_deps
 
 # fix permission denied errors:
-find src/ -type d -name bin -exec chmod -R +x {} \;
+find $chromiumPath/src -type d -name bin -exec chmod -R +x {} \;
 
 applyPatchReal() {
 	currentWorkingPatch=$1;
@@ -237,20 +238,19 @@ applyPatch() {
 }
 export -f applyPatch;
 
-cd src
+cd $chromiumPath/src
 
 # Apply our changes
 if [ $gsync -eq 1 ]; then
-    cd ..
-    pwd
+    cd $aosmiumPath
     copy_vanadium_patches
-    cd src
+    cd $chromiumPath/src
 
 	#Apply all available patches safely
 	echo "Applying patches"
-	find ../patches/0001-Vanadium/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
-	find ../patches/0002-LineageOS/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
-	find ../patches/0003-Cromite/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
+	find $aosmiumPath/patches/0001-Vanadium/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
+	find $aosmiumPath/patches/0002-LineageOS/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
+	find $aosmiumPath/patches/0003-Cromite/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
 
 	#Icon rebranding
 	echo "Icon rebranding"
