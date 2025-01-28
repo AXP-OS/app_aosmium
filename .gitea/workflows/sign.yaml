@@ -9,8 +9,7 @@ name: Sign APK
 on:
   push:
     paths:
-      - 'prebuilt/**/webview-unsigned.apk'
-      - 'prebuilt/**/browser-unsigned.apk'
+      - 'prebuilt/**'
       - trigger-release.txt
   workflow_dispatch:  # button shown only when in default branch
 
