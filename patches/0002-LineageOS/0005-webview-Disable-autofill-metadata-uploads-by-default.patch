@@ -6,13 +6,13 @@ Subject: [PATCH] webview: Disable autofill metadata uploads by default
 * [haggertk - 2021-11-16] - Update per d85f6c03db147
   (Reland "[Autofill] Inline kAutofillMetadataUploads")
 ---
- components/autofill/core/browser/randomized_encoder.cc | 2 +-
+ components/autofill/core/browser/crowdsourcing/randomized_encoder.cc | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/components/autofill/core/browser/randomized_encoder.cc b/components/autofill/core/browser/randomized_encoder.cc
+diff --git a/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc b/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc
 index 201ecfe1eaa3b..f49a7bc22e8ae 100644
---- a/components/autofill/core/browser/randomized_encoder.cc
-+++ b/components/autofill/core/browser/randomized_encoder.cc
+--- a/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc
++++ b/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc
 @@ -188,7 +188,7 @@ const char RandomizedEncoder::kUrlKeyedAnonymizedDataCollectionEnabled[] =
  std::unique_ptr<RandomizedEncoder> RandomizedEncoder::Create(
      PrefService* pref_service) {
