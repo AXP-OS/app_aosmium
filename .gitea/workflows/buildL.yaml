@@ -26,16 +26,16 @@ jobs:
     - name: Prep container
       shell: bash
       run: |
-        ln -s /home/androidsource/do-not-touch/docker_vols/aosmium ${{ github.workspace }}/aosmium
-        ln -s /home/androidsource/do-not-touch/docker_vols/vanadium ${{ github.workspace }}/vanadium
-        ln -s /home/androidsource/do-not-touch/docker_vols/chromium ${{ github.workspace }}/chromium
+        ln -sv /home/androidsource/do-not-touch/docker_vols/aosmium ${{ github.workspace }}/aosmium
+        ln -sv /home/androidsource/do-not-touch/docker_vols/vanadium ${{ github.workspace }}/vanadium
+        ln -sv /home/androidsource/do-not-touch/docker_vols/chromium ${{ github.workspace }}/chromium
 
     - name: Checkout AOSmium repos
       shell: bash
       id: vanco
       run: |
-        git config user.name "gitea-actions[bot]"
-        git config user.email "<sherlock@binbash.rocks>"
+        #git config user.name "gitea-actions[bot]"
+        #git config user.email "<sherlock@binbash.rocks>"
 
         cd aosmium
         git pull
