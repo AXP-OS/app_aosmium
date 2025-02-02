@@ -102,7 +102,7 @@ copy_vanadium_patches(){
 
 install_build_deps(){
     cd $chromiumPath/src
-    ./build/install-build-deps.sh --no-prompt
+    ./build/install-build-deps.sh --no-prompt --android || true
     cd $aosmiumPath
 }
 
