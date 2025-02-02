@@ -168,7 +168,7 @@ if [ $gsync -eq 1 ]; then
 fi
 
 # install dependencies
-install_build_deps
+#install_build_deps
 
 # fix permission denied errors:
 find $chromiumPath/src -type d -name bin -exec chmod -R +x {} \;
