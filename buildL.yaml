@@ -1,0 +1,115 @@
+#####################################################################################
+# documentation:
+# - https://docs.gitea.com/usage/actions/overview
+# - https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+#####################################################################################
+
+name: Build AOSmium
+
+on:
+  push:
+    branches:
+      - ci
+    paths:
+      - trigger-build.txt
+  workflow_dispatch:  # button shown only when in default branch
+
+# NOT implemented in Gitea!
+#permissions:
+#  contents: write # allow creating releases
+
+jobs:
+  build:
+    runs-on: sfxdevsrv
+    steps:
+
+    - name: Prep container
+      shell: bash
+      run: |
+        ln -s /home/androidsource/do-not-touch/docker_vols/aosmium ${{ github.workspace }}/aosmium
+        ln -s /home/androidsource/do-not-touch/docker_vols/vanadium ${{ github.workspace }}/vanadium
+        ln -s /home/androidsource/do-not-touch/docker_vols/chromium ${{ github.workspace }}/chromium
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+        clean: false  # avoid deleting chromium sources on later runs
+        fetch-depth: 1
+        lfs: true
+        path: aosmium
+
+    - name: Checkout AOSmium repos
+      shell: bash
+      id: vanco
+      run: |
+        git config user.name "gitea-actions[bot]"
+        git config user.email "<sherlock@binbash.rocks>"
+
+        if [ ! -d "${{ github.workspace }}/vanadium/.git" ];then
+          echo "Cloning Vanadium as ${{ github.workspace }}/vanadium is not a repo"
+          git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} ${{ github.workspace }}/vanadium
+        else
+          git config --global --add safe.directory ${{ github.workspace }}/vanadium
+          cd vanadium
+          git add -A
+          git reset --hard
+          git fetch --all
+          echo "vanadium commit: $(git log -1)"
+          cd ..
+        fi
+        
+        cd vanadium
+        latestVanadium=$(git tag | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
+        webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
+        echo "WV_VER=$webview_ver" >> $GITHUB_ENV
+
+#    - name: set up JDK
+#      uses: actions/setup-java@v3
+#      with:
+#        java-version: '18'
+#        distribution: 'temurin'
+
+    - name: Setup Android SDK
+      # https://github.com/android-actions/setup-android
+      uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 12266719
+        packages: "build-tools;35.0.0"
+
+    - name: "Prep build"
+      shell: bash
+      run: |
+        cd aosmium
+        if [ ! -L src ];then ln -fs ${{ github.workspace }}/chromium/src src;fi
+
+    - name: "Build arm"
+      shell: bash
+      run: |
+        cd aosmium
+        source trigger-build.txt
+        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
+
+    - name: "Build arm64"
+      shell: bash
+      run: |
+        cd aosmium
+        source trigger-build.txt
+        
+        # never do a sync+patch again
+        # (as this is handled in the previous step already)
+        export clean=0 gsync=0
+        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
+
+    - name: Push changes and APKs
+      shell: bash
+      run: |
+        cd aosmium
+        source trigger-build.txt
+        [ -z "${{ env.WV_VER }}" ] && echo "version var empty" && exit 3
+        [ "$skip_push" == "true" ] && echo "skipping repo push" && exit 0
+        git add -A
+        git config user.name "gitea-actions[bot]"
+        git config user.email "<sherlock@binbash.rocks>"
+        git commit -m "add ${{ env.WV_VER }}"
+        git push
+
