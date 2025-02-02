@@ -26,9 +26,9 @@ jobs:
     - name: Prep container
       shell: bash
       run: |
-        ln -sv /home/androidsource/do-not-touch/docker_vols/aosmium ${{ github.workspace }}/aosmium
-        ln -sv /home/androidsource/do-not-touch/docker_vols/vanadium ${{ github.workspace }}/vanadium
-        ln -sv /home/androidsource/do-not-touch/docker_vols/chromium ${{ github.workspace }}/chromium
+        ln -sv ${{ LOCAL_SRC_PATH }}/aosmium ${{ github.workspace }}/aosmium
+        ln -sv ${{ LOCAL_SRC_PATH }}/vanadium ${{ github.workspace }}/vanadium
+        ln -sv ${{ LOCAL_SRC_PATH }}/chromium ${{ github.workspace }}/chromium
 
     - name: Checkout AOSmium repos
       shell: bash
