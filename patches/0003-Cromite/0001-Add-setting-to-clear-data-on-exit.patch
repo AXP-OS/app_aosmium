@@ -15,7 +15,6 @@ License: GPL-2.0-or-later - https://spdx.org/licenses/GPL-2.0-or-later.html
  .../chrome_browsing_data_lifetime_manager.cc  | 22 +++++-
  .../chrome_browsing_data_remover_constants.h  |  3 +-
  .../chrome_browsing_data_remover_delegate.cc  | 14 ++++
- chrome/browser/dips/dips_service_impl.cc      |  3 +-
  .../api/settings_private/prefs_util.cc        | 17 +++++
  .../browser/profiles/ProfileManagerUtils.java |  5 ++
  .../profiles/android/profile_manager_utils.cc |  5 ++
@@ -33,6 +32,7 @@ License: GPL-2.0-or-later - https://spdx.org/licenses/GPL-2.0-or-later.html
  components/browsing_data/core/pref_names.cc   | 17 +++++
  components/browsing_data/core/pref_names.h    | 10 +++
  .../search_engines/template_url_service.cc    |  1 +
+ content/browser/dips/dips_service_impl.cc     |  3 +-
  content/browser/storage_partition_impl.cc     |  1 +
  29 files changed, 324 insertions(+), 23 deletions(-)
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragmentAtStart.java
@@ -40,7 +40,7 @@ License: GPL-2.0-or-later - https://spdx.org/licenses/GPL-2.0-or-later.html
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
-@@ -309,6 +309,7 @@ chrome_java_sources = [
+@@ -316,6 +316,7 @@ chrome_java_sources = [
    "java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragmentAdvanced.java",
    "java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragmentBasic.java",
    "java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataTabsFragment.java",
@@ -51,7 +51,7 @@ diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-@@ -180,6 +180,7 @@ import org.chromium.chrome.browser.profiles.ProfileProvider;
+@@ -178,6 +178,7 @@ import org.chromium.chrome.browser.profiles.ProfileProvider;
  import org.chromium.chrome.browser.quick_delete.QuickDeleteController;
  import org.chromium.chrome.browser.quick_delete.QuickDeleteDelegateImpl;
  import org.chromium.chrome.browser.quick_delete.QuickDeleteMetricsDelegate;
@@ -59,7 +59,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedAct
  import org.chromium.chrome.browser.read_later.ReadingListBackPressHandler;
  import org.chromium.chrome.browser.recent_tabs.CrossDevicePaneFactory;
  import org.chromium.chrome.browser.reengagement.ReengagementNotificationController;
-@@ -1590,7 +1591,11 @@ public class ChromeTabbedActivity extends ChromeActivity<ChromeActivityComponent
+@@ -1639,7 +1640,11 @@ public class ChromeTabbedActivity extends ChromeActivity implements MismatchedIn
              Intent intent = getIntent();
  
              boolean hadCipherData =
@@ -70,12 +70,12 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedAct
 +                ProfileManagerUtils.removeBrowsingDataAtStart();
 +            }
  
-             String PREF_CLOSE_TABS_ON_EXIT = "close_tabs_on_exit";
              boolean noRestoreState =
+                     CommandLine.getInstance().hasSwitch(ChromeSwitches.NO_RESTORE_STATE);
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
 --- a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
-@@ -456,6 +456,10 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
+@@ -475,6 +475,10 @@ public abstract class ClearBrowsingDataFragment extends ChromeBaseSettingsFragme
      /** Returns whether is a basic or advanced Clear Browsing Data tab. */
      protected abstract @ClearBrowsingDataTab int getClearBrowsingDataTabType();
  
@@ -86,7 +86,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/C
      /**
       * Decides whether a given dialog option should be selected when the dialog is initialized.
       *
-@@ -534,6 +538,7 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
+@@ -555,6 +559,7 @@ public abstract class ClearBrowsingDataFragment extends ChromeBaseSettingsFragme
       * options.
       */
      private void onClearButtonClicked() {
@@ -94,7 +94,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/C
          if (shouldShowImportantSitesDialog()) {
              showImportantDialogThenClear();
              return;
-@@ -566,6 +571,7 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
+@@ -585,6 +590,7 @@ public abstract class ClearBrowsingDataFragment extends ChromeBaseSettingsFragme
          Button clearButton = (Button) getView().findViewById(R.id.clear_button);
          boolean isEnabled = !getSelectedOptions().isEmpty();
          clearButton.setEnabled(isEnabled);
@@ -193,7 +193,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/C
  
      private Profile mProfile;
      private ClearBrowsingDataFetcher mFetcher;
-@@ -117,6 +117,8 @@ public class ClearBrowsingDataTabsFragment extends Fragment
+@@ -115,6 +115,8 @@ public class ClearBrowsingDataTabsFragment extends Fragment
                  return getActivity().getString(R.string.clear_browsing_data_basic_tab_title);
              case 1:
                  return getActivity().getString(R.string.prefs_section_advanced);
@@ -202,7 +202,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/C
              default:
                  throw new RuntimeException("invalid position: " + position);
          }
-@@ -167,6 +169,9 @@ public class ClearBrowsingDataTabsFragment extends Fragment
+@@ -166,6 +168,9 @@ public class ClearBrowsingDataTabsFragment extends Fragment
                  case 1:
                      fragment = new ClearBrowsingDataFragmentAdvanced();
                      break;
@@ -215,7 +215,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/C
 diff --git a/chrome/app/settings_strings.grdp b/chrome/app/settings_strings.grdp
 --- a/chrome/app/settings_strings.grdp
 +++ b/chrome/app/settings_strings.grdp
-@@ -2324,6 +2324,16 @@
+@@ -2220,6 +2220,16 @@
    <message name="IDS_SETTINGS_CLEAR_BROWSING_DATA" desc="Text for delete browsing data button in Privacy options">
      Delete browsing data
    </message>
@@ -235,13 +235,13 @@ diff --git a/chrome/app/settings_strings.grdp b/chrome/app/settings_strings.grdp
 diff --git a/chrome/browser/android/browsing_data/browsing_data_bridge.cc b/chrome/browser/android/browsing_data/browsing_data_bridge.cc
 --- a/chrome/browser/android/browsing_data/browsing_data_bridge.cc
 +++ b/chrome/browser/android/browsing_data/browsing_data_bridge.cc
-@@ -340,7 +340,7 @@ static void JNI_BrowsingDataBridge_SetLastClearBrowsingDataTab(
-     const JavaParamRef<jobject>& jprofile,
-     jint tab_index) {
+@@ -304,7 +304,7 @@ static void JNI_BrowsingDataBridge_SetLastClearBrowsingDataTab(JNIEnv* env,
+                                                                Profile* profile,
+                                                                jint tab_index) {
    DCHECK_GE(tab_index, 0);
 -  DCHECK_LT(tab_index, 2);
 +  DCHECK_LT(tab_index, 3);
-   GetPrefService(jprofile)->SetInteger(
+   GetPrefService(profile)->SetInteger(
        browsing_data::prefs::kLastClearBrowsingDataTab, tab_index);
  }
 diff --git a/chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager.cc b/chrome/browser/browsing_data/chrome_browsing_data_lifetime_manager.cc
@@ -299,7 +299,7 @@ diff --git a/chrome/browser/browsing_data/chrome_browsing_data_remover_constants
 diff --git a/chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.cc b/chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.cc
 --- a/chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.cc
 +++ b/chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.cc
-@@ -464,6 +464,9 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
+@@ -462,6 +462,9 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
            CreateTaskCompletionClosure(TracingDataType::kHistory),
            &history_task_tracker_);
      }
@@ -309,7 +309,7 @@ diff --git a/chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.
      if (ClipboardRecentContent::GetInstance())
        ClipboardRecentContent::GetInstance()->SuppressClipboardContent();
  
-@@ -572,6 +575,11 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
+@@ -570,6 +573,11 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
      // and SSL host state are scoped to hosts and represent them as std::string.
      // Rename the method to indicate its more general usage.
      if (profile_->GetSSLHostStateDelegate()) {
@@ -321,7 +321,7 @@ diff --git a/chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.
        profile_->GetSSLHostStateDelegate()->Clear(
            filter_builder->MatchesAllOriginsAndDomains()
                ? base::RepeatingCallback<bool(const std::string&)>()
-@@ -600,9 +608,13 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
+@@ -598,9 +606,13 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
      }
  
      device_event_log::Clear(delete_begin_, delete_end_);
@@ -335,7 +335,7 @@ diff --git a/chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.
      content::BackgroundTracingManager::GetInstance().DeleteTracesInDateRange(
          delete_begin_, delete_end_);
  
-@@ -1302,6 +1314,8 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
+@@ -1281,6 +1293,8 @@ void ChromeBrowsingDataRemoverDelegate::RemoveEmbedderData(
  
      if (should_clear_zero_suggest_and_session_token && template_url_service)
        template_url_service->ClearSessionToken();
@@ -344,30 +344,10 @@ diff --git a/chrome/browser/browsing_data/chrome_browsing_data_remover_delegate.
    }
  
    //////////////////////////////////////////////////////////////////////////////
-diff --git a/chrome/browser/dips/dips_service_impl.cc b/chrome/browser/dips/dips_service_impl.cc
---- a/chrome/browser/dips/dips_service_impl.cc
-+++ b/chrome/browser/dips/dips_service_impl.cc
-@@ -26,6 +26,7 @@
- #include "base/time/time.h"
- #include "base/types/pass_key.h"
- #include "chrome/browser/chrome_content_browser_client.h"
-+#include "chrome/browser/browsing_data/chrome_browsing_data_remover_constants.h"
- #include "chrome/browser/dips/chrome_dips_delegate.h"
- #include "chrome/browser/dips/dips_redirect_info.h"
- #include "chrome/browser/dips/dips_service_factory.h"
-@@ -195,7 +196,7 @@ class StateClearer : public content::BrowsingDataRemover::Observer {
-     }
-     remover->RemoveWithFilterAndReply(
-         base::Time::Min(), base::Time::Max(),
--        remove_mask |
-+        remove_mask | chrome_browsing_data_remover::DATA_TYPE_SKIP_SSL_HOST_STATE |
-             content::BrowsingDataRemover::DATA_TYPE_AVOID_CLOSING_CONNECTIONS,
-         content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB |
-             content::BrowsingDataRemover::ORIGIN_TYPE_PROTECTED_WEB,
 diff --git a/chrome/browser/extensions/api/settings_private/prefs_util.cc b/chrome/browser/extensions/api/settings_private/prefs_util.cc
 --- a/chrome/browser/extensions/api/settings_private/prefs_util.cc
 +++ b/chrome/browser/extensions/api/settings_private/prefs_util.cc
-@@ -540,6 +540,23 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
+@@ -526,6 +526,23 @@ const PrefsUtil::TypedPrefMap& PrefsUtil::GetAllowlistedKeys() {
    (*s_allowlist)[browsing_data::prefs::kLastClearBrowsingDataTab] =
        settings_api::PrefType::kNumber;
  
@@ -425,7 +405,7 @@ diff --git a/chrome/browser/profiles/android/profile_manager_utils.cc b/chrome/b
 diff --git a/chrome/browser/profiles/profile_manager.cc b/chrome/browser/profiles/profile_manager.cc
 --- a/chrome/browser/profiles/profile_manager.cc
 +++ b/chrome/browser/profiles/profile_manager.cc
-@@ -1428,6 +1428,19 @@ void ProfileManager::DoFinalInit(ProfileInfo* profile_info,
+@@ -1423,6 +1423,19 @@ void ProfileManager::DoFinalInit(ProfileInfo* profile_info,
    }
  }
  
@@ -445,7 +425,7 @@ diff --git a/chrome/browser/profiles/profile_manager.cc b/chrome/browser/profile
  void ProfileManager::DoFinalInitForServices(Profile* profile,
                                              bool go_off_the_record) {
    if (!do_final_services_init_ ||
-@@ -2114,7 +2127,7 @@ void ProfileManager::OnBrowserClosed(Browser* browser) {
+@@ -2098,7 +2111,7 @@ void ProfileManager::OnBrowserClosed(Browser* browser) {
    Profile* original_profile = profile->GetOriginalProfile();
    // Do nothing if the closed window is not the last window of the same profile.
    for (Browser* browser_iter : *BrowserList::GetInstance()) {
@@ -469,7 +449,7 @@ diff --git a/chrome/browser/profiles/profile_manager.h b/chrome/browser/profiles
 diff --git a/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_browsing_data_dialog.html b/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_browsing_data_dialog.html
 --- a/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_browsing_data_dialog.html
 +++ b/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_browsing_data_dialog.html
-@@ -318,6 +318,50 @@
+@@ -297,6 +297,50 @@
                  disabled="[[clearingInProgress_]]" no-set-pref>
              </settings-checkbox>
            </div>
@@ -523,7 +503,7 @@ diff --git a/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_
 diff --git a/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_browsing_data_dialog.ts b/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_browsing_data_dialog.ts
 --- a/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_browsing_data_dialog.ts
 +++ b/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_browsing_data_dialog.ts
-@@ -297,6 +297,7 @@ export class SettingsClearBrowsingDataDialogElement extends
+@@ -239,6 +239,7 @@ export class SettingsClearBrowsingDataDialogElement extends
          value: () =>
              [loadTimeData.getString('basicPageTitle'),
               loadTimeData.getString('advancedPageTitle'),
@@ -531,7 +511,7 @@ diff --git a/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_
      ],
        },
  
-@@ -423,6 +424,7 @@ export class SettingsClearBrowsingDataDialogElement extends
+@@ -363,6 +364,7 @@ export class SettingsClearBrowsingDataDialogElement extends
      }
      this.clearButtonDisabled_ =
          this.getSelectedDataTypes_(page as HTMLElement).length === 0;
@@ -542,7 +522,7 @@ diff --git a/chrome/browser/resources/settings/clear_browsing_data_dialog/clear_
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -1454,7 +1454,7 @@ For example, some websites may respond to this request by showing you ads that a
+@@ -1363,7 +1363,7 @@ For example, some websites may respond to this request by showing you ads that a
          Delete browsing data
        </message>
        <message name="IDS_CLEAR_BROWSING_DATA_SUMMARY" desc="Summary of the settings item that opens the Delete Browsing Data dialog.">
@@ -551,7 +531,7 @@ diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chro
        </message>
        <message name="IDS_CLEAR_BROWSING_DATA_HISTORY_DIALOG_TITLE" desc="Title of a dialog that is shown after the deletion of browsing history finished.">
          Deleted Chrome data
-@@ -1615,6 +1615,9 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1484,6 +1484,9 @@ Your Google account may have other forms of browsing history like searches and a
        <message name="IDS_ANDROID_APP_HISTORY_OPEN_FULL_OTHER_FORMS" desc="The informational message at the top of the history page letting users know that app-specific history may be missing some entries, followed by the info on the other forms of browing history.">
          Some of your history might not show up here. To see all your Chrome history, open full Chrome history. Also, your Google Account may have other forms of browsing history at <ph name="BEGIN_LINK">&lt;link&gt;</ph>myactivity.google.com<ph name="END_LINK">&lt;/link&gt;</ph>.
        </message>
@@ -564,7 +544,7 @@ diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chro
 diff --git a/chrome/browser/ui/webui/settings/settings_localized_strings_provider.cc b/chrome/browser/ui/webui/settings/settings_localized_strings_provider.cc
 --- a/chrome/browser/ui/webui/settings/settings_localized_strings_provider.cc
 +++ b/chrome/browser/ui/webui/settings/settings_localized_strings_provider.cc
-@@ -1839,6 +1839,7 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
+@@ -1895,6 +1895,7 @@ void AddPrivacyStrings(content::WebUIDataSource* html_source,
        {"clearedData", IDS_SETTINGS_CLEARED_DATA},
        {"clearBrowsingData", IDS_SETTINGS_CLEAR_BROWSING_DATA},
        {"clearBrowsingDataDescription", IDS_SETTINGS_CLEAR_DATA_DESCRIPTION},
@@ -575,7 +555,7 @@ diff --git a/chrome/browser/ui/webui/settings/settings_localized_strings_provide
 diff --git a/components/browsing_data/content/browsing_data_helper.cc b/components/browsing_data/content/browsing_data_helper.cc
 --- a/components/browsing_data/content/browsing_data_helper.cc
 +++ b/components/browsing_data/content/browsing_data_helper.cc
-@@ -40,8 +40,13 @@ bool WebsiteSettingsFilterAdapter(
+@@ -39,8 +39,13 @@ bool WebsiteSettingsFilterAdapter(
    // this filter is used for is DURABLE_STORAGE, which also only uses
    // origin-scoped patterns. Such patterns can be directly translated to a GURL.
    GURL url(primary_pattern.ToString());
@@ -650,7 +630,7 @@ diff --git a/components/browsing_data/core/browsing_data_policies_utils.h b/comp
 diff --git a/components/browsing_data/core/browsing_data_utils.cc b/components/browsing_data/core/browsing_data_utils.cc
 --- a/components/browsing_data/core/browsing_data_utils.cc
 +++ b/components/browsing_data/core/browsing_data_utils.cc
-@@ -347,6 +347,37 @@ bool GetDeletionPreferenceFromDataType(
+@@ -346,6 +346,37 @@ bool GetDeletionPreferenceFromDataType(
      BrowsingDataType data_type,
      ClearBrowsingDataTab clear_browsing_data_tab,
      std::string* out_pref) {
@@ -703,7 +683,7 @@ diff --git a/components/browsing_data/core/clear_browsing_data_tab.h b/component
 diff --git a/components/browsing_data/core/pref_names.cc b/components/browsing_data/core/pref_names.cc
 --- a/components/browsing_data/core/pref_names.cc
 +++ b/components/browsing_data/core/pref_names.cc
-@@ -65,6 +65,23 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
+@@ -63,6 +63,23 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
    registry->RegisterIntegerPref(
        kClearBrowsingDataHistoryNoticeShownTimes, 0);
  
@@ -750,7 +730,7 @@ diff --git a/components/browsing_data/core/pref_names.h b/components/browsing_da
 diff --git a/components/search_engines/template_url_service.cc b/components/search_engines/template_url_service.cc
 --- a/components/search_engines/template_url_service.cc
 +++ b/components/search_engines/template_url_service.cc
-@@ -777,6 +777,7 @@ void TemplateURLService::RemoveAutoGeneratedForUrlsBetween(
+@@ -778,6 +778,7 @@ void TemplateURLService::RemoveAutoGeneratedForUrlsBetween(
      if (turl->date_created() >= created_after &&
          (created_before.is_null() || turl->date_created() < created_before) &&
          turl->safe_for_autoreplace() && turl->prepopulate_id() == 0 &&
@@ -758,10 +738,30 @@ diff --git a/components/search_engines/template_url_service.cc b/components/sear
          turl->starter_pack_id() == 0 && !MatchesDefaultSearchProvider(turl) &&
          (url_filter.is_null() ||
           url_filter.Run(turl->GenerateSearchURL(search_terms_data())))) {
+diff --git a/content/browser/dips/dips_service_impl.cc b/content/browser/dips/dips_service_impl.cc
+--- a/content/browser/dips/dips_service_impl.cc
++++ b/content/browser/dips/dips_service_impl.cc
+@@ -26,6 +26,7 @@
+ #include "base/time/time.h"
+ #include "base/types/pass_key.h"
+ #include "content/browser/browser_context_impl.h"
++#include "chrome/browser/browsing_data/chrome_browsing_data_remover_constants.h"
+ #include "content/browser/dips/dips_storage.h"
+ #include "content/browser/dips/dips_utils.h"
+ #include "content/browser/dips/persistent_repeating_timer.h"
+@@ -198,7 +199,7 @@ class StateClearer : public content::BrowsingDataRemover::Observer {
+     remove_mask &= ~content::BrowsingDataRemover::DATA_TYPE_PRIVACY_SANDBOX;
+     remover->RemoveWithFilterAndReply(
+         base::Time::Min(), base::Time::Max(),
+-        remove_mask |
++        remove_mask | chrome_browsing_data_remover::DATA_TYPE_SKIP_SSL_HOST_STATE |
+             content::BrowsingDataRemover::DATA_TYPE_AVOID_CLOSING_CONNECTIONS,
+         content::BrowsingDataRemover::ORIGIN_TYPE_UNPROTECTED_WEB |
+             content::BrowsingDataRemover::ORIGIN_TYPE_PROTECTED_WEB,
 diff --git a/content/browser/storage_partition_impl.cc b/content/browser/storage_partition_impl.cc
 --- a/content/browser/storage_partition_impl.cc
 +++ b/content/browser/storage_partition_impl.cc
-@@ -1499,6 +1499,7 @@ void StoragePartitionImpl::Initialize(
+@@ -1538,6 +1538,7 @@ void StoragePartitionImpl::Initialize(
                              .AppendASCII("Code Cache");
      }
      DCHECK_GE(settings.size_in_bytes(), 0);
