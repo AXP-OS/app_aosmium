@@ -26,9 +26,9 @@ jobs:
     - name: Prep container
       shell: bash
       run: |
-        ln -sv ${{ LOCAL_SRC_PATH }}/aosmium ${{ github.workspace }}/aosmium
-        ln -sv ${{ LOCAL_SRC_PATH }}/vanadium ${{ github.workspace }}/vanadium
-        ln -sv ${{ LOCAL_SRC_PATH }}/chromium ${{ github.workspace }}/chromium
+        ln -sv ${{ vars.LOCAL_SRC_PATH }}/aosmium ${{ github.workspace }}/aosmium
+        ln -sv ${{ vars.LOCAL_SRC_PATH }}/vanadium ${{ github.workspace }}/vanadium
+        ln -sv ${{ vars.LOCAL_SRC_PATH }}/chromium ${{ github.workspace }}/chromium
 
     - name: Checkout AOSmium repos
       shell: bash
