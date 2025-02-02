@@ -38,7 +38,7 @@ jobs:
         #git config user.email "<sherlock@binbash.rocks>"
 
         cd aosmium
-        git pull
+        git pull origin main
         git lfs pull
         cd ..
 
