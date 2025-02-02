@@ -30,20 +30,17 @@ jobs:
         ln -s /home/androidsource/do-not-touch/docker_vols/vanadium ${{ github.workspace }}/vanadium
         ln -s /home/androidsource/do-not-touch/docker_vols/chromium ${{ github.workspace }}/chromium
 
-    - uses: actions/checkout@v4
-      with:
-        submodules: true
-        clean: false  # avoid deleting chromium sources on later runs
-        fetch-depth: 1
-        lfs: true
-        path: aosmium
-
     - name: Checkout AOSmium repos
       shell: bash
       id: vanco
       run: |
         git config user.name "gitea-actions[bot]"
         git config user.email "<sherlock@binbash.rocks>"
+
+        cd aosmium
+        git pull
+        git lfs pull
+        cd ..
 
         if [ ! -d "${{ github.workspace }}/vanadium/.git" ];then
           echo "Cloning Vanadium as ${{ github.workspace }}/vanadium is not a repo"
