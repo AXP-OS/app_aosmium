@@ -124,8 +124,8 @@ jobs:
           # AOSmium -The AXP.OS Browser
 
           See:
-          - [Documentation](https://github.com/AXP-OS/build/wiki/Browser)
-          - [Signature](https://github.com/AXP-OS/build/wiki/Signatures#axpos-app-signature)
+          - [Documentation](https://axpos.org/docs/knowledge/browser/)
+          - [Signature](https://axpos.org/docs/knowledge/signatures/#axpos-app-signature)
 
           |APK|sha512|
           |-|-|
