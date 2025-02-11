@@ -12,6 +12,7 @@ on:
       - 'prebuilt/**'
       - trigger-release.txt
   workflow_dispatch:  # button shown only when in default branch
+  workflow_call:      # allow to call it after apks have been built
 
 # NOT implemented in Gitea!
 #permissions:
