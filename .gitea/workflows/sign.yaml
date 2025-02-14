@@ -119,7 +119,7 @@ jobs:
         tag_name: ${{ env.APP_VERSION }}
         prerelease: true
         server_url: https://${{ vars.MIRROR_ORG_DOMAIN }}
-        repository: ${{ vars.MIRROR_LIMITED_ORG_NAME }}/${{ github.event.repository.name }}
+        repository: ${{ vars.MIRROR_ORG_NAME }}/${{ github.event.repository.name }}
         name: "!UNTESTED PRE-RELEASE! ${{ env.APP_VERSION }}"
         body: |
           # AOSmium -The AXP.OS Browser
