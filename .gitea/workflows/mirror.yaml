@@ -24,7 +24,10 @@ jobs:
     runs-on: docker-node-latest
 
     steps:
+
     - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.LOCAL_TOKEN_RO }}
 
     - name: "Create/Sync repos with configured mirror"
       # https://github.com/k8scat/action-mirror-git
@@ -40,12 +43,32 @@ jobs:
         dest_username: "${{ vars.MIRROR_ORG_NAME }}"
         dest_token: ${{ secrets.MIRROR_TOKEN_RW }}
         mirror_repos: ${{ github.event.repository.name }}
-        dest_create_repo_script: |
-          curl \
-            -H 'Content-Type: application/json' \
-            -H "Authorization: token ${INPUT_DEST_TOKEN}" \
-            -d "{\"name\":\"${REPO_NAME}\",\"private\":false}" \
-            '${{ vars.MIRROR_API_CREATE_REPO }}'
+#    disabled on codeberg ("Push to create is not enabled for organizations")
+#        dest_create_repo_script: |
+#          curl \
+#            -H 'Content-Type: application/json' \
+#            -H "Authorization: token ${{ secrets.MIRROR_TOKEN_RW }}" \
+#            -d "{\"name\":\"${{ github.event.repository.name }}\",\"private\":false}" \
+#            "https://${{ vars.MIRROR_ORG_DOMAIN }}/api/v1/repos/${{ vars.MIRROR_ORG_NAME }}/repos"
+
+    - name: "Set default branch"
+      run: |
+        echo "repo: >${{ github.event.repository.name }}<"
+        DEFBR=$(git branch --show-current)
+        echo "current on: >$DEFBR<"
+        RESP=$(curl -siX 'PATCH' \
+              "https://${{ vars.MIRROR_ORG_DOMAIN }}/api/v1/repos/${{ vars.MIRROR_ORG_NAME }}/${{ github.event.repository.name }}" \
+              -H "Authorization: token ${{ secrets.MIRROR_TOKEN_RW }}" \
+              -H 'accept: application/json' \
+              -H 'Content-Type: application/json' \
+              -d  '{ "default_branch": "'$DEFBR'" }')
+        if [ $? -ne 0 ];then echo "WARNING: unusual error ($?) occured during the patch request";fi
+        STATUS_CODE=$(echo "$RESP" | head -n 1 | cut -d ' ' -f2)
+        if [ "$STATUS_CODE" == "200" ]; then
+          echo "default branch set"
+        else
+          echo -e "WARNING: issue occured while setting default branch: $STATUS_CODE!\n$RESP"
+        fi
 
     - name: "Sync LFS"
       uses: valtech-sd/git-sync@v9
