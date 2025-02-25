@@ -115,7 +115,12 @@ jobs:
         git commit -m "add ${{ env.WV_VER }}"
         git push
 
+  mirror:
+    needs: build
+    uses: ./.gitea/workflows/mirror.yaml
+    secrets: inherit
+
   sign:
     needs: build
-    uses: ./.gitea/workflows/mirror_releases_org.yaml
+    uses: ./.gitea/workflows/sign.yaml
     secrets: inherit
