@@ -102,8 +102,12 @@ jobs:
         export clean=0 gsync=0
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
 
+    # we need to use a different token to push.
+    # action user cannot trigger a new workflow which is by design to avoid recycle triggering.
     - name: Push changes and APKs
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ secrets.LOCAL_TOKEN_PUSH }}
       run: |
         cd aosmium
         source trigger-build.txt
@@ -120,7 +124,7 @@ jobs:
 #    uses: ./.gitea/workflows/mirror.yaml
 #    secrets: inherit
 
-  sign:
-    needs: build
-    uses: ./.gitea/workflows/sign.yaml
-    secrets: inherit
+#  sign:
+#    needs: build
+#    uses: ./.gitea/workflows/sign.yaml
+#    secrets: inherit
