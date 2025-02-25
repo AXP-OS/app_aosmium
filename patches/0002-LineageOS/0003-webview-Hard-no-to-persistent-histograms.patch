@@ -15,18 +15,18 @@ Subject: [PATCH] webview: Hard no to persistent histograms
  1 file changed, 2 insertions(+)
 
 diff --git a/android_webview/browser/aw_field_trials.cc b/android_webview/browser/aw_field_trials.cc
-index 73641807044ad..0db485266564e 100644
+index 3106ff055433a..43d68ebc7e586 100644
 --- a/android_webview/browser/aw_field_trials.cc
 +++ b/android_webview/browser/aw_field_trials.cc
-@@ -92,6 +92,7 @@ class AwFeatureOverrides {
- }  // namespace
+@@ -77,6 +77,7 @@ void AwFeatureOverrides::OverrideFeatureWithFieldTrial(
+ }  // namespace internal
  
  void AwFieldTrials::OnVariationsSetupComplete() {
 +#if 0
    // Persistent histograms must be enabled ASAP, but depends on Features.
    base::FilePath metrics_dir;
    if (base::PathService::Get(base::DIR_ANDROID_APP_DATA, &metrics_dir)) {
-@@ -99,6 +100,7 @@ void AwFieldTrials::OnVariationsSetupComplete() {
+@@ -84,6 +85,7 @@ void AwFieldTrials::OnVariationsSetupComplete() {
    } else {
      NOTREACHED();
    }
