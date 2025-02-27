@@ -21,7 +21,14 @@ on:
 jobs:
   build:
     runs-on: docker-node-latest
-
+    outputs:
+      APP_VERSION: ${{ steps.vars.outputs.APP_VERSION }}
+      SHA32_WV: ${{ steps.hash.outputs.SHA32_WV }}
+      SHA64_WV: ${{ steps.hash.outputs.SHA64_WV }}
+      SHA32_BRW: ${{ steps.hash.outputs.SHA32_BRW }}
+      SHA64_BRW: ${{ steps.hash.outputs.SHA64_BRW }}
+      git_sha_short:  ${{ steps.ver.outputs.git_sha_short }}
+      upload_art_id: ${{ steps.upload.outputs.artifact-id }}
     steps:
 
     - name: Prep container
@@ -48,6 +55,7 @@ jobs:
 
     # https://github.com/r0adkll/sign-android-release/issues/84#issuecomment-1885690080
     - name: "Get & set app and build variables"
+      id: vars
       shell: bash
       run: |
         #see: https://maven.google.com/web/index.html#com.android.tools.build:aapt2
@@ -75,10 +83,16 @@ jobs:
         fi
 
         echo "APP_VERSION=${OVER}" >> $GITHUB_ENV
-        echo "APP64_VERSION=${APPV64}" >> $GITHUB_ENV
+        echo "APP32_VERSION=${APPV32}" >> $GITHUB_ENV
         echo "APP64_VERSION=${APPV64}" >> $GITHUB_ENV
         git_sha_short=$(git rev-parse --short "$GITHUB_SHA")
         echo "git_sha_short=$git_sha_short" >> $GITHUB_ENV
+
+        echo "APP_VERSION=${OVER}" >> $GITHUB_OUTPUT
+        #echo "APP32_VERSION=${APPV32}" >> $GITHUB_OUTPUT
+        #echo "APP64_VERSION=${APPV64}" >> $GITHUB_OUTPUT
+        echo "git_sha_short=$git_sha_short" >> $GITHUB_OUTPUT
+
         echo "APP32 version is: $APPV32 ($git_sha_short)"
         echo "APP64 version is: $APPV64 ($git_sha_short)"
 
@@ -100,6 +114,7 @@ jobs:
         keyPassword: ${{ secrets.APK_KEY_PASSWORD }}
 
     - name: Prep release
+      id: hash
       run: |
         cd apks
         sha512sum webview32-signed.apk > webview32-signed.apk.sha512
@@ -107,36 +122,19 @@ jobs:
         sha512sum browser32-signed.apk > browser32-signed.apk.sha512
         sha512sum browser64-signed.apk > browser64-signed.apk.sha512
 
-        echo "SHA32_WV=$(cat webview32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_ENV
-        echo "SHA64_WV=$(cat webview64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_ENV
-        echo "SHA32_BRW=$(cat browser32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_ENV
-        echo "SHA64_BRW=$(cat browser64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_ENV
+        echo "SHA32_WV=$(cat webview32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+        echo "SHA64_WV=$(cat webview64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+        echo "SHA32_BRW=$(cat browser32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+        echo "SHA64_BRW=$(cat browser64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
 
-    - name: Generate pre-release on MIRROR
-      uses: https://gitea.com/actions/gitea-release-action@v1
+    - name: Upload all files as artifact
+      uses: actions/upload-artifact@v3
+      id: upload
       with:
-        token: "${{ secrets.MIRROR_TOKEN_RW }}"
-        tag_name: ${{ env.APP_VERSION }}
-        prerelease: true
-        server_url: https://${{ vars.MIRROR_ORG_DOMAIN }}
-        repository: ${{ vars.MIRROR_ORG_NAME }}/${{ github.event.repository.name }}
-        name: "!UNTESTED PRE-RELEASE! ${{ env.APP_VERSION }}"
-        body: |
-          # AOSmium -The AXP.OS Browser
-
-          See:
-          - [Documentation](https://axpos.org/docs/knowledge/browser/)
-          - [Signature](https://axpos.org/docs/knowledge/signatures/#axpos-app-signature)
-
-          |APK|sha512|
-          |-|-|
-          |webview32-signed.apk|${{ env.SHA32_WV }}|
-          |webview64-signed.apk|${{ env.SHA64_WV }}|
-          |browser32-signed.apk|${{ env.SHA32_BRW }}|
-          |browser64-signed.apk|${{ env.SHA64_BRW }}|
-
-          [Signature](${{ vars.SIGNATURE_LINK }})
-        files: |
+        name: release-artifact
+        retention-days: 1
+        if-no-files-found: error
+        path: |
             ${{ steps.signAPK.outputs.signedFile0 }}
             ${{ steps.signAPK.outputs.signedFile0 }}.sha512
             ${{ steps.signAPK.outputs.signedFile1 }}
@@ -146,27 +144,71 @@ jobs:
             ${{ steps.signAPK.outputs.signedFile3 }}
             ${{ steps.signAPK.outputs.signedFile3 }}.sha512
 
-#    - name: Generate pre-release
-#      uses: https://gitea.com/actions/gitea-release-action@v1
-#      # https://github.com/akkuman/gitea-release-action
-#      with:
-#        token: "${{ secrets.LOCAL_TOKEN_REPO_RW }}"
-#        tag_name: ${{ env.APP_VERSION }}
-#        prerelease: true
-#        name: "!UNTESTED PRE-RELEASE! ${{ env.APP_VERSION }}"
-#        body: |
-#          # The AXP.OS WebView
-#
-#          |APK|sha512|
-#          |-|-|
-#          |webview32-signed.apk|${{ env.SHA32 }}|
-#          |webview64-signed.apk|${{ env.SHA64 }}|
-#
-#          [Signature](${{ vars.SIGNATURE_LINK }})
-#        files: |
-#            ${{ steps.signAPK.outputs.signedFile0 }}
-#            ${{ steps.signAPK.outputs.signedFile0 }}.sha512
-#            ${{ steps.signAPK.outputs.signedFile1 }}
-#            ${{ steps.signAPK.outputs.signedFile1 }}.sha512
+  release-codeberg:
+    name: "Release @Codeberg"
+    uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_mirror_main.yaml@main
+    runs-on: docker-node-latest
+    needs: build
+    secrets: inherit
+    with:
+      workflow_id: ${{ github.run_id }}
+      repo: ${{ github.event.repository.name }} # without org!
+      title: "!UNTESTED PRE-RELEASE! ${{ needs.build.outputs.APP_VERSION }}"
+      tag: ${{ needs.build.outputs.APP_VERSION }}
+      targetc: main
+      pre: true
+      #filepattern: '*.apk'
+      body: |
+          # AOSmium -The AXP.OS Browser
 
+          See:
+          - [Documentation](https://axpos.org/docs/knowledge/browser/)
+          - [Signature](https://axpos.org/docs/knowledge/signatures/#axpos-app-signature)
 
+          |APK|sha512|
+          |-|-|
+          |webview32-signed.apk|${{ needs.build.outputs.SHA32_WV }}|
+          |webview64-signed.apk|${{ needs.build.outputs.SHA64_WV }}|
+          |browser32-signed.apk|${{ needs.build.outputs.SHA32_BRW }}|
+          |browser64-signed.apk|${{ needs.build.outputs.SHA64_BRW }}|
+
+          [Signature](${{ vars.SIGNATURE_LINK }})
+
+  release-github:
+    name: "Release @github"
+    uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_mirror_second.yaml@main
+    runs-on: docker-node-latest
+    needs: [ build, release-codeberg ]
+    secrets: inherit
+    with:
+      workflow_id: ${{ github.run_id }}
+      repo: ${{ github.event.repository.name }} # without org!
+      title: "!UNTESTED PRE-RELEASE! ${{ needs.build.outputs.APP_VERSION }}"
+      tag: ${{ needs.build.outputs.APP_VERSION }}
+      targetc: main
+      pre: true
+      #filepattern: '*.apk'
+      body: >-
+          # AOSmium -The AXP.OS Browser\n
+          \n
+          See:\n
+          - [Documentation](https://axpos.org/docs/knowledge/browser/)\n
+          - [Signature](https://axpos.org/docs/knowledge/signatures/#axpos-app-signature)\n
+          \n
+          |APK|sha512|\n
+          |-|-|\n
+          |webview32-signed.apk|${{ needs.build.outputs.SHA32_WV }}|\n
+          |webview64-signed.apk|${{ needs.build.outputs.SHA64_WV }}|\n
+          |browser32-signed.apk|${{ needs.build.outputs.SHA32_BRW }}|\n
+          |browser64-signed.apk|${{ needs.build.outputs.SHA64_BRW }}|\n
+          \n
+          [Signature](${{ vars.SIGNATURE_LINK }})
+      filelist: >-
+          browser32-signed.apk
+          browser32-signed.apk.sha512
+          browser64-signed.apk
+          browser64-signed.apk.sha512
+          webview32-signed.apk
+          webview32-signed.apk.sha512
+          webview64-signed.apk
+          webview64-signed.apk.sha512
