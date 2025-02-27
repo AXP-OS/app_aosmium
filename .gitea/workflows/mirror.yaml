@@ -18,6 +18,7 @@ on:
     tags:
       - '*'
   workflow_dispatch:  # button shown only when in default branch
+  workflow_call:      # allow to call it
 
 jobs:
   build:
