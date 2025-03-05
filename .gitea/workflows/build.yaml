@@ -21,7 +21,7 @@ jobs:
     runs-on: docker-node-latest
     container:
       #options: --user root  # we need all privileges within the container
-      options: --memory 80g
+      #options: --memory 80g
       volumes:
         - /home/androidsource/do-not-touch/docker_vols/aosmium:/workspace/AXP.OS/app_aosmium/aosmium
         - /home/androidsource/do-not-touch/docker_vols/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
@@ -85,6 +85,8 @@ jobs:
         if [ ! -L src ];then ln -fs ${{ github.workspace }}/chromium/src src;fi
 
     - name: "Build arm"
+      env:
+        JAVA_OPTS: ${{ vars.JAVA_OPTS }}
       shell: bash
       run: |
         cd aosmium
@@ -92,6 +94,8 @@ jobs:
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
 
     - name: "Build arm64"
+      env:
+        JAVA_OPTS: ${{ vars.JAVA_OPTS }}
       shell: bash
       run: |
         cd aosmium
