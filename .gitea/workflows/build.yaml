@@ -91,6 +91,10 @@ jobs:
       run: |
         cd aosmium
         source trigger-build.txt
+        
+        # fix java OOM?!
+        sed -i 's/defaultMx="-Xmx2G"/defaultMx="-Xmx8G"/' ${{ github.workspace }}/chromium/src/third_party/android_sdk/public/build-tools/35.0.0/d8
+
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
 
     - name: "Build arm64"
