@@ -279,10 +279,6 @@ if [ $gsync -eq 1 ]; then
 	#Prepare the filter lists
 	#python vanadium/android_config/filter_lists/filter_list_download.py --output vanadium/android_config/filter_lists/filter_lists.txt --urls https://easylist.to/easylist/easylist.txt https://easylist.to/easylist/easyprivacy.txt https://divested.dev/hosts-domains-wildcards https://filters.adtidy.org/extension/ublock/filters/11.txt https://filters.adtidy.org/extension/ublock/filters/17.txt https://filters.adtidy.org/extension/ublock/filters/18.txt https://filters.adtidy.org/extension/ublock/filters/19.txt https://filters.adtidy.org/extension/ublock/filters/20.txt https://filters.adtidy.org/extension/ublock/filters/21.txt https://filters.adtidy.org/extension/ublock/filters/22.txt https://filters.adtidy.org/extension/ublock/filters/2.txt https://filters.adtidy.org/extension/ublock/filters/3.txt https://filters.adtidy.org/extension/ublock/filters/4.txt https://malware-filter.gitlab.io/phishing-filter/phishing-filter.txt https://malware-filter.gitlab.io/urlhaus-filter/urlhaus-filter-ag-online.txt https://ublockorigin.github.io/uAssets/filters/annoyances-cookies.txt https://ublockorigin.github.io/uAssets/filters/badware.txt https://ublockorigin.github.io/uAssets/filters/filters.txt https://ublockorigin.github.io/uAssets/filters/lan-block.txt https://ublockorigin.github.io/uAssets/filters/privacy.txt https://ublockorigin.github.io/uAssets/filters/quick-fixes.txt https://ublockorigin.github.io/uAssets/filters/unbreak.txt
 	#wc -l vanadium/android_config/filter_lists/filter_lists.txt
- 
- # fix java OOM?!
- sed -i 's/defaultMx="-Xmx2G"/defaultMx="-Xmx8G"/' third_party/android_sdk/public/build-tools/35.0.0/d8
-
 fi
 
 if [ $pause -eq 1 ]; then
