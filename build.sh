@@ -281,7 +281,12 @@ if [ $gsync -eq 1 ]; then
 	#wc -l vanadium/android_config/filter_lists/filter_lists.txt
     
     # fix java OOM?!
-    sed -i -E 's#^exec java "\$\{javaOpts\[\@\]\}"#exec java "${javaOpts[@]/-Xmx2G/-Xmx8G}"#g' third_party/android_sdk/public/build-tools/*/d8
+    sed -i -e '/^exec java/i \
+for i in "${!javaOpts[@]}"; do \
+  if [[ "${javaOpts[$i]}" == "Xmx2G" ]]; then \
+    javaOpts[$i]="Xmx8G" \
+  fi \
+done' third_party/android_sdk/public/build-tools/*/d8
 fi
 
 if [ $pause -eq 1 ]; then
