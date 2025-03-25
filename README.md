@@ -1,6 +1,6 @@
 # AOSmium - The AXP.OS Browser
 
-The [AXP.OS](https://axpos.org/) documentation can be found: [here](https://github.com/AXP-OS/build/wiki/Browser)
+The [AXP.OS](https://axpos.org/) documentation can be found: [here](https://axpos.org/docs/knowledge/browser/)
 
 ## Use
 
@@ -9,7 +9,7 @@ The [AXP.OS](https://axpos.org/) documentation can be found: [here](https://gith
 - Standalone versions might be build as well
 - Integration config:
     - easily by using [EXTENDROM](https://github.com/sfX-android/android_vendor_extendrom) (`EXTENDROM_PACKAGES="AXP.OS_WebView64"` or `"AXP.OS_WebView32"`)
-    - manually by adding [its signature](https://github.com/sfX-android/android_vendor_extendrom/blob/main/extra/webview_axp.os.sig.xml) to your overlay of `frameworks/base/core/res/res/xml/config_webview_packages.xml`
+    - manually by adding [its signature](https://github.com/sfX-android/android_vendor_extendrom/blob/main/extra/webview_aosmium.sig.xml) to your overlay of `frameworks/base/core/res/res/xml/config_webview_packages.xml`
 
 ## Automation
 
@@ -47,7 +47,7 @@ Releases will be created automatically during the _Signing_ workflow above.
 
 ### CI/CD Signature
 
-This app is signed by the [AXP.OS app key](https://github.com/AXP-OS/build/wiki/Signatures#axpos-app-signature)
+This app is signed by the [AXP.OS app key](https://axpos.org/docs/knowledge/signatures/#axpos-app-signature)
 
 ## Goals
 
