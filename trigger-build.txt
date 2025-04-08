@@ -16,11 +16,11 @@ trigger=47
 export build_targets="chrome_public_apk system_webview_apk"
 
 # by default the out/ directory will not be removed. if you want a clean build set this to 1
-#export clean=1
+export clean=1
 
 # sync the sources and apply patches?
 # should be set with the above clean var to 1
-#export gsync=1
+export gsync=1
 
 
 
