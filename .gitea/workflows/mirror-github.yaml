@@ -82,10 +82,3 @@ jobs:
           echo -e "WARNING: issue occured while setting default branch to $DEFBR: $?"
         fi
 
-    - name: "Sync LFS"
-      uses: valtech-sd/git-sync@v9
-      with:
-        source_repo: "https://tok:${{ secrets.LOCAL_TOKEN_RO }}@${{ vars.LOCAL_ORG_DOMAIN }}:${{ vars.LOCAL_ORG_PORT }}/${{ vars.LOCAL_ORG_NAME }}/${{ github.event.repository.name }}"
-        source_branch: "${{ github.event.ref }}"
-        destination_repo: "https://tok:${{ secrets.SCND_MIRROR_TOKEN_RW }}@${{ vars.SCND_MIRROR_ORG_DOMAIN }}/${{ vars.SCND_MIRROR_ORG_NAME }}/${{ github.event.repository.name }}"
-        destination_branch: "${{ github.event.ref }}"
