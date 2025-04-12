@@ -23,9 +23,9 @@ jobs:
       #options: --user root  # we need all privileges within the container
       #options: --memory 80g
       volumes:
-        - /home/androidsource/do-not-touch/docker_vols/aosmium:/workspace/AXP.OS/app_aosmium/aosmium
-        - /home/androidsource/do-not-touch/docker_vols/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
-        - /home/androidsource/do-not-touch/docker_vols/chromium:/workspace/AXP.OS/app_aosmium/chromium
+        - /home/aosp/docker_vols/aosmium:/workspace/AXP.OS/app_aosmium/aosmium
+        - /home/aosp/docker_vols/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
+        - /home/aosp/docker_vols/chromium:/workspace/AXP.OS/app_aosmium/chromium
     steps:
 
     - name: Prep container
