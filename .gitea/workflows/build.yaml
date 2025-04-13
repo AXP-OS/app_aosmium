@@ -76,7 +76,7 @@ jobs:
       uses: android-actions/setup-android@v3
       with:
         cmdline-tools-version: 12266719
-        packages: "build-tools;35.0.0"
+        packages: "build-tools;36.0.0"
 
     - name: "Prep build"
       shell: bash
