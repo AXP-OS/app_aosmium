@@ -152,16 +152,17 @@ export PATH="$(pwd -P)/depot_tools:$PATH"
 
 if [ $gsync -eq 1 ]; then
     echo "Syncing"
-    find $chromiumPath/src -name index.lock -delete
-    cd $chromiumPath/src
-    if [ -d .git ];then
+    if [ -d $chromiumPath/src/.git ];then
+        find $chromiumPath/src -name index.lock -delete
+        cd $chromiumPath/src
         git am --abort 2>>/dev/null || true
         git add -A 2>>/dev/null|| true
         git reset --hard
         yes | gclient sync -D -R -f -r $chromium_version
     else
         echo "Initial source download"
-        fetch --nohooks android
+        cd $chromiumPath
+        fetch --nohooks android || true
         yes | gclient sync -D -R -r $chromium_version
     fi
     cd $aosmiumPath
