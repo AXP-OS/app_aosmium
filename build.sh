@@ -102,7 +102,10 @@ copy_vanadium_patches(){
 
 install_build_deps(){
     cd $chromiumPath/src
-    ./build/install-build-deps.sh --no-prompt
+    ./build/install-build-deps.sh --no-prompt \
+    --no-chromeos-fonts \
+    --no-syms \
+    --no-backwards-compatible
     cd $aosmiumPath
 }
 
