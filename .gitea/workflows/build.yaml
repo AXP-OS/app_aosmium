@@ -35,7 +35,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: true
-        clean: false  # avoid deleting chromium sources on later runs
+        clean: true
         fetch-depth: 1
         lfs: true
         path: aosmium
@@ -71,18 +71,18 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
-    - name: Setup Android SDK
-      # https://github.com/android-actions/setup-android
-      uses: android-actions/setup-android@v3
-      with:
-        cmdline-tools-version: 12266719
-        packages: "build-tools;36.0.0"
+#    - name: Setup Android SDK
+#      # https://github.com/android-actions/setup-android
+#      uses: android-actions/setup-android@v3
+#      with:
+#        cmdline-tools-version: 12266719
+#        packages: "build-tools;36.0.0"
 
-    - name: "Prep build"
-      shell: bash
-      run: |
-        cd aosmium
-        if [ ! -L src ];then ln -fs ${{ github.workspace }}/chromium/src src;fi
+#    - name: "Prep build"
+#      shell: bash
+#      run: |
+#        cd aosmium
+#        if [ ! -L src ];then ln -fs ${{ github.workspace }}/chromium/src src;fi
 
     - name: "Build arm"
       env:
