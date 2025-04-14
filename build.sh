@@ -106,6 +106,9 @@ install_build_deps(){
     --no-chromeos-fonts \
     --no-syms \
     --no-backwards-compatible
+
+    gclient runhooks
+
     cd $aosmiumPath
 }
 
@@ -161,6 +164,7 @@ if [ $gsync -eq 1 ]; then
         git am --abort 2>>/dev/null || true
         git add -A 2>>/dev/null|| true
         git reset --hard
+        git rebase-update
         yes | gclient sync -D -R -f -r $chromium_version
     else
         echo "Initial source download"
@@ -168,6 +172,7 @@ if [ $gsync -eq 1 ]; then
         fetch --nohooks android || true
         yes | gclient sync -D -R -r $chromium_version
     fi
+    gclient runhooks
     cd $aosmiumPath
 fi
 
