@@ -159,11 +159,12 @@ export PATH="$(pwd -P)/depot_tools:$PATH"
 if [ $gsync -eq 1 ]; then
     echo "Syncing"
     if [ -d $chromiumPath/src/.git ];then
+        echo "Updating sources"
         find $chromiumPath/src -name index.lock -delete
         cd $chromiumPath/src
         git am --abort 2>>/dev/null || true
         git add -A 2>>/dev/null|| true
-        git reset --hard
+        git commit -m "build.sh: before-rebase"
         git rebase-update
         yes | gclient sync -D -R -f -r $chromium_version
     else
