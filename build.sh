@@ -153,6 +153,9 @@ shift $((OPTIND-1))
 # Add depot_tools to PATH
 if [ ! -d depot_tools ]; then
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+else
+    cd depot_tools
+    git pull
 fi
 export PATH="$(pwd -P)/depot_tools:$PATH"
 
