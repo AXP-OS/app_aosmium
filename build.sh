@@ -321,7 +321,7 @@ args+=' enable_resource_allowlist_generation=false'
 args+=' enable_remoting=false'
 args+=' enable_arcore=false'
 args+=' enable_openxr=false'
-args+=' enable_cardboard=false'
+args+=' enable_cardboard=false' # virtual reality (VR) platform by Google
 args+=' enable_vr=false'
 args+=' use_official_google_api_keys=false'
 args+=' chrome_pgo_phase=false'
@@ -336,6 +336,7 @@ args+=' use_relative_vtables_abi=false'
 args+=' enable_reporting=false' #Privacy
 args+=' use_v8_context_snapshot=false' # see https://github.com/uazo/cromite/pull/317 for context
 args+=' include_both_v8_snapshots=false' # see https://github.com/uazo/cromite/blob/c00bb4e191c836301b797f913b57a2c54f32b068/build/chromium.gn_args#L8-L9
+args+=' is_high_end_android=false' # TESTING. optimize ressource usage for low-end Android devices (drawbacks in performance for high end?!)
 #args+=' use_relr_relocations=true' # optimize speed+size, requires SDK28+ though!
 
 #args+=' config_apk_package="'$chromium_packageid_config'"' #Config app
