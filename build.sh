@@ -334,6 +334,10 @@ args+=' is_cfi=true' #Security
 args+=' use_cfi_cast=true'
 args+=' use_relative_vtables_abi=false'
 args+=' enable_reporting=false' #Privacy
+args+=' use_v8_context_snapshot=false' # see https://github.com/uazo/cromite/pull/317 for context
+args+=' include_both_v8_snapshots=false' # see https://github.com/uazo/cromite/blob/c00bb4e191c836301b797f913b57a2c54f32b068/build/chromium.gn_args#L8-L9
+#args+=' use_relr_relocations=true' # optimize speed+size, requires SDK28+ though!
+
 #args+=' config_apk_package="'$chromium_packageid_config'"' #Config app
 #args+=' config_apk_certdigest="'$chromium_cert_config'"'
 #args+=' config_apk_version_name="'$chromium_code_config'"'
