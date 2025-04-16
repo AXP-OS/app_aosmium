@@ -165,9 +165,9 @@ if [ $gsync -eq 1 ]; then
         echo "Updating sources"
         find $chromiumPath/src -name index.lock -delete
         cd $chromiumPath/src
-        git am --abort 2>>/dev/null || true
-        git add -A 2>>/dev/null|| true
-        git commit -m "build.sh: before-rebase"
+        git reset --hard 2>>/dev/null || true
+        git add -A 2>>/dev/null || true
+        git commit -m "build.sh: before-rebase" || true
         git rebase-update
         yes | gclient sync --jobs=8 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     else
