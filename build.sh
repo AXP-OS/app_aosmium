@@ -169,14 +169,19 @@ if [ $gsync -eq 1 ]; then
         git add -A 2>>/dev/null || true
         git commit -m "build.sh: before-rebase" || true
         git rebase-update
-        yes | gclient sync --jobs=8 --force --delete_unversioned_trees --reset --revision="$chromium_version"
+        cd ..
+        yes | gclient sync --jobs=16 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     else
         echo "Initial source download"
         cd $chromiumPath
         fetch --nohooks android || true
-        yes | gclient sync --jobs=8 --force --delete_unversioned_trees --reset --revision="$chromium_version"
+        yes | gclient sync --jobs=16 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     fi
     gclient runhooks
+
+    # workaround for android sdk which keeps on 35!?
+    #gclient sync --revision src/third_party/android_sdk/public/platforms/android-36@HEAD
+
     cd $aosmiumPath
 fi
 
