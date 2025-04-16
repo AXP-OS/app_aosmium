@@ -169,12 +169,12 @@ if [ $gsync -eq 1 ]; then
         git add -A 2>>/dev/null|| true
         git commit -m "build.sh: before-rebase"
         git rebase-update
-        yes | gclient sync -D -R -f -r $chromium_version
+        yes | gclient sync --jobs=8 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     else
         echo "Initial source download"
         cd $chromiumPath
         fetch --nohooks android || true
-        yes | gclient sync -D -R -r $chromium_version
+        yes | gclient sync --jobs=8 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     fi
     gclient runhooks
     cd $aosmiumPath
