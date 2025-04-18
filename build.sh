@@ -10,6 +10,14 @@
 #########################################################################################
 set -e
 
+tagmsg(){
+    MSG="$1"
+
+    echo -e "\n########################################################"
+    echo -e "$MSG"
+    echo -e "########################################################\n"
+}
+
 # grab latest published Vanadium tag
 real_latestVanadium=$(git ls-remote --tags https://github.com/GrapheneOS/Vanadium.git "*.*.*" | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
 latestVanadium="${vanadium_version:-$real_latestVanadium}"
@@ -25,7 +33,7 @@ chromium_code="${chromium_code:-$relatedChromiumCode}"
 
 echo "Using Vanadium version: $latestVanadium"
 echo "Using Chromium version: $chromium_version"
-echo "Using Chromium code: $chromium_code"
+tagmsg "Using Chromium code: $chromium_code"
 
 chromium_code_config="2024041800"
 chromium_rebrand_name="AOSmium"
@@ -86,14 +94,14 @@ build() {
     gn gen "out/$1" --args="$build_args"
 
     for bt in $build_targets;do
-        echo "Building: $bt (from: $build_targets)"
+        tagmsg "Building: $bt (from: $build_targets)"
         ninja -C out/$1 $bt
         if [ "$?" -eq 0 ]; then
             [ "$1" '==' "x64" ] && android_arch="x86_64" || android_arch=$1
             [[ "$bt" =~ "system_webview_apk" ]] && cp out/$1/apks/SystemWebView.apk $aosmiumPath/prebuilt/$android_arch/webview-unsigned.apk
             [[ "$bt" =~ "chrome_public_apk" ]] && cp out/$1/apks/ChromePublic.apk $aosmiumPath/prebuilt/$android_arch/browser-unsigned.apk
         fi
-        echo "FINISHED building: $bt"
+        tagmsg "FINISHED building: $bt"
     done
 }
 
@@ -109,6 +117,7 @@ copy_vanadium_patches(){
 }
 
 install_build_deps(){
+    tagmsg "Installing build dependencies"
     cd $chromiumPath/src
     ./build/install-build-deps.sh --no-prompt \
     --no-chromeos-fonts \
@@ -157,6 +166,7 @@ done
 shift $((OPTIND-1))
 
 # Add depot_tools to PATH
+tagmsg "Fetching depot tools"
 if [ ! -d depot_tools ]; then
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
 else
@@ -166,27 +176,29 @@ fi
 export PATH="$(pwd -P)/depot_tools:$PATH"
 
 if [ $gsync -eq 1 ]; then
-    echo "Syncing"
+    tagmsg "Syncing"
     if [ -d $chromiumPath/src/.git ];then
-        echo "Updating sources"
+        tagmsg "Updating sources"
         find $chromiumPath/src -name index.lock -delete
         cd $chromiumPath/src
-        git reset --hard 2>>/dev/null || true
-        git add -A 2>>/dev/null || true
-        git commit -m "build.sh: before-rebase" || true
+        tagmsg "Reset workspace"
+        git reset --hard >> $LOG 2>&1 || true
+        git add -A >> $LOG 2>&1 || true
+        git commit -m "build.sh: before-rebase" >> $LOG 2>&1|| true
         git rebase-update
         cd ..
+        tagmsg "Syncing"
         yes | gclient sync --jobs=12 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     else
-        echo "Initial source download"
+        tagmsg "Initial source download"
         cd $chromiumPath
         fetch --nohooks android || true
-a        yes | gclient sync --jobs=12 --force --delete_unversioned_trees --reset --revision="$chromium_version"
+        yes | gclient sync --jobs=12 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     fi
 
     gclient runhooks
 
-    # workaround for android sdk which keeps on 35!?
+    # workaround for android sdk which keeps on 35 bc we build an older chromium release
     if [ ! -d src/third_party/android_sdk/public/platforms/android-36 ];then
         cp -a ../tools/android-36 src/third_party/android_sdk/public/platforms/
     fi
@@ -277,13 +289,13 @@ if [ $gsync -eq 1 ]; then
     cd $chromiumPath/src
 
 	#Apply all available patches safely
-	echo "Applying patches"
+	tagmsg "Applying patches"
 	find $aosmiumPath/patches/0001-Vanadium/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
 	find $aosmiumPath/patches/0002-LineageOS/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
 	find $aosmiumPath/patches/0003-Cromite/ -name "*.patch" -print | sort -n | xargs -I '{}' bash -c 'applyPatch "$0"' {} \;;
 
 	#Icon rebranding
-	echo "Icon rebranding"
+	tagmsg "Icon rebranding"
 	#mkdir -p android_webview/nonembedded/java/res_icon/drawable-xxxhdpi
     find chrome/android/java/res_chromium_base/mipmap-* -type f -name 'app_icon*.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 75 -gamma 0.6 {} \;
     find chrome/android/java/res_chromium_base/mipmap-* -type f -name 'layered_app_icon*.png' -exec convert {} -colorspace gray -fill "$chromium_rebrand_color" -tint 75 -gamma 0.6 {} \;
@@ -294,7 +306,7 @@ if [ $gsync -eq 1 ]; then
 	#cp chrome/android/java/res_chromium_base/mipmap-xxxhdpi/app_icon.png android_webview/nonembedded/java/res_icon/drawable-xxxhdpi/icon_webview.png
 
 	#String rebranding, credit Vanadium
-	echo "String rebranding"
+	tagmsg "String rebranding"
 	sed -ri 's/(Google )?Chrom(e|ium)/'$chromium_rebrand_name'/g' chrome/android/java/res_chromium_base/values/channel_constants.xml chrome/app/chromium_strings.grd chrome/browser/ui/android/strings/android_chrome_strings.grd components/browser_ui/strings/android/site_settings.grdp components/components_chromium_strings.grd components/new_or_sad_tab_strings.grdp components/page_info_strings.grdp components/security_interstitials_strings.grdp;
 	find components/strings/ -name '*.xtb' -exec sed -ri 's/(Google )?Chrom(e|ium)/'$chromium_rebrand_name'/g' {} +;
 	find chrome/browser/ui/android/strings/translations -name '*.xtb' -exec sed -ri 's/(Google )?Chrom(e|ium)/'$chromium_rebrand_name'/g' {} +;
@@ -363,14 +375,14 @@ args+=' is_high_end_android=false' # TESTING. optimize ressource usage for low-e
 #args+=' config_apk_is_debug=false'
 
 # Setup environment
-[ $clean -eq 1 ] && rm -rf out && echo "Cleaned out"
+[ $clean -eq 1 ] && rm -rf out && tagmsg "Cleaned out"
 . build/android/envsetup.sh
 
 # Check target and build
 if [ -n "$build_arch" ]; then
     build $build_arch
 else
-    echo "Building all"
+    tagmsg "Building all"
     build arm
     build arm64
     #build x86
