@@ -43,6 +43,9 @@ pause=0
 supported_archs=(arm arm64 x86 x64)
 build_targets="${build_targets:-system_webview_apk}"
 aosmiumPath="$PWD"
+LOG="../$aosmiumPath/build.log"
+
+date > $LOG
 
 usage() {
     echo "Usage:"
@@ -105,7 +108,7 @@ install_build_deps(){
     ./build/install-build-deps.sh --no-prompt \
     --no-chromeos-fonts \
     --no-syms \
-    --no-backwards-compatible
+    --no-backwards-compatible >> $LOG
 
     cd $aosmiumPath
 }
@@ -181,6 +184,9 @@ a        yes | gclient sync --jobs=12 --force --delete_unversioned_trees --reset
     # workaround for android sdk which keeps on 35!?
     if [ ! -d src/third_party/android_sdk/public/platforms/android-36 ];then
         cp -a ../tools/android-36 src/third_party/android_sdk/public/platforms/
+    fi
+    if [ ! -d src/third_party/android_sdk/public/build-tools/36.0.0
+        cp -a ../tools/36.0.0 src/third_party/android_sdk/public/build-tools/
     fi
 
     cd $aosmiumPath
