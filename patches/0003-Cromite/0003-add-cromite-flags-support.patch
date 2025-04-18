@@ -1,0 +1,18 @@
+From: uazo <uazo@users.noreply.github.com>
+Date: Fri, 18 Apr 2025 13:36:31 +0200
+Subject: [PATCH] add-cromite-flags-support
+---
+ .../strings/android_chrome_strings.grd        | 2 +
+ 1 file changed, 2 insertions(+), 0 deletions(-)
+diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
+index d696c50bc8e53..7e6698f3b6f44 100644
+--- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
++++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
+@@ -202,6 +202,8 @@ CHAR_LIMIT guidelines:
+   </translations>
+   <release seq="1">
+     <messages fallback_to_english="true">
++      <part file="cromite_android_chrome_strings_grd/placeholder.txt"/>
++
+       <part file="android_chrome_ext_strings.grdp" />
+       <!-- NOTE: Generic strings used across multiple features belong in //components/browser_ui/strings/android. -->
