@@ -240,7 +240,7 @@ applyPatchReal() {
         echo "Applying (as diff): $currentWorkingPatch"
 		git apply "$@" \
             && git add -A > /dev/null\
-      		&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f3-100)"
+      		&& git commit --author="$(grep -i From: $currentWorkingPatch | cut -d ' ' -f2-100)" -m "$(grep -i Subject: $currentWorkingPatch | cut -d ' ' -f2-100)"
         if [ $? -ne 0 ];then
             echo "ERROR: applying $currentWorkingPatch (diff)"
             return 3
