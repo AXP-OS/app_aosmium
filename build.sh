@@ -107,8 +107,6 @@ install_build_deps(){
     --no-syms \
     --no-backwards-compatible
 
-    gclient runhooks
-
     cd $aosmiumPath
 }
 
@@ -177,7 +175,6 @@ if [ $gsync -eq 1 ]; then
         fetch --nohooks android || true
 a        yes | gclient sync --jobs=12 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     fi
-    cd $aosmiumPath
 
     gclient runhooks
 
@@ -185,6 +182,8 @@ a        yes | gclient sync --jobs=12 --force --delete_unversioned_trees --reset
     if [ ! -d src/third_party/android_sdk/public/platforms/android-36 ];then
         cp -a ../tools/android-36 src/third_party/android_sdk/public/platforms/
     fi
+
+    cd $aosmiumPath
 fi
 
 # install dependencies
