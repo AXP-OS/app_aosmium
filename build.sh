@@ -183,6 +183,8 @@ if [ $gsync -eq 1 ]; then
         cd $chromiumPath/src
         tagmsg "Reset workspace"
         git reset --hard >> $LOG 2>&1 || true
+        git rebase --abort >> $LOG 2>&1 || true
+        git am --abort >> $LOG 2>&1 || true
         git add -A >> $LOG 2>&1 || true
         git commit -m "build.sh: before-rebase" >> $LOG 2>&1|| true
         git rebase-update
