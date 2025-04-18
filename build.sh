@@ -185,7 +185,7 @@ a        yes | gclient sync --jobs=12 --force --delete_unversioned_trees --reset
     if [ ! -d src/third_party/android_sdk/public/platforms/android-36 ];then
         cp -a ../tools/android-36 src/third_party/android_sdk/public/platforms/
     fi
-    if [ ! -d src/third_party/android_sdk/public/build-tools/36.0.0
+    if [ ! -d src/third_party/android_sdk/public/build-tools/36.0.0 ];then
         cp -a ../tools/36.0.0 src/third_party/android_sdk/public/build-tools/
     fi
 
