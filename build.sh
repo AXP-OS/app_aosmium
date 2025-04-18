@@ -43,7 +43,7 @@ pause=0
 supported_archs=(arm arm64 x86 x64)
 build_targets="${build_targets:-system_webview_apk}"
 aosmiumPath="$PWD"
-LOG="../$aosmiumPath/build.log"
+LOG="$aosmiumPath/build.log"
 
 date > $LOG
 
