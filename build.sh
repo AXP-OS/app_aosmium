@@ -175,14 +175,16 @@ if [ $gsync -eq 1 ]; then
         echo "Initial source download"
         cd $chromiumPath
         fetch --nohooks android || true
-        yes | gclient sync --jobs=12 --force --delete_unversioned_trees --reset --revision="$chromium_version"
+a        yes | gclient sync --jobs=12 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     fi
     cd $aosmiumPath
 
     gclient runhooks
 
     # workaround for android sdk which keeps on 35!?
-    cp -a ../tools/android-36 src/third_party/android_sdk/public/platforms/
+    if [ ! -d src/third_party/android_sdk/public/platforms/android-36 ];then
+        cp -a ../tools/android-36 src/third_party/android_sdk/public/platforms/
+    fi
 fi
 
 # install dependencies
