@@ -20,7 +20,7 @@ export clean=0
 
 # RESET + SYNC sources + APPLY patches?
 # should be set with the above clean var to 1
-export gsync=0
+export gsync=1
 
 
 
