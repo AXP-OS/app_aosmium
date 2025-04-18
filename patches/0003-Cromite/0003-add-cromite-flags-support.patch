@@ -12,7 +12,7 @@ index d696c50bc8e53..7abca96f5791e 100644
    </translations>
    <release seq="1">
      <messages fallback_to_english="true">
-+      <part file="cromite_android_chrome_strings_grd/placeholder.txt"/>
++      <part file="cromite_android_chrome_strings_grd/Add-setting-to-clear-data-on-exit.grdp"/>
        <part file="android_chrome_ext_strings.grdp" />
        <!-- NOTE: Generic strings used across multiple features belong in //components/browser_ui/strings/android. -->
 
