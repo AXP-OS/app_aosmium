@@ -208,6 +208,9 @@ if [ $gsync -eq 1 ]; then
         cp -a ../tools/36.0.0 src/third_party/android_sdk/public/build-tools/
     fi
 
+    # workaround for cromite flags
+    touch src/chrome/browser/ui/android/strings/cromite_android_chrome_strings_grd/placeholder.txt
+
     cd $aosmiumPath
 fi
 
