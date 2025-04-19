@@ -101,7 +101,6 @@ build() {
         [[ "$build_targets" =~ "chrome_public_apk" ]] && cp out/$1/apks/ChromePublic.apk $aosmiumPath/prebuilt/$android_arch/browser-unsigned.apk
     fi
     tagmsg "FINISHED building: $build_targets"
-    done
 }
 
 copy_vanadium_patches(){
