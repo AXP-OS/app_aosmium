@@ -93,15 +93,14 @@ build() {
 
     gn gen "out/$1" --args="$build_args"
 
-    for bt in $build_targets;do
-        tagmsg "Building: $bt (from: $build_targets)"
-        ninja -C out/$1 $bt
-        if [ "$?" -eq 0 ]; then
-            [ "$1" '==' "x64" ] && android_arch="x86_64" || android_arch=$1
-            [[ "$bt" =~ "system_webview_apk" ]] && cp out/$1/apks/SystemWebView.apk $aosmiumPath/prebuilt/$android_arch/webview-unsigned.apk
-            [[ "$bt" =~ "chrome_public_apk" ]] && cp out/$1/apks/ChromePublic.apk $aosmiumPath/prebuilt/$android_arch/browser-unsigned.apk
-        fi
-        tagmsg "FINISHED building: $bt"
+    tagmsg "Building: $build_targets"
+    ninja -C out/$1 $build_targets
+    if [ "$?" -eq 0 ]; then
+        [ "$1" '==' "x64" ] && android_arch="x86_64" || android_arch=$1
+        [[ "$build_targets" =~ "system_webview_apk" ]] && cp out/$1/apks/SystemWebView.apk $aosmiumPath/prebuilt/$android_arch/webview-unsigned.apk
+        [[ "$build_targets" =~ "chrome_public_apk" ]] && cp out/$1/apks/ChromePublic.apk $aosmiumPath/prebuilt/$android_arch/browser-unsigned.apk
+    fi
+    tagmsg "FINISHED building: $build_targets"
     done
 }
 
