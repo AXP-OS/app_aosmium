@@ -171,7 +171,7 @@ else
     cd depot_tools
     git pull
 fi
-export PATH="$(pwd -P)/depot_tools:$PATH"
+export PATH="$aosmiumPath/depot_tools:$PATH"
 
 if [ $gsync -eq 1 ]; then
     tagmsg "Syncing"
