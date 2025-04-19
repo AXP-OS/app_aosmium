@@ -66,11 +66,11 @@ jobs:
         webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
         echo "WV_VER=$webview_ver" >> $GITHUB_ENV
 
-    - name: set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+#    - name: set up JDK
+#      uses: actions/setup-java@v3
+#      with:
+#        java-version: '18'
+#        distribution: 'temurin'
 
 #    - name: Setup Android SDK
 #      # https://github.com/android-actions/setup-android
