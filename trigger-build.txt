@@ -25,7 +25,8 @@ export gsync=0
 
 # add any specific args to thr ninja build cmd
 # when unset or empty ninja will autodetect the job count etc
-NINJA_ARGS="-j6 --quiet"
+NINJA_ARGS="-j6"
+# --quiet"
 
 
 
