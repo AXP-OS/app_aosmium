@@ -142,6 +142,19 @@ jobs:
         cp prebuilt/arm/browser*.apk apks/browser32.apk
         cp prebuilt/arm64/browser*.apk apks/browser64.apk
 
+    - name: set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '18'
+        distribution: 'temurin'
+
+    - name: Setup Android SDK
+      # https://github.com/android-actions/setup-android
+      uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 12266719
+        packages: "build-tools;35.0.0"
+
     # https://github.com/marketplace/actions/sign-android-releases-apk
     - name: Sign APK
       id: signAPK
