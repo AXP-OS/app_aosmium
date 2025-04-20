@@ -92,9 +92,48 @@ jobs:
         export clean=0 gsync=0
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
 
-    - name: "Prep APKs"
+    # https://github.com/r0adkll/sign-android-release/issues/84#issuecomment-1885690080
+    - name: "Get & set app and build variables"
+      id: vars
       shell: bash
       run: |
+        #see: https://maven.google.com/web/index.html#com.android.tools.build:aapt2
+
+        APPV32=$(../tools/aapt2 dump badging prebuilt/arm/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        APPV64=$(../tools/aapt2 dump badging prebuilt/arm64/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        OVER=v$(date +%Y.%m.%d)
+        
+        [ -z "$APPV32" ] && echo "ERROR: empty APPV32 detected" && exit 3
+        [ -z "$APPV64" ] && echo "ERROR: empty APPV64 detected" && exit 3
+        [ -z "$OVER" ] && echo "ERROR: empty OVER detected" && exit 3
+
+        if [ "$APPV32" != "$APPV64" ];then
+            echo "WARNING: arm/arm64 versions differ ($APPV32/$APPV64) and due to this they will be BOTH set to: >$OVER<"
+            APPV32="$OVER"
+            APPV64="$OVER"
+        else
+            OVER="$APPV64"
+        fi
+
+        APPV64_BRW=$(../tools/aapt2 dump badging prebuilt/arm64/browser-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        if [ "$APPV64" != "$APPV64_BRW" ];then
+          echo "WARNING: webview and browser versions differ ($APPV64 / $APPV64_BRW)!"
+        fi
+
+        echo "APP_VERSION=${OVER}" >> $GITHUB_ENV
+        echo "APP32_VERSION=${APPV32}" >> $GITHUB_ENV
+        echo "APP64_VERSION=${APPV64}" >> $GITHUB_ENV
+        git_sha_short=$(git rev-parse --short "$GITHUB_SHA")
+        echo "git_sha_short=$git_sha_short" >> $GITHUB_ENV
+
+        echo "APP_VERSION=${OVER}" >> $GITHUB_OUTPUT
+        #echo "APP32_VERSION=${APPV32}" >> $GITHUB_OUTPUT
+        #echo "APP64_VERSION=${APPV64}" >> $GITHUB_OUTPUT
+        echo "git_sha_short=$git_sha_short" >> $GITHUB_OUTPUT
+
+        echo "APP32 version is: $APPV32 ($git_sha_short)"
+        echo "APP64 version is: $APPV64 ($git_sha_short)"
+
         cd aosmium
         source trigger-build.txt
         mkdir apks
