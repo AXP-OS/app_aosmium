@@ -135,8 +135,6 @@ jobs:
         echo "APP32 version is: $APPV32 ($git_sha_short)"
         echo "APP64 version is: $APPV64 ($git_sha_short)"
 
-        cd aosmium
-        source trigger-build.txt
         mkdir apks
 
         cp prebuilt/arm/web*.apk apks/webview32.apk
