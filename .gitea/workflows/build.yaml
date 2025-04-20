@@ -147,7 +147,7 @@ jobs:
       id: signAPK
       uses: NoCrypt/sign-android@main
       with:
-        releaseDir: apks
+        releaseDir: aosmium/apks
         signingKey: ${{ secrets.APK_SIGNING_KEY_64 }}
         keyAlias: ${{ secrets.APK_ALIAS }}
         keyStorePassword: ${{ secrets.APK_KEY_STORE_PASSWORD }}
@@ -156,7 +156,7 @@ jobs:
     - name: Prep release
       id: hash
       run: |
-        cd apks
+        cd aosmium/apks
         sha512sum webview32-signed.apk > webview32-signed.apk.sha512
         sha512sum webview64-signed.apk > webview64-signed.apk.sha512
         sha512sum browser32-signed.apk > browser32-signed.apk.sha512
