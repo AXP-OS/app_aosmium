@@ -99,8 +99,8 @@ jobs:
       run: |
         #see: https://maven.google.com/web/index.html#com.android.tools.build:aapt2
 
-        APPV32=$(../tools/aapt2 dump badging prebuilt/arm/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
-        APPV64=$(../tools/aapt2 dump badging prebuilt/arm64/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        APPV32=$(tools/aapt2 dump badging prebuilt/arm/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        APPV64=$(tools/aapt2 dump badging prebuilt/arm64/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
         OVER=v$(date +%Y.%m.%d)
         
         [ -z "$APPV32" ] && echo "ERROR: empty APPV32 detected" && exit 3
@@ -115,7 +115,7 @@ jobs:
             OVER="$APPV64"
         fi
 
-        APPV64_BRW=$(../tools/aapt2 dump badging prebuilt/arm64/browser-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        APPV64_BRW=$(tools/aapt2 dump badging prebuilt/arm64/browser-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
         if [ "$APPV64" != "$APPV64_BRW" ];then
           echo "WARNING: webview and browser versions differ ($APPV64 / $APPV64_BRW)!"
         fi
@@ -185,6 +185,12 @@ jobs:
             ${{ steps.signAPK.outputs.signedFile3 }}
             ${{ steps.signAPK.outputs.signedFile3 }}.sha512
 
+  mirror:
+    needs: build
+    uses: ./.gitea/workflows/mirror.yaml
+    runs-on: docker-node-latest
+    secrets: inherit
+
   release-codeberg:
     name: "Release @Codeberg"
     uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_mirror_main.yaml@main
@@ -253,10 +259,3 @@ jobs:
           webview32-signed.apk.sha512
           webview64-signed.apk
           webview64-signed.apk.sha512
-
-
-  mirror:
-    needs: build
-    uses: ./.gitea/workflows/mirror.yaml
-    runs-on: docker-node-latest
-    secrets: inherit
