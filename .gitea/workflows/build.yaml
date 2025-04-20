@@ -218,7 +218,7 @@ jobs:
       pre: true
       #filepattern: '*.apk'
       body: |
-          # AOSmium -The AXP.OS Browser
+          # AOSmium - The AXP.OS Browser
 
           See:
           - [Documentation](https://axpos.org/docs/knowledge/browser/)
@@ -248,7 +248,7 @@ jobs:
       pre: true
       #filepattern: '*.apk'
       body: >-
-          # AOSmium -The AXP.OS Browser\n
+          # AOSmium - The AXP.OS Browser\n
           \n
           See:\n
           - [Documentation](https://axpos.org/docs/knowledge/browser/)\n
