@@ -4,15 +4,15 @@ Subject: Do not check for the presence of use_remoteexec
 
 ---
  build/toolchain/remoteexec_defaults.gni | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/build/toolchain/remoteexec_defaults.gni b/build/toolchain/remoteexec_defaults.gni
---- a/build/toolchain/remoteexec_defaults.gni
-+++ b/build/toolchain/remoteexec_defaults.gni
-@@ -2,4 +2,4 @@
- # value of use_reclient.
- # TODO(crbug.com/341167943): Use reclient only if use_siso=false.
- use_reclient_on_siso = true
--use_reclient_on_ninja = true
-+use_reclient_on_ninja = false
---
+  diff --git a/build/toolchain/remoteexec_defaults.gni b/build/toolchain/remoteexec_defaults.gni
+  --- a/build/toolchain/remoteexec_defaults.gni
+  +++ b/build/toolchain/remoteexec_defaults.gni
+  @@ -1,4 +1,4 @@
+   # rbe.gni and autoninja.py will read this file to get the default
+    # value of use_reclient.
+     use_reclient_on_siso = false
+     -use_reclient_on_ninja = true
+     +use_reclient_on_ninja = false
+     --
