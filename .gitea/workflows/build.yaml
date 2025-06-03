@@ -260,8 +260,6 @@ jobs:
           |browser32-signed.apk|${{ needs.build.outputs.SHA32_BRW }}|
           |browser64-signed.apk|${{ needs.build.outputs.SHA64_BRW }}|
 
-          [Signature](${{ vars.SIGNATURE_LINK }})
-
   release-github:
     name: "Release @github"
     uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_mirror_second.yaml@main
@@ -289,8 +287,7 @@ jobs:
           |webview64-signed.apk|${{ needs.build.outputs.SHA64_WV }}|\n
           |browser32-signed.apk|${{ needs.build.outputs.SHA32_BRW }}|\n
           |browser64-signed.apk|${{ needs.build.outputs.SHA64_BRW }}|\n
-          \n
-          [Signature](${{ vars.SIGNATURE_LINK }})
+
       filelist: >-
           browser32-signed.apk
           browser32-signed.apk.sha512
