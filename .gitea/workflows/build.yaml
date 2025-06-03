@@ -175,6 +175,18 @@ jobs:
         sha512sum browser32-signed.apk > browser32-signed.apk.sha512
         sha512sum browser64-signed.apk > browser64-signed.apk.sha512
 
+        cp webview32-signed.apk AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk
+        sha512sum AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+
+        cp webview64-signed.apk AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk
+        sha512sum AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+
+        cp browser32-signed.apk AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk
+        sha512sum AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+
+        cp browser64-signed.apk AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk
+        sha512sum AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+
         echo "SHA32_WV=$(cat webview32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
         echo "SHA64_WV=$(cat webview64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
         echo "SHA32_BRW=$(cat browser32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
@@ -196,6 +208,23 @@ jobs:
             ${{ steps.signAPK.outputs.signedFile2 }}.sha512
             ${{ steps.signAPK.outputs.signedFile3 }}
             ${{ steps.signAPK.outputs.signedFile3 }}.sha512
+
+    - name: Upload F-Droid apks as artifact
+      uses: actions/upload-artifact@v3
+      id: upload
+      with:
+        name: release-fdroid
+        retention-days: 1
+        if-no-files-found: error
+        path: |
+            aosmium/apks/AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk
+            aosmium/apks/AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk
+            aosmium/apks/AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk
+            aosmium/apks/AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk
+            aosmium/apks/AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+            aosmium/apks/AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+            aosmium/apks/AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+            aosmium/apks/AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
 
   mirror:
     needs: build
@@ -271,3 +300,13 @@ jobs:
           webview32-signed.apk.sha512
           webview64-signed.apk
           webview64-signed.apk.sha512
+
+  release-fdroid-cutting:
+    name: "Release @F-Droid Cutting"
+    uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_fdroid-cutting.yaml@main
+    runs-on: fdroid-cutting
+    needs: build
+    secrets: inherit
+    with:
+      workflow_id: ${{ github.run_id }}
+      repo: ${{ github.event.repository.name }} # without org!
