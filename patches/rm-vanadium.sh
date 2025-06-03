@@ -100,4 +100,4 @@ rm -fv *-config-Compile-the-config-holder-app-with-forceQuery.patch
 rm -fv *-Reduce-user-agent-and-client-hints-for-webview.patch
 rm -fv *-config-disable-domain-reliability-feature.patch
 rm -fv *-config-Disable-fullscreen-exit-callback-for-picture-.patch
-rm -fv *-tmp-Disable-usage-of-new-checkServerTrusted-API-for-
+rm -fv *-tmp-Disable-usage-of-new-checkServerTrusted-API-for-.patch
