@@ -39,7 +39,7 @@ jobs:
     - name: Prep container
       shell: bash
       run: |
-        ulimit -u 16384
+        ulimit -a
         apt-get update && apt-get -y install git-lfs curl lsb-release python3 file gperf sudo gcc-multilib
 
     - uses: actions/checkout@v4
