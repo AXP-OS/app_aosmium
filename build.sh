@@ -170,6 +170,7 @@ if [ ! -d depot_tools ]; then
 else
     cd depot_tools
     git pull
+    ./update_depot_tools
 fi
 export PATH="$aosmiumPath/depot_tools:$PATH"
 
