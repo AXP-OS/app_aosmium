@@ -28,7 +28,7 @@ export gsync=0
 # lowering the job count to 6 fixes the weird error:
 #    "java.lang.OutOfMemoryError: unable to create native thread: \
 #     possibly out of memory or process/resource limits reached"
-NINJA_ARGS="-j4 --quiet"
+NINJA_ARGS="-j1 --quiet"
 
 ######################################################################################################
 # links to patches which change often:
