@@ -167,6 +167,7 @@ shift $((OPTIND-1))
 tagmsg "Fetching depot tools"
 if [ ! -d depot_tools ]; then
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+    ./update_depot_tools
 else
     cd depot_tools
     git pull
