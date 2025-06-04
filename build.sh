@@ -167,12 +167,15 @@ shift $((OPTIND-1))
 tagmsg "Fetching depot tools"
 if [ ! -d depot_tools ]; then
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+    cd depot_tools
     ./update_depot_tools
 else
     cd depot_tools
     git pull
     ./update_depot_tools
 fi
+cd ..
+
 export PATH="$aosmiumPath/depot_tools:$PATH"
 
 if [ $gsync -eq 1 ]; then
