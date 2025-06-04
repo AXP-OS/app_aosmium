@@ -29,7 +29,6 @@ jobs:
       upload_art_id: ${{ steps.upload.outputs.artifact-id }}
     container:
       #options: --user root  # we need all privileges within the container
-      options: --ulimit nproc=16348:16348
       volumes:
         - /home/aosp/docker_vols/aosmium:/workspace/AXP.OS/app_aosmium/aosmium
         - /home/aosp/docker_vols/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
@@ -39,7 +38,9 @@ jobs:
 
     - name: Prep container
       shell: bash
-      run: apt-get update && apt-get -y install git-lfs curl lsb-release python3 file gperf sudo gcc-multilib
+      run: |
+        ulimit -u 16384
+        apt-get update && apt-get -y install git-lfs curl lsb-release python3 file gperf sudo gcc-multilib
 
     - uses: actions/checkout@v4
       with:
