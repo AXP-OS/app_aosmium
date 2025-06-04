@@ -29,7 +29,7 @@ jobs:
       upload_art_id: ${{ steps.upload.outputs.artifact-id }}
     container:
       #options: --user root  # we need all privileges within the container
-      #options: --ulimit nproc=16348:16348 --ulimit nofile=524288:524288
+      options: --ulimit nproc=16348:16348
       volumes:
         - /home/aosp/docker_vols/aosmium:/workspace/AXP.OS/app_aosmium/aosmium
         - /home/aosp/docker_vols/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
