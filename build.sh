@@ -171,7 +171,7 @@ if [ ! -d depot_tools ]; then
     ./update_depot_tools
 else
     cd depot_tools
-    git pull
+    git pull origin main
     ./update_depot_tools
 fi
 cd ..
