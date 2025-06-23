@@ -1,5 +1,7 @@
 # AOSmium - The AXP.OS Browser
 
+![IMAGE](https://axpos.org/img/AOSmium_web.png)
+
 The [AXP.OS](https://axpos.org/) documentation can be found: [here](https://axpos.org/docs/knowledge/browser/)
 
 ## Use
