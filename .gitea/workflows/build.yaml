@@ -27,6 +27,8 @@ jobs:
     runs-on: docker-node-chromium
     outputs:
       APP_VERSION: ${{ steps.vars.outputs.APP_VERSION }}
+      BARM32: ${{ steps.vars.outputs.BARM32 }}
+      BARM64: ${{ steps.vars.outputs.BARM64 }}
       SHA32_WV: ${{ steps.hash.outputs.SHA32_WV }}
       SHA64_WV: ${{ steps.hash.outputs.SHA64_WV }}
       SHA32_BRW: ${{ steps.hash.outputs.SHA32_BRW }}
@@ -48,7 +50,7 @@ jobs:
       run: |
         ulimit -a
         apt-get update && apt-get -y install git-lfs curl lsb-release python3 file gperf sudo gcc-multilib
-        echo 'input: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}'
+        echo 'input: ${{ inputs.buildarch }}'
 
     - uses: actions/checkout@v4
       with:
@@ -62,8 +64,6 @@ jobs:
       shell: bash
       id: vanco
       run: |
-        echo "input: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}"
-
         git config --global user.name "gitea-actions[bot]"
         git config --global user.email "<sherlock@binbash.rocks>"
 
@@ -86,7 +86,7 @@ jobs:
         echo "WV_VER=$webview_ver" >> $GITHUB_ENV
 
     - name: "Build arm"
-      if: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}
+      if: contains(' ' ~ inputs.buildarch ~ ' ', ' arm ')
       shell: bash
       run: |
         ulimit -a
@@ -95,7 +95,7 @@ jobs:
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
 
     - name: "Build arm64"
-      if: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm64(\\s|$)') }}
+      if: contains(' ' ~ inputs.buildarch ~ ' ', ' arm64 ')
       shell: bash
       run: |
         cd aosmium
@@ -110,12 +110,22 @@ jobs:
     - name: "Get & set app and build variables"
       id: vars
       shell: bash
+      env:
+        INPUT_BUILDARCH: ${{ inputs.buildarch }}
       run: |
         #req: https://maven.google.com/web/index.html#com.android.tools.build:aapt2
+        BARM32=unset
+        BARM64=unset
 
-        BARM32=${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}
-        BARM64=${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm64(\\s|$)') }}
+        if [[ " ${INPUT_BUILDARCH} " =~ [[:space:]]arm[[:space:]] ]]; then
+          BARM32=arm
+        fi
+        if [[ " ${INPUT_BUILDARCH} " =~ [[:space:]]arm64[[:space:]] ]]; then
+          BARM64=arm64
+        fi
         echo "BARM32: $BARM32, BARM64: $BARM64"
+        echo "BARM32=$BARM32" >> $GITHUB_OUTPUT
+        echo "BARM64=$BARM64" >> $GITHUB_OUTPUT
 
         cd aosmium
 
@@ -188,8 +198,8 @@ jobs:
     - name: Prep release
       id: hash
       run: |
-        BARM32=${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}
-        BARM64=${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm64(\\s|$)') }}
+        BARM32=${{ steps.vars.outputs.BARM32 }}
+        BARM64=${{ steps.vars.outputs.BARM64 }}
         echo "BARM32: $BARM32, BARM64: $BARM64"
 
         cd aosmium/apks
