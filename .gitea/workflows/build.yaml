@@ -82,6 +82,8 @@ jobs:
         webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
         echo "WV_VER=$webview_ver" >> $GITHUB_ENV
 
+        echo "input: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}"
+
     - name: "Build arm"
       if: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}
       shell: bash
