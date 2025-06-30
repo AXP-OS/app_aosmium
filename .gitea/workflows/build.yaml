@@ -15,7 +15,7 @@ on:
       buildarch:
         description: 'Limit to specific arch?!'
         required: false
-        default: "arm arm64"
+        default: "arm_both" # arm, arm64, arm_both
         type: string
 
 # NOT implemented in Gitea!
@@ -27,8 +27,8 @@ jobs:
     runs-on: docker-node-chromium
     outputs:
       APP_VERSION: ${{ steps.vars.outputs.APP_VERSION }}
-      BARM32: ${{ steps.vars.outputs.BARM32 }}
-      BARM64: ${{ steps.vars.outputs.BARM64 }}
+      BARM32: ${{ steps.vanco.outputs.BARM32 }}
+      BARM64: ${{ steps.vanco.outputs.BARM64 }}
       SHA32_WV: ${{ steps.hash.outputs.SHA32_WV }}
       SHA64_WV: ${{ steps.hash.outputs.SHA64_WV }}
       SHA32_BRW: ${{ steps.hash.outputs.SHA32_BRW }}
@@ -63,6 +63,8 @@ jobs:
     - name: Checkout AOSmium repos
       shell: bash
       id: vanco
+      env:
+        INPUT_BUILDARCH: ${{ inputs.buildarch }}
       run: |
         git config --global user.name "gitea-actions[bot]"
         git config --global user.email "<sherlock@binbash.rocks>"
@@ -85,8 +87,26 @@ jobs:
         webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
         echo "WV_VER=$webview_ver" >> $GITHUB_ENV
 
+        BARM32=unset
+        BARM64=unset
+        
+        if [ "${INPUT_BUILDARCH}" == "arm_both" ]; then
+          BARM32=arm32
+          BARM64=arm64
+        else
+          if [ "${INPUT_BUILDARCH}" == "arm32" ]; then
+            BARM32=arm32
+          fi
+          if [ "${INPUT_BUILDARCH}" == "arm64" ]; then
+            BARM64=arm64
+          fi
+        fi
+        echo "BARM32: $BARM32, BARM64: $BARM64"
+        echo "BARM32=$BARM32" >> $GITHUB_OUTPUT
+        echo "BARM64=$BARM64" >> $GITHUB_OUTPUT
+
     - name: "Build arm"
-      if: contains(' ' ~ inputs.buildarch ~ ' ', ' arm ')
+      if: ${{ contains(inputs.buildarch, 'arm32') }}
       shell: bash
       run: |
         ulimit -a
@@ -95,45 +115,38 @@ jobs:
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
 
     - name: "Build arm64"
-      if: contains(' ' ~ inputs.buildarch ~ ' ', ' arm64 ')
+      if: ${{ contains(inputs.buildarch, 'arm64') }}
       shell: bash
       run: |
         cd aosmium
         source trigger-build.txt
-        
-        # never do a sync+patch again
-        # (as this is handled in the previous step already)
-        export clean=0 gsync=0
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
+
+    - name: "Build arm & arm64"
+      if: ${{ contains(inputs.buildarch, 'arm_both') }}
+      shell: bash
+      run: |
+        ulimit -a
+        cd aosmium
+        source trigger-build.txt
+        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm arm64
 
     # https://github.com/r0adkll/sign-android-release/issues/84#issuecomment-1885690080
     - name: "Get & set app and build variables"
       id: vars
       shell: bash
-      env:
-        INPUT_BUILDARCH: ${{ inputs.buildarch }}
       run: |
         #req: https://maven.google.com/web/index.html#com.android.tools.build:aapt2
-        BARM32=unset
-        BARM64=unset
-
-        if [[ " ${INPUT_BUILDARCH} " =~ [[:space:]]arm[[:space:]] ]]; then
-          BARM32=arm
-        fi
-        if [[ " ${INPUT_BUILDARCH} " =~ [[:space:]]arm64[[:space:]] ]]; then
-          BARM64=arm64
-        fi
-        echo "BARM32: $BARM32, BARM64: $BARM64"
-        echo "BARM32=$BARM32" >> $GITHUB_OUTPUT
-        echo "BARM64=$BARM64" >> $GITHUB_OUTPUT
-
         cd aosmium
+        BARM32=${{ steps.vanco.outputs.BARM32 }}
+        BARM64=${{ steps.vanco.outputs.BARM64 }}
+        echo "BARM32: $BARM32, BARM64: $BARM64"
 
-        [ "$BARM32" == "arm" ] && APPV32=$(../tools/aapt2 dump badging prebuilt/arm/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        [ "$BARM32" == "arm32" ] && APPV32=$(../tools/aapt2 dump badging prebuilt/arm/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
         [ "$BARM64" == "arm64" ] && APPV64=$(../tools/aapt2 dump badging prebuilt/arm64/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
         OVER=v$(date +%Y.%m.%d)
         
-        [ "$BARM32" == "arm" ] && [ -z "$APPV32" ] && echo "ERROR: empty APPV32 detected" && exit 3
+        [ "$BARM32" == "arm32" ] && [ -z "$APPV32" ] && echo "ERROR: empty APPV32 detected" && exit 3
         [ "$BARM64" == "arm64" ] && [ -z "$APPV64" ] && echo "ERROR: empty APPV64 detected" && exit 3
         [ -z "$OVER" ] && echo "ERROR: empty OVER detected" && exit 3
 
@@ -153,7 +166,7 @@ jobs:
         fi
 
         echo "APP_VERSION=${OVER}" >> $GITHUB_ENV
-        [ "$BARM" == "arm" ] && echo "APP32_VERSION=${APPV32}" >> $GITHUB_ENV
+        [ "$BARM" == "arm32" ] && echo "APP32_VERSION=${APPV32}" >> $GITHUB_ENV
         [ "$BARM64" == "arm64" ] && echo "APP64_VERSION=${APPV64}" >> $GITHUB_ENV
         git_sha_short=$(git rev-parse --short "$GITHUB_SHA")
         echo "git_sha_short=$git_sha_short" >> $GITHUB_ENV
@@ -161,13 +174,13 @@ jobs:
         echo "APP_VERSION=${OVER}" >> $GITHUB_OUTPUT
         echo "git_sha_short=$git_sha_short" >> $GITHUB_OUTPUT
 
-        [ "$BARM" == "arm" ] && echo "APP32 version is: $APPV32 ($git_sha_short)"
+        [ "$BARM" == "arm32" ] && echo "APP32 version is: $APPV32 ($git_sha_short)"
         [ "$BARM64" == "arm64" ] && echo "APP64 version is: $APPV64 ($git_sha_short)"
 
         mkdir apks
 
-        [ "$BARM32" == "arm" ] && cp prebuilt/arm/web*.apk apks/webview32.apk
-        [ "$BARM32" == "arm" ] && cp prebuilt/arm/browser*.apk apks/browser32.apk
+        [ "$BARM32" == "arm32" ] && cp prebuilt/arm/web*.apk apks/webview32.apk
+        [ "$BARM32" == "arm32" ] && cp prebuilt/arm/browser*.apk apks/browser32.apk
         [ "$BARM64" == "arm64" ] && cp prebuilt/arm64/web*.apk apks/webview64.apk
         [ "$BARM64" == "arm64" ] && cp prebuilt/arm64/browser*.apk apks/browser64.apk
 
@@ -198,8 +211,8 @@ jobs:
     - name: Prep release
       id: hash
       run: |
-        BARM32=${{ steps.vars.outputs.BARM32 }}
-        BARM64=${{ steps.vars.outputs.BARM64 }}
+        BARM32=${{ steps.vanco.outputs.BARM32 }}
+        BARM64=${{ steps.vanco.outputs.BARM64 }}
         echo "BARM32: $BARM32, BARM64: $BARM64"
 
         cd aosmium/apks
@@ -219,7 +232,7 @@ jobs:
             aosmium/apks/AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512"
         fi
 
-        if [ "$BARM32" == "arm" ];then
+        if [ "$BARM32" == "arm32" ];then
           sha512sum webview32-signed.apk > webview32-signed.apk.sha512
           sha512sum browser32-signed.apk > browser32-signed.apk.sha512
           cp webview32-signed.apk AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk
