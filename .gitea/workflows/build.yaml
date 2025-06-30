@@ -11,6 +11,12 @@ on:
     paths:
       - trigger-build.txt
   workflow_dispatch:  # button shown only when in default branch
+    inputs:
+      buildarch:
+        description: 'Limit to specific arch?!'
+        required: false
+        default: "arm arm64"
+        type: string
 
 # NOT implemented in Gitea!
 #permissions:
@@ -27,6 +33,7 @@ jobs:
       SHA64_BRW: ${{ steps.hash.outputs.SHA64_BRW }}
       git_sha_short:  ${{ steps.ver.outputs.git_sha_short }}
       upload_art_id: ${{ steps.upload.outputs.artifact-id }}
+      FILELIST: ${{ steps.hash.outputs.FILELIST }}
     container:
       #options: --user root  # we need all privileges within the container
       volumes:
@@ -76,6 +83,7 @@ jobs:
         echo "WV_VER=$webview_ver" >> $GITHUB_ENV
 
     - name: "Build arm"
+      if: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}
       shell: bash
       run: |
         ulimit -a
@@ -84,6 +92,7 @@ jobs:
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
 
     - name: "Build arm64"
+      if: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm64(\\s|$)') }}
       shell: bash
       run: |
         cd aosmium
@@ -100,14 +109,19 @@ jobs:
       shell: bash
       run: |
         #req: https://maven.google.com/web/index.html#com.android.tools.build:aapt2
+
+        BARM32=${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}
+        BARM64=${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm64(\\s|$)') }}
+        echo "BARM32: $BARM32, BARM64: $BARM64"
+
         cd aosmium
 
-        APPV32=$(../tools/aapt2 dump badging prebuilt/arm/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
-        APPV64=$(../tools/aapt2 dump badging prebuilt/arm64/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        [ "$BARM32" == "arm" ] && APPV32=$(../tools/aapt2 dump badging prebuilt/arm/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        [ "$BARM64" == "arm64" ] && APPV64=$(../tools/aapt2 dump badging prebuilt/arm64/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
         OVER=v$(date +%Y.%m.%d)
         
-        [ -z "$APPV32" ] && echo "ERROR: empty APPV32 detected" && exit 3
-        [ -z "$APPV64" ] && echo "ERROR: empty APPV64 detected" && exit 3
+        [ "$BARM32" == "arm" ] && [ -z "$APPV32" ] && echo "ERROR: empty APPV32 detected" && exit 3
+        [ "$BARM64" == "arm64" ] && [ -z "$APPV64" ] && echo "ERROR: empty APPV64 detected" && exit 3
         [ -z "$OVER" ] && echo "ERROR: empty OVER detected" && exit 3
 
         if [ "$APPV32" != "$APPV64" ];then
@@ -118,31 +132,31 @@ jobs:
             OVER="$APPV64"
         fi
 
-        APPV64_BRW=$(../tools/aapt2 dump badging prebuilt/arm64/browser-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
-        if [ "$APPV64" != "$APPV64_BRW" ];then
-          echo "WARNING: webview and browser versions differ ($APPV64 / $APPV64_BRW)!"
+        if [ "$BARM64" == "arm64" ];then
+          APPV64_BRW=$(../tools/aapt2 dump badging prebuilt/arm64/browser-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+          if [ "$APPV64" != "$APPV64_BRW" ];then
+            echo "WARNING: webview and browser versions differ ($APPV64 / $APPV64_BRW)!"
+          fi
         fi
 
         echo "APP_VERSION=${OVER}" >> $GITHUB_ENV
-        echo "APP32_VERSION=${APPV32}" >> $GITHUB_ENV
-        echo "APP64_VERSION=${APPV64}" >> $GITHUB_ENV
+        [ "$BARM" == "arm" ] && echo "APP32_VERSION=${APPV32}" >> $GITHUB_ENV
+        [ "$BARM64" == "arm64" ] && echo "APP64_VERSION=${APPV64}" >> $GITHUB_ENV
         git_sha_short=$(git rev-parse --short "$GITHUB_SHA")
         echo "git_sha_short=$git_sha_short" >> $GITHUB_ENV
 
         echo "APP_VERSION=${OVER}" >> $GITHUB_OUTPUT
-        #echo "APP32_VERSION=${APPV32}" >> $GITHUB_OUTPUT
-        #echo "APP64_VERSION=${APPV64}" >> $GITHUB_OUTPUT
         echo "git_sha_short=$git_sha_short" >> $GITHUB_OUTPUT
 
-        echo "APP32 version is: $APPV32 ($git_sha_short)"
-        echo "APP64 version is: $APPV64 ($git_sha_short)"
+        [ "$BARM" == "arm" ] && echo "APP32 version is: $APPV32 ($git_sha_short)"
+        [ "$BARM64" == "arm64" ] && echo "APP64 version is: $APPV64 ($git_sha_short)"
 
         mkdir apks
 
-        cp prebuilt/arm/web*.apk apks/webview32.apk
-        cp prebuilt/arm64/web*.apk apks/webview64.apk
-        cp prebuilt/arm/browser*.apk apks/browser32.apk
-        cp prebuilt/arm64/browser*.apk apks/browser64.apk
+        [ "$BARM32" == "arm" ] && cp prebuilt/arm/web*.apk apks/webview32.apk
+        [ "$BARM32" == "arm" ] && cp prebuilt/arm/browser*.apk apks/browser32.apk
+        [ "$BARM64" == "arm64" ] && cp prebuilt/arm64/web*.apk apks/webview64.apk
+        [ "$BARM64" == "arm64" ] && cp prebuilt/arm64/browser*.apk apks/browser64.apk
 
     - name: set up JDK
       uses: actions/setup-java@v3
@@ -171,28 +185,43 @@ jobs:
     - name: Prep release
       id: hash
       run: |
+        BARM32=${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}
+        BARM64=${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm64(\\s|$)') }}
+        echo "BARM32: $BARM32, BARM64: $BARM64"
+
         cd aosmium/apks
-        sha512sum webview32-signed.apk > webview32-signed.apk.sha512
-        sha512sum webview64-signed.apk > webview64-signed.apk.sha512
-        sha512sum browser32-signed.apk > browser32-signed.apk.sha512
-        sha512sum browser64-signed.apk > browser64-signed.apk.sha512
 
-        cp webview32-signed.apk AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk
-        sha512sum AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+        if [ "$BARM64" == "arm64" ];then
+          sha512sum webview64-signed.apk > webview64-signed.apk.sha512
+          sha512sum browser64-signed.apk > browser64-signed.apk.sha512
+          cp webview64-signed.apk AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk
+          sha512sum AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+          cp browser64-signed.apk AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk
+          sha512sum AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+          echo "SHA64_WV=$(cat webview64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+          echo "SHA64_BRW=$(cat browser64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+          FILELIST="aosmium/apks/AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk \
+            aosmium/apks/AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk \
+            aosmium/apks/AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512 \
+            aosmium/apks/AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512"
+        fi
 
-        cp webview64-signed.apk AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk
-        sha512sum AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
-
-        cp browser32-signed.apk AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk
-        sha512sum AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
-
-        cp browser64-signed.apk AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk
-        sha512sum AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
-
-        echo "SHA32_WV=$(cat webview32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
-        echo "SHA64_WV=$(cat webview64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
-        echo "SHA32_BRW=$(cat browser32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
-        echo "SHA64_BRW=$(cat browser64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+        if [ "$BARM32" == "arm" ];then
+          sha512sum webview32-signed.apk > webview32-signed.apk.sha512
+          sha512sum browser32-signed.apk > browser32-signed.apk.sha512
+          cp webview32-signed.apk AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk
+          sha512sum AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+          cp browser32-signed.apk AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk
+          sha512sum AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+          echo "SHA32_WV=$(cat webview32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+          FILELIST="$FILELIST \
+            aosmium/apks/AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk \
+            aosmium/apks/AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk \
+            aosmium/apks/AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512 \
+            aosmium/apks/AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512"
+        fi
+        echo -e "FILELIST:\n$FILELIST"
+        echo -e "FILELIST='$FILELIST'" >> $GITHUB_OUTPUT
 
     - name: Upload all files as artifact
       uses: actions/upload-artifact@v3
@@ -200,16 +229,9 @@ jobs:
       with:
         name: release-artifact
         retention-days: 1
-        if-no-files-found: error
+        #if-no-files-found: error
         path: |
-            ${{ steps.signAPK.outputs.signedFile0 }}
-            ${{ steps.signAPK.outputs.signedFile0 }}.sha512
-            ${{ steps.signAPK.outputs.signedFile1 }}
-            ${{ steps.signAPK.outputs.signedFile1 }}.sha512
-            ${{ steps.signAPK.outputs.signedFile2 }}
-            ${{ steps.signAPK.outputs.signedFile2 }}.sha512
-            ${{ steps.signAPK.outputs.signedFile3 }}
-            ${{ steps.signAPK.outputs.signedFile3 }}.sha512
+            ${{ steps.hash.outputs.FILELIST }}
 
     - name: Upload F-Droid apks as artifact
       uses: actions/upload-artifact@v3
@@ -217,16 +239,9 @@ jobs:
       with:
         name: release-fdroid
         retention-days: 1
-        if-no-files-found: error
+        #if-no-files-found: error
         path: |
-            aosmium/apks/AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk
-            aosmium/apks/AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk
-            aosmium/apks/AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk
-            aosmium/apks/AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk
-            aosmium/apks/AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
-            aosmium/apks/AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
-            aosmium/apks/AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
-            aosmium/apks/AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+            ${{ steps.hash.outputs.FILELIST }}
 
   mirror:
     needs: build
@@ -257,10 +272,10 @@ jobs:
 
           |APK|sha512|
           |-|-|
-          |webview32-signed.apk|${{ needs.build.outputs.SHA32_WV }}|
-          |webview64-signed.apk|${{ needs.build.outputs.SHA64_WV }}|
-          |browser32-signed.apk|${{ needs.build.outputs.SHA32_BRW }}|
-          |browser64-signed.apk|${{ needs.build.outputs.SHA64_BRW }}|
+          |webview32-signed.apk|${{ needs.build.outputs.SHA32_WV || 'not-part-of-this-release' }}|
+          |webview64-signed.apk|${{ needs.build.outputs.SHA64_WV || 'not-part-of-this-release' }}|
+          |browser32-signed.apk|${{ needs.build.outputs.SHA32_BRW || 'not-part-of-this-release' }}|
+          |browser64-signed.apk|${{ needs.build.outputs.SHA64_BRW || 'not-part-of-this-release' }}|
 
   release-github:
     name: "Release @github"
@@ -275,7 +290,7 @@ jobs:
       tag: ${{ needs.build.outputs.APP_VERSION }}
       targetc: main
       pre: true
-      #filepattern: '*.apk'
+      filepattern: '*.apk*'
       body: >-
           # AOSmium - The AXP.OS Browser\n
           \n
@@ -285,18 +300,18 @@ jobs:
           \n
           |APK|sha512|\n
           |-|-|\n
-          |webview32-signed.apk|${{ needs.build.outputs.SHA32_WV }}|\n
-          |webview64-signed.apk|${{ needs.build.outputs.SHA64_WV }}|\n
-          |browser32-signed.apk|${{ needs.build.outputs.SHA32_BRW }}|\n
-          |browser64-signed.apk|${{ needs.build.outputs.SHA64_BRW }}|\n
+          |webview32-signed.apk|${{ needs.build.outputs.SHA32_WV || 'not-part-of-this-release' }}|\n
+          |webview64-signed.apk|${{ needs.build.outputs.SHA64_WV || 'not-part-of-this-release' }}|\n
+          |browser32-signed.apk|${{ needs.build.outputs.SHA32_BRW || 'not-part-of-this-release' }}|\n
+          |browser64-signed.apk|${{ needs.build.outputs.SHA64_BRW || 'not-part-of-this-release' }}|\n
 
       filelist: >-
           browser32-signed.apk
           browser32-signed.apk.sha512
-          browser64-signed.apk
-          browser64-signed.apk.sha512
           webview32-signed.apk
           webview32-signed.apk.sha512
+          browser64-signed.apk
+          browser64-signed.apk.sha512
           webview64-signed.apk
           webview64-signed.apk.sha512
 
