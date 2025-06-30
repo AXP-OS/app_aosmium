@@ -48,6 +48,7 @@ jobs:
       run: |
         ulimit -a
         apt-get update && apt-get -y install git-lfs curl lsb-release python3 file gperf sudo gcc-multilib
+        echo "input: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}"
 
     - uses: actions/checkout@v4
       with:
@@ -61,6 +62,8 @@ jobs:
       shell: bash
       id: vanco
       run: |
+        echo "input: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}"
+
         git config --global user.name "gitea-actions[bot]"
         git config --global user.email "<sherlock@binbash.rocks>"
 
@@ -81,8 +84,6 @@ jobs:
         latestVanadium=$(git tag | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
         webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
         echo "WV_VER=$webview_ver" >> $GITHUB_ENV
-
-        echo "input: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}"
 
     - name: "Build arm"
       if: ${{ inputs.buildarch && inputs.buildarch.match('(^|\\s)arm(\\s|$)') }}
