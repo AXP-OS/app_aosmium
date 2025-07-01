@@ -102,15 +102,3 @@ rm -fv *-config-disable-domain-reliability-feature.patch
 rm -fv *-config-Disable-fullscreen-exit-callback-for-picture-.patch
 rm -fv *-tmp-Disable-usage-of-new-checkServerTrusted-API-for-.patch
 rm -fv *-tmp-config-Enable-Local-Network-Permission-access-an.patch
-# libcronet bug (g-rewards), no SSL bug (g-maps)
-rm -fv *-upstream-LNA-Port-LNA-permission-to-Android.patch
-rm -fv *-Disable-permission-prompt-for-local-network-access-i.patch
-rm -fv *-Revert-Disable-permission-prompt-for-local-network-a.patch
-rm -fv *-Revert-tmp-expose-local-network-access-flags-for-And.patch
-rm -fv *-Disable-Local-Network-access-feature-in-webview.patch
-rm -fv *-tmp-expose-local-network-access-flags-for-Android.patch
-rm -fv *-enable-Local-Network-Access-checks-by-default.patch
-rm -fv *-config-disable-domain-reliability-feature.patch
-rm -fv *-enable-Local-Network-Access-checks-by-default.patch
-rm -fv *-Disable-Local-Network-access-feature-in-webview.patch
-
