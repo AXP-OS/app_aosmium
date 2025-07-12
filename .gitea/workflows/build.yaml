@@ -13,9 +13,9 @@ on:
   workflow_dispatch:  # button shown only when in default branch
     inputs:
       buildarch:
-        description: "Limit to specific arch (arm, arm64, arm_both)"
+        description: "Limit to specific arch (arm32, arm64, arm_both)"
         required: false
-        default: "arm_both" # arm, arm64, arm_both
+        default: "arm_both" # arm32, arm64, arm_both
         type: string
 
 # NOT implemented in Gitea!
