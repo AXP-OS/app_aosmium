@@ -13,7 +13,7 @@ on:
   workflow_dispatch:  # button shown only when in default branch
     inputs:
       buildarch:
-        description: 'Limit to specific arch?!'
+        description: "Limit to specific arch (arm, arm64, arm_both)"
         required: false
         default: "arm_both" # arm, arm64, arm_both
         type: string
