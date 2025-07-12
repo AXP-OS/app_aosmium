@@ -168,15 +168,19 @@ jobs:
         echo "APP_VERSION=${OVER}" >> $GITHUB_OUTPUT
         echo "git_sha_short=$git_sha_short" >> $GITHUB_OUTPUT
 
-        [ "$BARM32" == "1" ] && echo "APP32 version is: $APPV32 ($git_sha_short)"
-        [ "$BARM64" == "1" ] && echo "APP64 version is: $APPV64 ($git_sha_short)"
-
         mkdir apks
 
-        [ "$BARM32" == "1" ] && cp prebuilt/arm/web*.apk apks/webview32.apk
-        [ "$BARM32" == "1" ] && cp prebuilt/arm/browser*.apk apks/browser32.apk
-        [ "$BARM64" == "1" ] && cp prebuilt/arm64/web*.apk apks/webview64.apk
-        [ "$BARM64" == "1" ] && cp prebuilt/arm64/browser*.apk apks/browser64.apk
+        if [ "$BARM32" == "1" ];then
+            echo "APP32 version is: $APPV32 ($git_sha_short)"
+            cp prebuilt/arm/web*.apk apks/webview32.apk || true
+            cp prebuilt/arm/browser*.apk apks/browser32.apk || true
+        fi
+        
+        if [ "$BARM64" == "1" ];then
+             echo "APP64 version is: $APPV64 ($git_sha_short)"
+             cp prebuilt/arm64/web*.apk apks/webview64.apk || true
+             cp prebuilt/arm64/browser*.apk apks/browser64.apk || true
+        fi
 
     - name: set up JDK
       uses: actions/setup-java@v3
