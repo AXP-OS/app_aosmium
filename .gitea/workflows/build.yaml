@@ -93,14 +93,14 @@ jobs:
         echo "BARM_BOTH=0" >> $GITHUB_OUTPUT
 
         case ${INPUT_BUILDARCH} in
-          arm32) echo "BARM32=1" >> $GITHUB_OUTPUT ;;
-          arm64) echo "BARM64=1" >> $GITHUB_OUTPUT ;;
-           *) echo "BARM_BOTH=1" >> $GITHUB_OUTPUT ;; # both is default so any invalid or empty input will build both
+          arm32) echo "BARM32: $BARM32"; echo "BARM32=1" >> $GITHUB_OUTPUT ;;
+          arm64) echo "BARM64: $BARM64"; echo "BARM64=1" >> $GITHUB_OUTPUT ;;
+           *) echo "BARM_BOTH=1";
+              echo "BARM_BOTH=1" >> $GITHUB_OUTPUT ;; # both is default so any invalid or empty input will build both
         esac
-        echo "BARM32: $BARM32, BARM64: $BARM64, BARM_BOTH=$BARM_BOTH"
 
     - name: "Build arm32"
-      if: ${{ steps.vanco.outputs.BARM32 }} == 1
+      if: ${{ steps.vanco.outputs.BARM32 }} == "1"
       shell: bash
       run: |
         ulimit -a
@@ -109,15 +109,15 @@ jobs:
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
 
     - name: "Build arm64"
-      if: ${{ steps.vanco.outputs.BARM64 }} == 1
+      if: ${{ steps.vanco.outputs.BARM64 }} == "1"
       shell: bash
       run: |
         cd aosmium
         source trigger-build.txt
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
 
-    - name: "Build arm & arm64"
-      if: ${{ steps.vanco.outputs.BARM_BOTH }} == 1
+    - name: "Build arm32 & arm64"
+      if: ${{ steps.vanco.outputs.BARM_BOTH }} == "1"
       shell: bash
       run: |
         ulimit -a
