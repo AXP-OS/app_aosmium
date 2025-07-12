@@ -100,7 +100,7 @@ jobs:
         esac
 
     - name: "Build arm32"
-      if: ${{ steps.vanco.outputs.BARM32 }} == "1"
+      if: ${{ steps.vanco.outputs.BARM32 == '1' }}
       shell: bash
       run: |
         ulimit -a
@@ -109,7 +109,7 @@ jobs:
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
 
     - name: "Build arm64"
-      if: ${{ steps.vanco.outputs.BARM64 }} == "1"
+      if: ${{ steps.vanco.outputs.BARM64 == '1' }}
       shell: bash
       run: |
         cd aosmium
@@ -117,7 +117,7 @@ jobs:
         ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
 
     - name: "Build arm32 & arm64"
-      if: ${{ steps.vanco.outputs.BARM_BOTH }} == "1"
+      if: ${{ steps.vanco.outputs.BARM_BOTH == '1' }}
       shell: bash
       run: |
         ulimit -a
