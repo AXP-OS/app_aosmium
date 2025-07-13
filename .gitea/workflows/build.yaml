@@ -131,10 +131,15 @@ jobs:
       shell: bash
       run: |
         #req: https://maven.google.com/web/index.html#com.android.tools.build:aapt2
-        cd aosmium
-        BARM32=${{ steps.vanco.outputs.BARM32 }}
-        BARM64=${{ steps.vanco.outputs.BARM64 }}
+        if [ "${{ steps.vanco.outputs.BARM_BOTH }}" == 1 ];then
+            BARM32=1; BARM64=1
+        else
+            BARM32=${{ steps.vanco.outputs.BARM32 }}
+            BARM64=${{ steps.vanco.outputs.BARM64 }}
+        fi
         echo "BARM32: $BARM32, BARM64: $BARM64"
+
+        cd aosmium
 
         [ "$BARM32" == "1" ] && APPV32=$(../tools/aapt2 dump badging prebuilt/arm/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
         [ "$BARM64" == "1" ] && APPV64=$(../tools/aapt2 dump badging prebuilt/arm64/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
@@ -209,8 +214,12 @@ jobs:
     - name: Prep release
       id: hash
       run: |
-        BARM32=${{ steps.vanco.outputs.BARM32 }}
-        BARM64=${{ steps.vanco.outputs.BARM64 }}
+        if [ "${{ steps.vanco.outputs.BARM_BOTH }}" == 1 ];then
+            BARM32=1; BARM64=1
+        else
+            BARM32=${{ steps.vanco.outputs.BARM32 }}
+            BARM64=${{ steps.vanco.outputs.BARM64 }}
+        fi
         echo "BARM32: $BARM32, BARM64: $BARM64"
 
         cd aosmium/apks
