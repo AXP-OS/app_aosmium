@@ -123,7 +123,8 @@ jobs:
         ulimit -a
         cd aosmium
         source trigger-build.txt
-        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm arm64
+        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
+        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
 
     # https://github.com/r0adkll/sign-android-release/issues/84#issuecomment-1885690080
     - name: "Get & set app and build variables"
@@ -150,9 +151,13 @@ jobs:
         [ -z "$OVER" ] && echo "ERROR: empty OVER detected" && exit 3
 
         if [ "$APPV32" != "$APPV64" ];then
+            if [ "${{ steps.vanco.outputs.BARM_BOTH }}" == 1 ];then
+               echo "ERROR: arm/arm64 versions differ ($APPV32/$APPV64)!!"
+               exit 3
+            fi
             echo "WARNING: arm/arm64 versions differ ($APPV32/$APPV64) and due to this they will be BOTH set to: >$OVER<"
-            APPV32="$OVER"
-            APPV64="$OVER"
+            #APPV32="$OVER"
+            #APPV64="$OVER"
         else
             OVER="$APPV64"
         fi
