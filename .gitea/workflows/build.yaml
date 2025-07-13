@@ -243,23 +243,21 @@ jobs:
           cp browser32-signed.apk AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk
           sha512sum AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
           echo "SHA32_WV=$(cat webview32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
-          FILELIST="$FILELIST \
-            aosmium/apks/AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk \
-            aosmium/apks/AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk \
-            aosmium/apks/AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512 \
-            aosmium/apks/AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512"
+          echo "SHA32_BRW=$(cat browser32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
         fi
-        echo -e "FILELIST:\n$FILELIST"
-        echo -e "FILELIST='$FILELIST'" >> $GITHUB_OUTPUT
 
-    - name: Upload all files as artifact
+    - name: Upload release files as artifact
       uses: actions/upload-artifact@v3
       id: upload
       with:
         name: release-artifact
         retention-days: 1
         if-no-files-found: error
-        path: aosmium/apks/AOSmium-*
+        path: |
+          aosmium/apks/browser*-signed.apk
+          aosmium/apks/browser*-signed.apk.sha512
+          aosmium/apks/webview*-signed.apk
+          aosmium/apks/webview*-signed.apk.sha512
 
     - name: Upload F-Droid apks as artifact
       uses: actions/upload-artifact@v3
