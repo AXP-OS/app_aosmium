@@ -123,8 +123,12 @@ jobs:
         ulimit -a
         cd aosmium
         source trigger-build.txt
-        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
-        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
+
+        #./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
+        # fixme: do not clean
+        #./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
+
+        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a all
 
     # https://github.com/r0adkll/sign-android-release/issues/84#issuecomment-1885690080
     - name: "Get & set app and build variables"
