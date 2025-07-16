@@ -7,7 +7,7 @@ trigger=56
 
 # overwrite Vanadium version to be used. if unset or empty the latest available will be used
 # must be a valid tag (e.g. "132.0.6834.79.1")
-export vanadium_version="138.0.7204.63.0"
+export vanadium_version="138.0.7204.157.0"
 
 # a space separated list of build targets. defaults to "system_webview_apk".
 # available targets are: system_webview_apk chrome_public_apk vanadium_config_apk
@@ -17,14 +17,21 @@ export build_targets="chrome_public_apk system_webview_apk"
 
 # by default the out/ directory will not be removed.
 # if you want a clean build set this to 1
-export clean=0
-#export clean=1
+#export clean=0
+export clean=1
 
 # RESET + SYNC sources + APPLY patches?
 # usually should be set to 1 when clean=1
-export gsync=0
-#export gsync=1
+#export gsync=0
+export gsync=1
 
+
+
+
+
+
+######################################################################################################
+#
 # add any specific args to the ninja build cmd
 # when unset or empty ninja will autodetect the job count etc
 # lowering the job count to 6 fixes the weird error:
