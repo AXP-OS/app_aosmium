@@ -7,7 +7,7 @@ trigger=56
 
 # overwrite Vanadium version to be used. if unset or empty the latest available will be used
 # must be a valid tag (e.g. "132.0.6834.79.1")
-export vanadium_version="138.0.7204.168.1"
+export vanadium_version="139.0.7258.62.1"
 
 # a space separated list of build targets. defaults to "system_webview_apk".
 # available targets are: system_webview_apk chrome_public_apk vanadium_config_apk
