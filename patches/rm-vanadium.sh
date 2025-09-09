@@ -104,3 +104,4 @@ rm -fv *-tmp-Disable-usage-of-new-checkServerTrusted-API-for-.patch
 rm -fv *-tmp-config-Enable-Local-Network-Permission-access-an.patch
 rm -fv *-fixup-config-parser-Add-config-parser-for-browser-an.patch
 rm -fv *-Add-VanadiumConfig-version-on-about-Vanadium-setting.patch
+rm -fv *-Restore-local-password-manager-UI.patch
