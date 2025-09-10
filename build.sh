@@ -112,7 +112,7 @@ copy_vanadium_patches(){
     cp patches/* $aosmiumPath/patches/0001-Vanadium/
     
     # AOSmium overwrites
-    cp $aosmiumPath/patches/9000-AOSmium/211-Restore-local-password-manager-UI.patch $aosmiumPath/patches/0001-Vanadium/
+    cp $aosmiumPath/patches/9000-AOSmium/0211-Restore-local-password-manager-UI.patch $aosmiumPath/patches/0001-Vanadium/
  
     cd $aosmiumPath/patches/0001-Vanadium/
     bash ../rm-vanadium.sh
