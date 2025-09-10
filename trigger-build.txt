@@ -3,7 +3,7 @@
 # increase the following counter for just triggering a build with default options.
 # (alternatively go into the actions tab select the build.yaml and simply start a build with the following settings)
 # (this counter is no version id/number, it is just.. a counter to have smth to commit)
-trigger=56
+trigger=57
 
 # overwrite Vanadium version to be used. if unset or empty the latest available will be used
 # must be a valid tag (e.g. "132.0.6834.79.1") from https://github.com/GrapheneOS/Vanadium/tags but usually taken from the latest announced tag on https://grapheneos.org/releases
