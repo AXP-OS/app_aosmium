@@ -40,10 +40,10 @@ jobs:
     container:
       #options: --user root  # we need all privileges within the container
       volumes:
-        - /home/aosp/docker_vols/aosmium:/workspace/AXP.OS/app_aosmium/aosmium
-        - /home/aosp/docker_vols/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
-        - /home/aosp/docker_vols/chromium:/workspace/AXP.OS/app_aosmium/chromium
-        - /home/aosp/docker_vols/tools:/workspace/AXP.OS/app_aosmium/tools
+        - /srv/docker_vols/aosmium:/workspace/AXP.OS/app_aosmium/aosmium
+        - /srv/docker_vols/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
+        - /srv/docker_vols/chromium:/workspace/AXP.OS/app_aosmium/chromium
+        - /srv/docker_vols/tools:/workspace/AXP.OS/app_aosmium/tools
     steps:
 
     - name: Prep container
