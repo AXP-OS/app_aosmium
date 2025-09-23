@@ -197,7 +197,7 @@ if [ $gsync -eq 1 ]; then
         git rebase-update
         cd ..
         tagmsg "Syncing"
-        yes | gclient sync --force --delete_unversioned_trees --reset --revision="$chromium_version"
+        yes | gclient sync --jobs=4 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     else
         tagmsg "Initial source download"
         cd $chromiumPath
