@@ -11,9 +11,9 @@ export vanadium_version="140.0.7339.155.0"
 
 # a space separated list of build targets. defaults to "system_webview_apk".
 # available targets are: system_webview_apk chrome_public_apk vanadium_config_apk
-export build_targets="system_webview_apk"
+#export build_targets="system_webview_apk"
 #export build_targets="chrome_public_apk"
-#export build_targets="chrome_public_apk system_webview_apk"
+export build_targets="chrome_public_apk system_webview_apk"
 
 # by default the out/ directory will not be removed.
 # if you want a clean build set this to 1
