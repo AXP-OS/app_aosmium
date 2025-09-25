@@ -12,6 +12,11 @@ on:
       - trigger-build.txt
   workflow_dispatch:  # button shown only when in default branch
     inputs:
+      pushrelease:
+        description: "Release after a succesful build"
+        required: false
+        default: true
+        type: boolean
       buildarch:
         description: "Limit to specific arch (arm32, arm64, arm_both)"
         required: false
@@ -267,6 +272,7 @@ jobs:
           aosmium/apks/webview*-signed.apk.sha512
 
     - name: Upload F-Droid apks as artifact
+      if: ${{ inputs.pushrelease == 'true' }}
       uses: actions/upload-artifact@v3
       id: upload
       with:
@@ -283,6 +289,7 @@ jobs:
 
   release-codeberg:
     name: "Release @Codeberg"
+    if: ${{ inputs.pushrelease == 'true' }}
     uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_mirror_main.yaml@main
     runs-on: docker-node-latest
     needs: build
@@ -311,6 +318,7 @@ jobs:
 
   release-github:
     name: "Release @github"
+    if: ${{ inputs.pushrelease == 'true' }}
     uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_mirror_second.yaml@main
     runs-on: docker-node-latest
     needs: [ build, release-codeberg ]
@@ -345,6 +353,7 @@ jobs:
          
   release-fdroid-cutting:
     name: "Release @F-Droid Cutting"
+    if: ${{ inputs.pushrelease == 'true' }}
     uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_fdroid-cutting.yaml@main
     runs-on: fdroid-cutting
     needs: build
