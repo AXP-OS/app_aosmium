@@ -289,7 +289,7 @@ jobs:
 
   release-codeberg:
     name: "Release @Codeberg"
-    if: ${{ inputs.pushrelease == 'true' }}
+    #if: ${{ inputs.pushrelease == 'true' }}
     uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_mirror_main.yaml@main
     runs-on: docker-node-latest
     needs: build
