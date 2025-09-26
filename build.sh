@@ -376,8 +376,8 @@ args+=' use_relative_vtables_abi=false'
 args+=' enable_reporting=false' #Privacy
 args+=' use_v8_context_snapshot=false' # see https://github.com/uazo/cromite/pull/317 for context
 args+=' include_both_v8_snapshots=false' # see https://github.com/uazo/cromite/blob/c00bb4e191c836301b797f913b57a2c54f32b068/build/chromium.gn_args#L8-L9
-args+=' is_high_end_android=false' # TESTING. optimize ressource usage for low-end Android devices (drawbacks in performance for high end?!)
-#args+=' use_relr_relocations=true' # optimize speed+size, requires SDK28+ though!
+args+=' is_high_end_android=false' # optimize ressource usage for low-end Android devices (drawbacks in performance for high end?!)
+args+=' use_relr_relocations=true' # optimize speed+size, requires SDK28+ though!
 
 #args+=' config_apk_package="'$chromium_packageid_config'"' #Config app
 #args+=' config_apk_certdigest="'$chromium_cert_config'"'
