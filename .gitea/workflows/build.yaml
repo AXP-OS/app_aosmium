@@ -272,7 +272,7 @@ jobs:
           aosmium/apks/webview*-signed.apk.sha512
 
     - name: Upload F-Droid apks as artifact
-      if: ${{ inputs.pushrelease == 'true' }}
+      #if: ${{ inputs.pushrelease == 'true' }}
       uses: actions/upload-artifact@v3
       id: upload
       with:
@@ -318,7 +318,7 @@ jobs:
 
   release-github:
     name: "Release @github"
-    if: ${{ inputs.pushrelease == 'true' }}
+    #if: ${{ inputs.pushrelease == 'true' }}
     uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_mirror_second.yaml@main
     runs-on: docker-node-latest
     needs: [ build, release-codeberg ]
@@ -353,7 +353,7 @@ jobs:
          
   release-fdroid-cutting:
     name: "Release @F-Droid Cutting"
-    if: ${{ inputs.pushrelease == 'true' }}
+    #if: ${{ inputs.pushrelease == 'true' }}
     uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_fdroid-cutting.yaml@main
     runs-on: fdroid-cutting
     needs: build
