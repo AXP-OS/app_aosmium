@@ -356,7 +356,7 @@ args+=' dfmify_dev_ui=false' #Don't build as module
 args+=' ffmpeg_branding="Chrome"' #Codec support
 args+=' proprietary_codecs=true'
 args+=' use_login_database_as_backend=true' #Enable password manager without GMS
-args+=' enable_nacl=false' #Unncessary
+#args+=' enable_nacl=false' #Unncessary
 args+=' enable_resource_allowlist_generation=false'
 args+=' enable_remoting=false'
 args+=' enable_arcore=false'
