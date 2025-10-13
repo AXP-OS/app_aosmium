@@ -105,3 +105,4 @@ rm -fv *-tmp-config-Enable-Local-Network-Permission-access-an.patch
 rm -fv *-fixup-config-parser-Add-config-parser-for-browser-an.patch
 rm -fv *-Add-VanadiumConfig-version-on-about-Vanadium-setting.patch
 rm -fv *-Increment-minSdk-to-33-trichrome-apk-build-targets.patch
+rm -fv *-Support-to-automatically-apply-patches-to-some-subpr.patch
