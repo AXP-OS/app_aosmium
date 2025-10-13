@@ -112,8 +112,11 @@ copy_vanadium_patches(){
     cp patches/* $aosmiumPath/patches/0001-Vanadium/
     
     # AOSmium overwrites
-    if [ -f "$aosmiumPath/patches/0001-Vanadium/0211-Restore-local-password-manager-UI.patch" ];then
-        cp $aosmiumPath/patches/9000-AOSmium/0211-Restore-local-password-manager-UI.patch $aosmiumPath/patches/0001-Vanadium/
+    AOSN_rlpmu=$(ls -la "$aosmiumPath/patches/0001-Vanadium/" | grep Restore-local-password-manager-UI.patch)
+    AOSC_rlpmu=$(ls -la "$aosmiumPath/patches/0001-Vanadium/" | grep -c Restore-local-password-manager-UI.patch)
+
+    if [ $AOSC_rlpmu -eq 1 ];then
+        cp $aosmiumPath/patches/9000-AOSmium/Restore-local-password-manager-UI.patch $aosmiumPath/patches/0001-Vanadium/$AOSN_rlpmu
     fi
 
     cd $aosmiumPath/patches/0001-Vanadium/
