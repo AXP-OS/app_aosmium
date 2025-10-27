@@ -40,9 +40,9 @@ rm -fv *-config-add-new-needed-deps-to-fetch-filter-lists.patch
 rm -fv *-config-Build-target-for-android-assets-including-the.patch
 rm -fv *-config-Build-target-for-android-assets-for-config-fi.patch
 rm -fv *-config-Add-the-needed-component-and-protobuf-file-fo.patch
-#rm -fv *-Extension-of-build-system-for-java-files-in-base-lay.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
-#rm -fv *-Add-hooks-for-LibraryLoader-on-early-initialization-.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
-#rm -fv *-Add-hooks-for-initializing-contents-of-VanadiumConfi.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
+rm -fv *-Extension-of-build-system-for-java-files-in-base-lay.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
+rm -fv *-Add-hooks-for-LibraryLoader-on-early-initialization-.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
+rm -fv *-Add-hooks-for-initializing-contents-of-VanadiumConfi.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
 rm -fv *-Extension-of-build-system-at-android-specific-subres.patch
 rm -fv *-Expose-fetching-config-state-for-content-filtering-t.patch
 rm -fv *-Use-ruleset-from-config-apk-whenever-it-s-present.patch
@@ -59,7 +59,7 @@ rm -fv *-Skip-checks-for-android-autofill-service-app-when-us.patch
 rm -fv *-config-generator-Initial-configuration-for-config-ap.patch
 rm -fv *-config-parser-Add-config-parser-for-browser-and-webv.patch
 rm -fv *-filter-lists-Helper-script-for-fetching-content-filt.patch
-#rm -fv *-Add-hooks-for-applying-flags-features-at-runtime.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
+rm -fv *-Add-hooks-for-applying-flags-features-at-runtime.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
 rm -fv *-content-filtering-Add-update-handling-of-subresource.patch
 rm -fv *-config-generator-Always-enable-CredentialManager-API.patch
 rm -fv *-Enable-CredentialManager-APIs-for-all-apps-supportin.patch
@@ -92,7 +92,7 @@ rm -fv *-fixup-content-filtering-Add-update-handling-of-subre.patch
 rm -fv *-fixup-Use-the-content-filtering-from-config-app-when.patch
 rm -fv *-Use-64-bit-toolchain-by-default-for-generating-resou.patch
 rm -fv *-enable-stack-clash-protection-for-arm64-targets.patch
-#rm -fv *-Always-start-child-processes-in-jitless-mode-when-ex.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
+rm -fv *-Always-start-child-processes-in-jitless-mode-when-ex.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
 rm -fv *-Use-fstack-protector-strong-with-shadow-call-stack-w.patch
 rm -fv *-config-Explicitly-declare-queries-to-config-package-.patch
 rm -fv *-add-support-for-german-specific-language-content-fil.patch
@@ -109,3 +109,4 @@ rm -fv *-Support-to-automatically-apply-patches-to-some-subpr.patch
 rm -fv *-Restore-local-password-manager-UI.patch
 rm -fv *-Suppport-applying-patches-to-v8-subproject.patch
 rm -fv *-Support-applying-patches-to-search-engine-data-resou.patch
+rm -fv *-enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
