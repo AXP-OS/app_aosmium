@@ -106,7 +106,7 @@ rm -fv *-fixup-config-parser-Add-config-parser-for-browser-an.patch
 rm -fv *-Add-VanadiumConfig-version-on-about-Vanadium-setting.patch
 rm -fv *-Increment-minSdk-to-33-trichrome-apk-build-targets.patch
 rm -fv *-Support-to-automatically-apply-patches-to-some-subpr.patch
-rm -fv *-Restore-local-password-manager-UI.patch
-rm -fv *-Suppport-applying-patches-to-v8-subproject.patch
+#rm -fv *-Restore-local-password-manager-UI.patch # fails due to wrong patch creation, fixed by build.sh on-the-fly
+rm -fv *-Sup*ort-applying-patches-to-v8-subproject.patch
 rm -fv *-Support-applying-patches-to-search-engine-data-resou.patch
 rm -fv *-enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch

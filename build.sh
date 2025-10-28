@@ -116,7 +116,8 @@ copy_vanadium_patches(){
     AOSC_rlpmu=$(ls -1 "$aosmiumPath/patches/0001-Vanadium/" | grep -c Restore-local-password-manager-UI.patch)
 
     if [ $AOSC_rlpmu -eq 1 ];then
-        cp $aosmiumPath/patches/9000-AOSmium/Restore-local-password-manager-UI.patch $aosmiumPath/patches/0001-Vanadium/$AOSN_rlpmu
+        sed -i 's/Vanadium/Chrome/g' $aosmiumPath/patches/0001-Vanadium/$AOSN_rlpmu # GrapheneOS generates patches AFTER re-branding!
+        #cp $aosmiumPath/patches/9000-AOSmium/Restore-local-password-manager-UI.patch $aosmiumPath/patches/0001-Vanadium/$AOSN_rlpmu
     fi
 
     cd $aosmiumPath/patches/0001-Vanadium/
