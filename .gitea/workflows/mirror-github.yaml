@@ -9,7 +9,7 @@
 # - sync otherwise
 ############################################################################################
 
-name: "Mirror repo to ${{ vars.SCND_MIRROR_ORG_NAME }}"
+name: "Mirror repo to GITHUB"
 run-name: Initiated by ${{ gitea.actor }}
 on:
   push:
@@ -73,8 +73,8 @@ jobs:
         GH_TOKEN: ${{ secrets.SCND_MIRROR_TOKEN_RW }}
       run: |
         echo "repo: >${{ github.event.repository.name }}<"
-        DEFBR=$(git branch --show-current)
-        echo "current on: >$DEFBR<"
+        DEFBR=${{ github.event.repository.default_branch }}
+        echo "default branch: >$DEFBR<"
         gh repo edit ${{ vars.SCND_MIRROR_ORG_NAME }}/${{ github.event.repository.name }} --default-branch $DEFBR
         if [ "$?" == "0" ]; then
           echo "default branch set to: $DEFBR"
@@ -82,3 +82,10 @@ jobs:
           echo -e "WARNING: issue occured while setting default branch to $DEFBR: $?"
         fi
 
+    - name: "Sync LFS"
+      uses: valtech-sd/git-sync@v9
+      with:
+        source_repo: "https://tok:${{ secrets.LOCAL_TOKEN_RO }}@${{ vars.LOCAL_ORG_DOMAIN }}:${{ vars.LOCAL_ORG_PORT }}/${{ vars.LOCAL_ORG_NAME }}/${{ github.event.repository.name }}"
+        source_branch: "${{ github.event.ref }}"
+        destination_repo: "https://tok:${{ secrets.SCND_MIRROR_TOKEN_RW }}@${{ vars.SCND_MIRROR_ORG_DOMAIN }}/${{ vars.SCND_MIRROR_ORG_NAME }}/${{ github.event.repository.name }}"
+        destination_branch: "${{ github.event.ref }}"
