@@ -4,12 +4,12 @@
 # - https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
 # - https://docs.gitea.com/usage/actions/faq#what-workflow-trigger-events-does-gitea-support
 ############################################################################################
-# Mirror this repo to e.g. Codeberg
+# Mirror this repo to e.g. Codeberg or disroot
 # - create repo if needed
 # - sync otherwise
 ############################################################################################
 
-name: "Mirror repo to ${{ vars.MIRROR_ORG_NAME }}"
+name: "Mirror repo to primary site"
 run-name: Initiated by ${{ gitea.actor }}
 on:
   push:
@@ -39,10 +39,10 @@ jobs:
         source_port: ${{ vars.LOCAL_ORG_PORT }}
         source_username: "${{ vars.LOCAL_ORG_NAME }}"
         source_token: ${{ secrets.LOCAL_TOKEN_RO }}
-        dest_protocol: https
-        dest_host: ${{ vars.MIRROR_ORG_DOMAIN }}
+        dest_protocol: ssh
         dest_username: "${{ vars.MIRROR_ORG_NAME }}"
-        dest_token: ${{ secrets.MIRROR_TOKEN_RW }}
+        dest_host: ${{ vars.MIRROR_ORG_DOMAIN }}
+        dest_private_key: ${{ secrets.MIRROR_SSH_PRIVKEY }}
         mirror_repos: ${{ github.event.repository.name }}
 #    disabled on codeberg ("Push to create is not enabled for organizations")
 #        dest_create_repo_script: |
