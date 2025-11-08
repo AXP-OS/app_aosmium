@@ -7,7 +7,7 @@ trigger=61
 
 # overwrite Vanadium version to be used. if unset or empty the latest available will be used
 # must be a valid tag (e.g. "132.0.6834.79.1") from https://github.com/GrapheneOS/Vanadium/tags but usually taken from the latest announced tag on https://grapheneos.org/releases
-export vanadium_version="142.0.7444.48.0"
+export vanadium_version="142.0.7444.138.1"
 
 # a space separated list of build targets. defaults to "system_webview_apk".
 # available targets are: system_webview_apk chrome_public_apk vanadium_config_apk
