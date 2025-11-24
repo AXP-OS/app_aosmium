@@ -18,18 +18,17 @@ diff --git a/android_webview/browser/aw_field_trials.cc b/android_webview/browse
 index 3106ff055433a..43d68ebc7e586 100644
 --- a/android_webview/browser/aw_field_trials.cc
 +++ b/android_webview/browser/aw_field_trials.cc
-@@ -77,6 +77,7 @@ void AwFeatureOverrides::OverrideFeatureWithFieldTrial(
- }  // namespace internal
+@@ -36,12 +35,14 @@
+ #include "ui/gl/gl_switches.h"
  
  void AwFieldTrials::OnVariationsSetupComplete() {
 +#if 0
    // Persistent histograms must be enabled ASAP, but depends on Features.
-   base::FilePath metrics_dir;
-   if (base::PathService::Get(base::DIR_ANDROID_APP_DATA, &metrics_dir)) {
-@@ -84,6 +85,7 @@ void AwFieldTrials::OnVariationsSetupComplete() {
-   } else {
-     NOTREACHED();
-   }
+   android_webview::AwMetricsServiceClient* metrics_service_client =
+       android_webview::AwMetricsServiceClient::GetInstance();
+   metrics_service_client->SetUpMetricsDir();
+   InstantiatePersistentHistogramsWithFeaturesAndCleanup(
+       metrics_service_client->GetMetricsDir());
 +#endif
  }
  
