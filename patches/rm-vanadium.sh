@@ -111,3 +111,4 @@ rm -fv *-Sup*ort-applying-patches-to-v8-subproject.patch
 rm -fv *-Support-applying-patches-to-search-engine-data-resou.patch
 rm -fv *-enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
 rm -fv *-config-disable-additional-buttons-below-search-bar-i.patch
+rm -fv *-config-always-enable-autofill-screens-regardless-of-.patch
