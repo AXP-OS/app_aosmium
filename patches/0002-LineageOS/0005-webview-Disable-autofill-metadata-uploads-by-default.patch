@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Kevin F. Haggerty" <haggertk@lineageos.org>
+Date: Tue, 28 Sep 2021 08:43:01 -0600
+Subject: [PATCH] webview: Disable autofill metadata uploads by default
+
+* [haggertk - 2021-11-16] - Update per d85f6c03db147
+  (Reland "[Autofill] Inline kAutofillMetadataUploads")
+---
+ .../autofill/core/browser/crowdsourcing/randomized_encoder.cc   | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc b/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc
+index 348ccdec09abf..b6c77d5d552d0 100644
+--- a/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc
++++ b/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc
+@@ -117,7 +117,7 @@ std::string GetEncodingSeed(PrefService* pref_service) {
+ std::optional<RandomizedEncoder> RandomizedEncoder::Create(
+     PrefService* pref_service) {
+   // Early abort if metadata uploads are not enabled.
+-  if (!pref_service) {
++  if (!pref_service || (true)) {
+     return std::nullopt;
+   }
+ 

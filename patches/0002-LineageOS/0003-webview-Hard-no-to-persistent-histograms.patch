@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: "Kevin F. Haggerty" <haggertk@lineageos.org>
+Date: Sun, 27 Dec 2020 09:42:54 -0700
+Subject: [PATCH] webview: Hard no to persistent histograms
+
+* It's probably some kind of bug somewhere that these are never
+  deleted, but they don't really add value to us in the first
+  place.
+* Stop eating 4MB every single time any app that uses webview
+  ever opens.
+* These were guarded by a feature check before
+  https://chromium.googlesource.com/chromium/src/+/b86102f2a243
+---
+ android_webview/browser/aw_field_trials.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/android_webview/browser/aw_field_trials.cc b/android_webview/browser/aw_field_trials.cc
+index eec32a4a84800..7d594f1fe86b5 100644
+--- a/android_webview/browser/aw_field_trials.cc
++++ b/android_webview/browser/aw_field_trials.cc
+@@ -35,12 +35,14 @@
+ #include "ui/gl/gl_switches.h"
+ 
+ void AwFieldTrials::OnVariationsSetupComplete() {
++#if 0
+   // Persistent histograms must be enabled ASAP, but depends on Features.
+   android_webview::AwMetricsServiceClient* metrics_service_client =
+       android_webview::AwMetricsServiceClient::GetInstance();
+   metrics_service_client->SetUpMetricsDir();
+   InstantiatePersistentHistogramsWithFeaturesAndCleanup(
+       metrics_service_client->GetMetricsDir());
++#endif
+ }
+ 
+ // TODO(crbug.com/40271903): Consider to migrate all WebView feature overrides

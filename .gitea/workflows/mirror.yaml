@@ -1,0 +1,80 @@
+############################################################################################
+# documentation:
+# - https://docs.gitea.com/usage/actions/overview
+# - https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+# - https://docs.gitea.com/usage/actions/faq#what-workflow-trigger-events-does-gitea-support
+############################################################################################
+# Mirror this repo to e.g. Codeberg or disroot
+# - create repo if needed
+# - sync otherwise
+############################################################################################
+
+name: "Mirror repo to primary site"
+run-name: Initiated by ${{ gitea.actor }}
+on:
+  push:
+    branches:
+      - '*'
+    tags:
+      - '*'
+  workflow_dispatch:  # button shown only when in default branch
+  workflow_call:      # allow to call it
+
+jobs:
+  build:
+    runs-on: docker-node-latest
+
+    steps:
+
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.LOCAL_TOKEN_RO }}
+
+    - name: "Create/Sync repos with configured mirror"
+      # https://github.com/k8scat/action-mirror-git
+      uses: k8scat/action-mirror-git@v0.1.3
+      with:
+        source_protocol: https
+        source_host: ${{ vars.LOCAL_ORG_DOMAIN }}
+        source_port: ${{ vars.LOCAL_ORG_PORT }}
+        source_username: "${{ vars.LOCAL_ORG_NAME }}"
+        source_token: ${{ secrets.LOCAL_TOKEN_RO }}
+        dest_protocol: ssh
+        dest_username: "${{ vars.MIRROR_ORG_NAME }}"
+        dest_host: ${{ vars.MIRROR_ORG_DOMAIN }}
+        dest_private_key: ${{ secrets.MIRROR_SSH_PRIVKEY }}
+        mirror_repos: ${{ github.event.repository.name }}
+#    disabled on codeberg ("Push to create is not enabled for organizations")
+#        dest_create_repo_script: |
+#          curl \
+#            -H 'Content-Type: application/json' \
+#            -H "Authorization: token ${{ secrets.MIRROR_TOKEN_RW }}" \
+#            -d "{\"name\":\"${{ github.event.repository.name }}\",\"private\":false}" \
+#            "https://${{ vars.MIRROR_ORG_DOMAIN }}/api/v1/repos/${{ vars.MIRROR_ORG_NAME }}/repos"
+
+    - name: "Set default branch"
+      run: |
+        echo "repo: >${{ github.event.repository.name }}<"
+        DEFBR=$(git branch --show-current)
+        echo "current on: >$DEFBR<"
+        RESP=$(curl -siX 'PATCH' \
+              "https://${{ vars.MIRROR_ORG_DOMAIN }}/api/v1/repos/${{ vars.MIRROR_ORG_NAME }}/${{ github.event.repository.name }}" \
+              -H "Authorization: token ${{ secrets.MIRROR_TOKEN_RW }}" \
+              -H 'accept: application/json' \
+              -H 'Content-Type: application/json' \
+              -d  '{ "default_branch": "'$DEFBR'" }')
+        if [ $? -ne 0 ];then echo "WARNING: unusual error ($?) occured during the patch request";fi
+        STATUS_CODE=$(echo "$RESP" | head -n 1 | cut -d ' ' -f2)
+        if [ "$STATUS_CODE" == "200" ]; then
+          echo "default branch set"
+        else
+          echo -e "WARNING: issue occured while setting default branch: $STATUS_CODE!\n$RESP"
+        fi
+
+    - name: "Sync LFS"
+      uses: valtech-sd/git-sync@v9
+      with:
+        source_repo: "https://tok:${{ secrets.LOCAL_TOKEN_RO }}@${{ vars.LOCAL_ORG_DOMAIN }}:${{ vars.LOCAL_ORG_PORT }}/${{ vars.LOCAL_ORG_NAME }}/${{ github.event.repository.name }}"
+        source_branch: "${{ github.event.ref }}"
+        destination_repo: "https://tok:${{ secrets.MIRROR_TOKEN_RW }}@${{ vars.MIRROR_ORG_DOMAIN }}/${{ vars.MIRROR_ORG_NAME }}/${{ github.event.repository.name }}"
+        destination_branch: "${{ github.event.ref }}"

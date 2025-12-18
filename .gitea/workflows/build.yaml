@@ -1,0 +1,374 @@
+#####################################################################################
+# documentation:
+# - https://docs.gitea.com/usage/actions/overview
+# - https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+#####################################################################################
+
+name: Build AOSmium
+
+on:
+  push:
+    paths:
+      - trigger-build.txt
+  workflow_dispatch:  # button shown only when in default branch
+    inputs:
+      pushrelease:
+        description: "Release after a succesful build"
+        required: false
+        default: true
+        type: boolean
+      buildarch:
+        description: "Limit to specific arch (arm32, arm64, arm_both)"
+        required: false
+        default: "arm_both" # arm32, arm64, arm_both
+        type: string
+
+# NOT implemented in Gitea!
+#permissions:
+#  contents: write # allow creating releases
+
+jobs:
+  build:
+    runs-on: docker-node-chromium
+    outputs:
+      APP_VERSION: ${{ steps.vars.outputs.APP_VERSION }}
+      BARM32: ${{ steps.vanco.outputs.BARM32 }}
+      BARM64: ${{ steps.vanco.outputs.BARM64 }}
+      BARM_BOTH: ${{ steps.vanco.outputs.BARM_BOTH }}
+      SHA32_WV: ${{ steps.hash.outputs.SHA32_WV }}
+      SHA64_WV: ${{ steps.hash.outputs.SHA64_WV }}
+      SHA32_BRW: ${{ steps.hash.outputs.SHA32_BRW }}
+      SHA64_BRW: ${{ steps.hash.outputs.SHA64_BRW }}
+      git_sha_short:  ${{ steps.ver.outputs.git_sha_short }}
+      upload_art_id: ${{ steps.upload.outputs.artifact-id }}
+      FILELIST: ${{ steps.hash.outputs.FILELIST }}
+    container:
+      #options: --user root  # we need all privileges within the container
+      volumes:
+        - /srv/docker_vols/aosmium:/workspace/AXP.OS/app_aosmium/aosmium
+        - /srv/docker_vols/vanadium:/workspace/AXP.OS/app_aosmium/vanadium
+        - /srv/docker_vols/chromium:/workspace/AXP.OS/app_aosmium/chromium
+        - /srv/docker_vols/tools:/workspace/AXP.OS/app_aosmium/tools
+    steps:
+
+    - name: Prep container
+      shell: bash
+      run: |
+        ulimit -a
+        apt-get update && apt-get -y install git-lfs curl lsb-release python3 file gperf sudo gcc-multilib
+        echo 'input: ${{ inputs.buildarch }}'
+
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
+        clean: true
+        fetch-depth: 1
+        lfs: true
+        path: aosmium
+        token: ${{ secrets.LOCAL_TOKEN_RW }}
+
+    - name: Checkout AOSmium repos
+      shell: bash
+      id: vanco
+      env:
+        INPUT_BUILDARCH: ${{ inputs.buildarch }}
+      run: |
+        git config --global user.name "gitea-actions[bot]"
+        git config --global user.email "<sherlock@binbash.rocks>"
+
+        if [ ! -d "${{ github.workspace }}/vanadium/.git" ];then
+          echo "Cloning Vanadium as ${{ github.workspace }}/vanadium is not a repo"
+          git clone ${{ vars.VANADIUM_REPO_SERVER }}/${{ vars.VANADIUM_REPO_NAME }} ${{ github.workspace }}/vanadium
+        else
+          git config --global --add safe.directory ${{ github.workspace }}/vanadium
+          cd vanadium
+          git add -A
+          git reset --hard
+          git fetch --all
+          echo "vanadium commit: $(git log -1)"
+          cd ..
+        fi
+        
+        cd vanadium
+        latestVanadium=$(git tag | cut -d '/' -f3 |grep -v '{' | sort -Vr | head -n 1)
+        webview_ver=$(echo "${latestVanadium}" | cut -d '.' -f 1-4)
+        echo "WV_VER=$webview_ver" >> $GITHUB_ENV
+
+        echo "BARM32=0" >> $GITHUB_OUTPUT
+        echo "BARM64=0" >> $GITHUB_OUTPUT
+        echo "BARM_BOTH=0" >> $GITHUB_OUTPUT
+
+        case ${INPUT_BUILDARCH} in
+          arm32) echo "BARM32: $BARM32"; echo "BARM32=1" >> $GITHUB_OUTPUT ;;
+          arm64) echo "BARM64: $BARM64"; echo "BARM64=1" >> $GITHUB_OUTPUT ;;
+           *) echo "BARM_BOTH=1";
+              echo "BARM_BOTH=1" >> $GITHUB_OUTPUT ;; # both is default so any invalid or empty input will build both
+        esac
+
+    - name: "Build arm32"
+      if: ${{ steps.vanco.outputs.BARM32 == '1' }}
+      shell: bash
+      run: |
+        cd aosmium
+        source trigger-build.txt
+        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
+
+    - name: "Build arm64"
+      if: ${{ steps.vanco.outputs.BARM64 == '1' }}
+      shell: bash
+      run: |
+        cd aosmium
+        source trigger-build.txt
+        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
+
+    - name: "Build arm32 & arm64"
+      if: ${{ steps.vanco.outputs.BARM_BOTH == '1' }}
+      shell: bash
+      run: |
+        cd aosmium
+        source trigger-build.txt
+
+        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm
+        export clean=0 gsync=0
+        ./build.sh -V ${{ github.workspace }}/vanadium -C ${{ github.workspace }}/chromium -a arm64
+
+    # https://github.com/r0adkll/sign-android-release/issues/84#issuecomment-1885690080
+    - name: "Get & set app and build variables"
+      id: vars
+      shell: bash
+      run: |
+        #req: https://maven.google.com/web/index.html#com.android.tools.build:aapt2
+        if [ "${{ steps.vanco.outputs.BARM_BOTH }}" == 1 ];then
+            BARM32=1; BARM64=1
+        else
+            BARM32=${{ steps.vanco.outputs.BARM32 }}
+            BARM64=${{ steps.vanco.outputs.BARM64 }}
+        fi
+        echo "BARM32: $BARM32, BARM64: $BARM64"
+
+        cd aosmium
+
+        [ "$BARM32" == "1" ] && APPV32=$(../tools/aapt2 dump badging prebuilt/arm/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        [ "$BARM64" == "1" ] && APPV64=$(../tools/aapt2 dump badging prebuilt/arm64/webview-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+        OVER=v$(date +%Y.%m.%d)
+        
+        [ "$BARM32" == "1" ] && [ -z "$APPV32" ] && echo "ERROR: empty APPV32 detected" && exit 3
+        [ "$BARM64" == "1" ] && [ -z "$APPV64" ] && echo "ERROR: empty APPV64 detected" && exit 3
+        [ -z "$OVER" ] && echo "ERROR: empty OVER detected" && exit 3
+
+        if [ "$APPV32" != "$APPV64" ];then
+            if [ "${{ steps.vanco.outputs.BARM_BOTH }}" == 1 ];then
+               echo "ERROR: arm/arm64 versions differ ($APPV32/$APPV64)!!"
+               exit 3
+            fi
+            echo "WARNING: arm/arm64 versions differ ($APPV32/$APPV64) and due to this they will be BOTH set to: >$OVER<"
+            #APPV32="$OVER"
+            #APPV64="$OVER"
+        else
+            OVER="$APPV64"
+        fi
+
+        if [ "$BARM64" == "1" ];then
+          APPV64_BRW=$(../tools/aapt2 dump badging prebuilt/arm64/browser-unsigned.apk | grep "VersionName" | sed -e "s/.*versionName='//" -e "s/' .*//")
+          if [ "$APPV64" != "$APPV64_BRW" ];then
+            echo "WARNING: webview and browser versions differ ($APPV64 / $APPV64_BRW)!"
+          fi
+        fi
+
+        echo "APP_VERSION=${OVER}" >> $GITHUB_ENV
+        [ "$BARM32" == "1" ] && echo "APP32_VERSION=${APPV32}" >> $GITHUB_ENV
+        [ "$BARM64" == "1" ] && echo "APP64_VERSION=${APPV64}" >> $GITHUB_ENV
+        git_sha_short=$(git rev-parse --short "$GITHUB_SHA")
+        echo "git_sha_short=$git_sha_short" >> $GITHUB_ENV
+
+        echo "APP_VERSION=${OVER}" >> $GITHUB_OUTPUT
+        echo "git_sha_short=$git_sha_short" >> $GITHUB_OUTPUT
+
+        mkdir apks
+
+        if [ "$BARM32" == "1" ];then
+            echo "APP32 version is: $APPV32 ($git_sha_short)"
+            cp prebuilt/arm/web*.apk apks/webview32.apk || true
+            cp prebuilt/arm/browser*.apk apks/browser32.apk || true
+        fi
+        
+        if [ "$BARM64" == "1" ];then
+             echo "APP64 version is: $APPV64 ($git_sha_short)"
+             cp prebuilt/arm64/web*.apk apks/webview64.apk || true
+             cp prebuilt/arm64/browser*.apk apks/browser64.apk || true
+        fi
+
+    - name: set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '18'
+        distribution: 'temurin'
+
+    - name: Setup Android SDK
+      # https://github.com/android-actions/setup-android
+      uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 12266719
+        packages: "build-tools;35.0.0"
+
+    # https://github.com/marketplace/actions/sign-android-releases-apk
+    - name: Sign APK
+      id: signAPK
+      uses: NoCrypt/sign-android@main
+      with:
+        releaseDir: aosmium/apks
+        signingKey: ${{ secrets.APK_SIGNING_KEY_64 }}
+        keyAlias: ${{ secrets.APK_ALIAS }}
+        keyStorePassword: ${{ secrets.APK_KEY_STORE_PASSWORD }}
+        keyPassword: ${{ secrets.APK_KEY_PASSWORD }}
+
+    - name: Prep release
+      id: hash
+      run: |
+        if [ "${{ steps.vanco.outputs.BARM_BOTH }}" == 1 ];then
+            BARM32=1; BARM64=1
+        else
+            BARM32=${{ steps.vanco.outputs.BARM32 }}
+            BARM64=${{ steps.vanco.outputs.BARM64 }}
+        fi
+        echo "BARM32: $BARM32, BARM64: $BARM64"
+
+        cd aosmium/apks
+
+        if [ "$BARM64" == "1" ];then
+          sha512sum webview64-signed.apk > webview64-signed.apk.sha512
+          sha512sum browser64-signed.apk > browser64-signed.apk.sha512
+          cp webview64-signed.apk AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk
+          sha512sum AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Webview64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+          cp browser64-signed.apk AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk
+          sha512sum AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Browser64_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+          echo "SHA64_WV=$(cat webview64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+          echo "SHA64_BRW=$(cat browser64-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+        fi
+
+        if [ "$BARM32" == "1" ];then
+          sha512sum webview32-signed.apk > webview32-signed.apk.sha512
+          sha512sum browser32-signed.apk > browser32-signed.apk.sha512
+          cp webview32-signed.apk AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk
+          sha512sum AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Webview32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+          cp browser32-signed.apk AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk
+          sha512sum AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk > AOSmium-Browser32_${{ steps.vars.outputs.APP_VERSION }}.apk.sha512
+          echo "SHA32_WV=$(cat webview32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+          echo "SHA32_BRW=$(cat browser32-signed.apk.sha512 | cut -d ' ' -f1)" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Commit & push patchset
+      run: |
+        git config --global user.name "${{ GIT_AUTHOR_AOS_NAME }}"
+        git config --global user.email "${{ GIT_AUTHOR_AOS_MAIL }}"
+        git status
+
+        git add patches
+        git commit -m "update patchset for ${{ step.vars.outputs.APP_VERSION }}"
+        git push
+        echo $?
+        git status
+
+    - name: Upload release files as artifact
+      uses: actions/upload-artifact@v3
+      id: upload
+      with:
+        name: release-artifact
+        retention-days: 1
+        if-no-files-found: error
+        path: |
+          aosmium/apks/browser*-signed.apk
+          aosmium/apks/browser*-signed.apk.sha512
+          aosmium/apks/webview*-signed.apk
+          aosmium/apks/webview*-signed.apk.sha512
+
+    - name: Upload F-Droid apks as artifact
+      #if: ${{ inputs.pushrelease == 'true' }}
+      uses: actions/upload-artifact@v3
+      id: upload
+      with:
+        name: release-fdroid
+        retention-days: 1
+        if-no-files-found: error
+        path: aosmium/apks/AOSmium-*
+
+  mirror:
+    needs: build
+    uses: ./.gitea/workflows/mirror.yaml
+    runs-on: docker-node-latest
+    secrets: inherit
+
+  release-codeberg:
+    name: "Release @Codeberg"
+    #if: ${{ inputs.pushrelease == 'true' }}
+    uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_mirror_main.yaml@main
+    runs-on: docker-node-latest
+    needs: build
+    secrets: inherit
+    with:
+      workflow_id: ${{ github.run_id }}
+      repo: ${{ github.event.repository.name }} # without org!
+      title: "!UNTESTED PRE-RELEASE! ${{ needs.build.outputs.APP_VERSION }}"
+      tag: ${{ needs.build.outputs.APP_VERSION }}
+      targetc: main
+      pre: true
+      #filepattern: '*.apk'
+      body: |
+          # AOSmium - The AXP.OS Browser
+
+          See:
+          - [Documentation](https://axpos.org/docs/knowledge/browser/)
+          - [Signature](https://axpos.org/docs/knowledge/signatures/#axpos-app-signature)
+
+          |APK|sha512|
+          |-|-|
+          |webview32-signed.apk|${{ needs.build.outputs.SHA32_WV || 'not-part-of-this-release' }}|
+          |webview64-signed.apk|${{ needs.build.outputs.SHA64_WV || 'not-part-of-this-release' }}|
+          |browser32-signed.apk|${{ needs.build.outputs.SHA32_BRW || 'not-part-of-this-release' }}|
+          |browser64-signed.apk|${{ needs.build.outputs.SHA64_BRW || 'not-part-of-this-release' }}|
+
+  release-github:
+    name: "Release @github"
+    #if: ${{ inputs.pushrelease == 'true' }}
+    uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_mirror_second.yaml@main
+    runs-on: docker-node-latest
+    needs: [ build, release-codeberg ]
+    secrets: inherit
+    with:
+      workflow_id: ${{ github.run_id }}
+      repo: ${{ github.event.repository.name }} # without org!
+      title: "!UNTESTED PRE-RELEASE! ${{ needs.build.outputs.APP_VERSION }}"
+      tag: ${{ needs.build.outputs.APP_VERSION }}
+      targetc: main
+      pre: true
+      filepattern: '*.apk*'
+      body: >-
+          # AOSmium - The AXP.OS Browser\n
+          \n
+          See:\n
+          - [Documentation](https://axpos.org/docs/knowledge/browser/)\n
+          - [Signature](https://axpos.org/docs/knowledge/signatures/#axpos-app-signature)\n
+          \n
+          |APK|sha512|\n
+          |-|-|\n
+          |webview32-signed.apk|${{ needs.build.outputs.SHA32_WV || 'not-part-of-this-release' }}|\n
+          |webview64-signed.apk|${{ needs.build.outputs.SHA64_WV || 'not-part-of-this-release' }}|\n
+          |browser32-signed.apk|${{ needs.build.outputs.SHA32_BRW || 'not-part-of-this-release' }}|\n
+          |browser64-signed.apk|${{ needs.build.outputs.SHA64_BRW || 'not-part-of-this-release' }}|\n
+
+      filelist: >-
+          browser*-signed.apk
+          browser*-signed.apk.sha512
+          webview*-signed.apk
+          webview*-signed.apk.sha512
+         
+  release-fdroid-cutting:
+    name: "Release @F-Droid Cutting"
+    #if: ${{ inputs.pushrelease == 'true' }}
+    uses: https://codeberg.org/AXP-OS/actions/.gitea/workflows/release_fdroid-cutting.yaml@main
+    runs-on: fdroid-cutting
+    needs: build
+    secrets: inherit
+    with:
+      workflow_id: ${{ github.run_id }}
+      repo: ${{ github.event.repository.name }} # without org!

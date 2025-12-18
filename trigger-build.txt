@@ -1,0 +1,56 @@
+# this file will be sourced by the ci/cd workflow and allows to overwrite the defaults in the build script
+
+# increase the following counter for just triggering a build with default options.
+# (alternatively go into the actions tab select the build.yaml and simply start a build with the following settings)
+# (this counter is no version id/number, it is just.. a counter to have smth to commit)
+trigger=61
+
+# overwrite Vanadium version to be used. if unset or empty the latest available will be used
+# must be a valid tag (e.g. "132.0.6834.79.1") from https://github.com/GrapheneOS/Vanadium/tags but usually taken from the latest announced tag on https://grapheneos.org/releases
+export vanadium_version="143.0.7499.146.0"
+
+# a space separated list of build targets. defaults to "system_webview_apk".
+# available targets are: system_webview_apk chrome_public_apk vanadium_config_apk
+#export build_targets="system_webview_apk"
+#export build_targets="chrome_public_apk"
+export build_targets="chrome_public_apk system_webview_apk"
+
+# by default the out/ directory will not be removed.
+# if you want a clean build set this to 1
+#export clean=0
+export clean=1
+
+# RESET + SYNC sources + APPLY patches?
+# usually should be set to 1 when clean=1
+#export gsync=0
+export gsync=1
+
+
+
+
+
+
+######################################################################################################
+#
+# add any specific args to the ninja build cmd
+# when unset or empty ninja will autodetect the job count etc
+# lowering the job count to 6 fixes the weird error:
+#    "java.lang.OutOfMemoryError: unable to create native thread: \
+#     possibly out of memory or process/resource limits reached"
+#NINJA_ARGS="-j1 --quiet"
+NINJA_ARGS="--quiet"
+
+######################################################################################################
+# links to patches which change often:
+#
+# - https://github.com/uazo/cromite/blob/master/build/patches/Add-setting-to-clear-data-on-exit.patch
+#
+######################################################################################################
+
+
+######################################################################################################
+###### LEGACY - DO NOT CHANGE - should always be skip_push=true
+# after a successful build the workflow will push changes to this repo
+# if you do not want to auto-push set skip_push=true
+export skip_push=true
+######################################################################################################

@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: quh4gko8 <88831734+quh4gko8@users.noreply.github.com>
+Date: Tue, 19 Sep 2023 13:31:07 +0000
+Subject: [PATCH] temporary: Workaround for crashes at StackTrace calls
+
+---
+ tools/cfi/ignores.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tools/cfi/ignores.txt b/tools/cfi/ignores.txt
+index c5bbc1b76a939..3392635702bd2 100644
+--- a/tools/cfi/ignores.txt
++++ b/tools/cfi/ignores.txt
+@@ -300,3 +300,7 @@ src:*third_party/pthreadpool/src/src/portable-api.c
+ ######### Uncategorized
+ 
+ src:*native_client/*
++
++######### Downstream addition
++[cfi-unrelated-cast]
++fun:__unw_init_local
