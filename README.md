@@ -27,9 +27,7 @@ _Building_ will be triggered when:
 
 [trigger-build.txt](trigger-build.txt) can be used as a workflow trigger only but also to _configure_ the build process itself (see the inline comments).
 
-### Signing + Release
-
-#### Signing
+### Signing
 
 _Signing_ will be triggered when:
 - `prebuilt/*/browser-unsigned.apk` changes
@@ -39,7 +37,7 @@ _Signing_ will be triggered when:
 
 increasing the counter in [trigger-release.txt](trigger-release.txt) is usually **not** needed (as it runs anyways on apk pushes and one can trigger a workflow manually within the actions tab) but kept as an alternative method to force the signing + release process.
 
-#### Download
+### Download
 
 Releases will be created automatically during the _Signing_ workflow above.
 
@@ -51,8 +49,8 @@ Manual download:
 - [@Codeberg](https://codeberg.org/AXP-OS/app_aosmium/releases)
 - [@Github](https://github.com/AXP-OS/app_aosmium/releases)
 
-Keep updated:
-- while you can download and update manually it is strongly recommended to use the [AXP.OS F-Droid repo](https://axpos.org/docs/knowledge/fdroid/) instead
+Stay up to date:
+- while you _can_ download and update _manually_ it is strongly recommended to use the [AXP.OS F-Droid repo](https://axpos.org/docs/knowledge/fdroid/) instead
 
 ### CI/CD Signature
 
