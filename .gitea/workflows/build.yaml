@@ -65,7 +65,7 @@ jobs:
         fetch-depth: 1
         lfs: true
         path: aosmium
-        token: ${{ secrets.LOCAL_TOKEN_RW }}
+        token: ${{ secrets.LOCAL_TOKEN_REPO_RW }}
 
     - name: Checkout AOSmium repos
       shell: bash
