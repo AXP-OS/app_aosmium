@@ -316,7 +316,12 @@ jobs:
       body: |
           # AOSmium - The AXP.OS Browser
 
-          See:
+          Changelogs:
+          - [Chromium](https://developer.chrome.com/release-notes)
+          - [Vanadium](https://github.com/GrapheneOS/Vanadium/releases/tag/${{ needs.build.outputs.APP_VERSION }})
+          - [AOSmium](https://codeberg.org/AXP-OS/app_aosmium/commits/branch/main)
+
+          See also:
           - [Documentation](https://axpos.org/docs/knowledge/browser/)
           - [Signature](https://axpos.org/docs/knowledge/signatures/#axpos-app-signature)
 
@@ -345,7 +350,12 @@ jobs:
       body: >-
           # AOSmium - The AXP.OS Browser\n
           \n
-          See:\n
+          Changelogs:\n
+          - [Chromium](https://developer.chrome.com/release-notes)\n
+          - [Vanadium](https://github.com/GrapheneOS/Vanadium/releases/tag/${{ needs.build.outputs.APP_VERSION }})\n
+          - [AOSmium](https://codeberg.org/AXP-OS/app_aosmium/commits/branch/main)\n
+          \n
+          See also:\n
           - [Documentation](https://axpos.org/docs/knowledge/browser/)\n
           - [Signature](https://axpos.org/docs/knowledge/signatures/#axpos-app-signature)\n
           \n
