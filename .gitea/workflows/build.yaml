@@ -318,7 +318,7 @@ jobs:
 
           Changelogs:
           - [Chromium](https://developer.chrome.com/release-notes)
-          - [Vanadium](https://github.com/GrapheneOS/Vanadium/releases/tag/${{ needs.build.outputs.APP_VERSION }})
+          - [Vanadium](https://github.com/GrapheneOS/Vanadium/releases/tag/${{ needs.build.outputs.APP_VERSION }}.0)
           - [AOSmium](https://codeberg.org/AXP-OS/app_aosmium/commits/branch/main)
 
           See also:
@@ -352,7 +352,7 @@ jobs:
           \n
           Changelogs:\n
           - [Chromium](https://developer.chrome.com/release-notes)\n
-          - [Vanadium](https://github.com/GrapheneOS/Vanadium/releases/tag/${{ needs.build.outputs.APP_VERSION }})\n
+          - [Vanadium](https://github.com/GrapheneOS/Vanadium/releases/tag/${{ needs.build.outputs.APP_VERSION }}.0)\n
           - [AOSmium](https://codeberg.org/AXP-OS/app_aosmium/commits/branch/main)\n
           \n
           See also:\n
