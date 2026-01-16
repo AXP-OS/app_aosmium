@@ -113,4 +113,4 @@ rm -fv *-enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
 rm -fv *-config-disable-additional-buttons-below-search-bar-i.patch
 rm -fv *-config-always-enable-autofill-screens-regardless-of-.patch
 rm -fv *-config-test-Add-ConfigInfo-on-necessary-test-targets.patch
-
+rm -fv *-config-always-reduce-user-agent-for-WebView.patch
