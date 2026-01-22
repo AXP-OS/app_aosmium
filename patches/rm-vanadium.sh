@@ -115,3 +115,4 @@ rm -fv *-config-always-enable-autofill-screens-regardless-of-.patch
 rm -fv *-config-test-Add-ConfigInfo-on-necessary-test-targets.patch
 rm -fv *-config-always-reduce-user-agent-for-WebView.patch
 rm -fv *-config-disable-autofill-server-communication-by-defa.patch
+rm -fv *-config-disable-unsupported-HTTPS-first-dialog-UI-by-.patch
