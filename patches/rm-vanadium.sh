@@ -117,3 +117,4 @@ rm -fv *-config-always-reduce-user-agent-for-WebView.patch
 rm -fv *-config-disable-autofill-server-communication-by-defa.patch
 rm -fv *-config-disable-unsupported-HTTPS-first-dialog-UI-by-.patch
 rm -fv *-add-support-for-other-language-content-filtering-dep.patch # req adblocker
+rm -fv *-config-enable-permission-site-settings-radio-button-.patch
