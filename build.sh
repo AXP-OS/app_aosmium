@@ -4,7 +4,7 @@
 # Helper script for fetching, patching and building the AXP.OS WebView (fka Mulch)
 #
 # Copyright (c) 2020-2024 Divested Computing Group
-# Copyright (c) 2025 AXP.OS <steadfasterX |AT| binbash #DOT# rocks>
+# Copyright (c) 2025-2026 AXP.OS <steadfasterX |AT| axpos #DOT# org>
 #
 # License: GPLv2
 #########################################################################################
@@ -114,12 +114,11 @@ copy_vanadium_patches(){
     cp patches/* $aosmiumPath/patches/0001-Vanadium/
     
     # AOSmium overwrites
-    AOSN_rlpmu=$(ls -1 "$aosmiumPath/patches/0001-Vanadium/" | grep Restore-local-password-manager-UI.patch)
-    AOSC_rlpmu=$(ls -1 "$aosmiumPath/patches/0001-Vanadium/" | grep -c Restore-local-password-manager-UI.patch)
+    AOSN_rlpmu=$(ls -1 "$aosmiumPath/patches/0001-Vanadium/" | grep -E "Restore-local-password-manager-UI.patch|always-enable-autofill-screens-regardless-of-autofil.patch" | tr '\n' ' ')
+    AOSC_rlpmu=$(ls -1 "$aosmiumPath/patches/0001-Vanadium/" | grep -cE "Restore-local-password-manager-UI.patch|always-enable-autofill-screens-regardless-of-autofil.patch")
 
-    if [ $AOSC_rlpmu -eq 1 ];then
+    if [ $AOSC_rlpmu -ge 1 ];then
         sed -i 's/Vanadium/Chrome/g' $aosmiumPath/patches/0001-Vanadium/$AOSN_rlpmu # GrapheneOS generates patches AFTER re-branding!
-        #cp $aosmiumPath/patches/9000-AOSmium/Restore-local-password-manager-UI.patch $aosmiumPath/patches/0001-Vanadium/$AOSN_rlpmu
     fi
 
     cd $aosmiumPath/patches/0001-Vanadium/
