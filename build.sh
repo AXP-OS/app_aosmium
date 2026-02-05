@@ -114,12 +114,11 @@ copy_vanadium_patches(){
     cp patches/* $aosmiumPath/patches/0001-Vanadium/
     
     # AOSmium overwrites
-    AOSN_rlpmu=$(ls -1 "$aosmiumPath/patches/0001-Vanadium/" | grep -E "Restore-local-password-manager-UI.patch|always-enable-autofill-screens-regardless-of-autofil.patch" | tr '\n' ' ')
-    AOSC_rlpmu=$(ls -1 "$aosmiumPath/patches/0001-Vanadium/" | grep -cE "Restore-local-password-manager-UI.patch|always-enable-autofill-screens-regardless-of-autofil.patch")
-
-    if [ $AOSC_rlpmu -ge 1 ];then
-        sed -i 's/Vanadium/Chrome/g' $aosmiumPath/patches/0001-Vanadium/$AOSN_rlpmu # GrapheneOS generates patches AFTER re-branding!
-    fi
+    AOS_ow_files=$(find "$aosmiumPath/patches/0001-Vanadium/" -type f | grep -E "Restore-local-password-manager-UI.patch|always-enable-autofill-screens-regardless-of-autofil.patch" | tr '\n' ' ')
+    
+    for ow in $AOS_ow_files;do
+        sed -i 's/Vanadium/Chrome/g' $ow # GrapheneOS generates patches AFTER re-branding and it is not planned to change that
+    done
 
     cd $aosmiumPath/patches/0001-Vanadium/
     bash ../rm-vanadium.sh
