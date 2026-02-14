@@ -120,3 +120,4 @@ rm -fv *-add-support-for-other-language-content-filtering-dep.patch # req adbloc
 rm -fv *-config-enable-permission-site-settings-radio-button-.patch
 rm -fv *-tmp-config-disable-broken-splitting-of-local-network.patch
 rm -fv *-Respect-connectivity-check-setting-on-browser-connec.patch
+rm -fv *-Respect-connectivity-check-setting-on-dns_probe_runn.patch
