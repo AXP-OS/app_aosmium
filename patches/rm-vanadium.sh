@@ -47,7 +47,7 @@ rm -fv *-Extension-of-build-system-at-android-specific-subres.patch
 rm -fv *-Expose-fetching-config-state-for-content-filtering-t.patch
 rm -fv *-Use-ruleset-from-config-apk-whenever-it-s-present.patch
 rm -fv *-Add-update-handling-of-subresource-filter-component-.patch
-rm -fv *-Extension-of-build-system-for-static-library-deps-at.patch
+#rm -fv *-Extension-of-build-system-for-static-library-deps-at.patch
 rm -fv *-Update-subresource-filter-from-config-apk.patch
 rm -fv *-Use-the-content-filtering-from-config-app-when-avail.patch
 rm -fv *-subresource-filter-rules-version-on-about-Vanadium-s.patch
@@ -119,5 +119,5 @@ rm -fv *-config-disable-unsupported-HTTPS-first-dialog-UI-by-.patch
 rm -fv *-add-support-for-other-language-content-filtering-dep.patch # req adblocker
 rm -fv *-config-enable-permission-site-settings-radio-button-.patch
 rm -fv *-tmp-config-disable-broken-splitting-of-local-network.patch
-rm -fv *-Respect-connectivity-check-setting-on-browser-connec.patch
-rm -fv *-Respect-connectivity-check-setting-on-dns_probe_runn.patch
+#rm -fv *-Respect-connectivity-check-setting-on-browser-connec.patch
+#rm -fv *-Respect-connectivity-check-setting-on-dns_probe_runn.patch
