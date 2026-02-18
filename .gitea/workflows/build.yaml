@@ -259,15 +259,21 @@ jobs:
 
     - name: Commit & push patchset
       run: |
-        git config --global user.name "${{ GIT_AUTHOR_AOS_NAME }}"
-        git config --global user.email "${{ GIT_AUTHOR_AOS_MAIL }}"
+        cd aosmium
+        git config --global user.name "${{ vars.GIT_AUTHOR_AOS_NAME }}"
+        git config --global user.email "${{ vars.GIT_AUTHOR_AOS_MAIL }}"
         git status
 
-        git add patches
-        git commit -m "update patchset for ${{ step.vars.outputs.APP_VERSION }}"
-        git push
-        echo $?
-        git status
+        CMTL=$(git status --porcelain=v1 | wc -l 2>/dev/null)
+        if [ $CMTL -gt 0 ];then
+          echo "starting git commit+push"
+          git add patches
+          git commit -m "update patchset for ${{ step.vars.outputs.APP_VERSION }}"
+          git push || exit 3
+          git status
+        else
+          echo "nothing to commit!"
+        fi
 
     - name: Upload release files as artifact
       uses: actions/upload-artifact@v3
