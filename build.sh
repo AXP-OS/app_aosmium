@@ -4,7 +4,7 @@
 # Helper script for fetching, patching and building the AXP.OS WebView (fka Mulch)
 #
 # Copyright (c) 2020-2024 Divested Computing Group
-# Copyright (c) 2025-2026 AXP.OS <steadfasterX |AT| axpos #DOT# org>
+# Copyright (c) 2025-2026 AXP.OS <project |AT| axpos #DOT# org>
 #
 # License: GPLv2
 #########################################################################################
@@ -42,9 +42,9 @@ chromium_packageid_webview="org.axpos.aosmium_wv"
 chromium_packageid_standalone="org.axpos.aosmium"
 chromium_packageid_libtrichrome="org.axpos.aosmium_tcl"
 chromium_packageid_config="org.axpos.aosmium_config"
-#unzip -p chromium.apk META-INF/[SIGNER].RSA | keytool -printcert | grep "SHA256:" | sed 's/.*SHA256:* //' | sed 's/://g' |  tr '[:upper:]' '[:lower:]'
-#chromium_cert_trichrome="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
-#chromium_cert_config="260e0a49678c78b70c02d6537add3b6dc0a17171bbde8ce75fd4026a8a3e18d2"
+#unzip -p chromium.apk META-INF/[SIGNER].[EC|RSA] | keytool -printcert | grep "SHA256:" | sed 's/.*SHA256:* //' | sed 's/://g' |  tr '[:upper:]' '[:lower:]'
+chromium_cert_trichrome="005c9805d501bf50c1a8bfd3204b6908843088581fdcf3db8ab4f688ffc0e7b6"
+chromium_cert_config="005c9805d501bf50c1a8bfd3204b6908843088581fdcf3db8ab4f688ffc0e7b6"
 clean=${clean:-0}
 gsync=${gsync:-0}
 pause=0
@@ -328,15 +328,15 @@ if [ $gsync -eq 1 ]; then
 	sed -i 's/Android System WebView/'$chromium_rebrand_name' System WebView/' android_webview/nonembedded/java/AndroidManifest.xml;
 
 	#Config stuff
-	#sed -i 's/Vanadium/'$chromium_rebrand_name'/' vanadium/android_config/BUILD.gn;
+	sed -i 's/Vanadium/'$chromium_rebrand_name'/' vanadium/android_config/BUILD.gn # config app rebranding
 	#sed -i 's/TAG = "VanadiumConfigBridge"/TAG = "'$chromium_rebrand_name'ConfigBridge"/' base/android/java/src/org/chromium/base/config/VanadiumConfigBridge.java;
-	#sed -i 's/app.vanadium.config/'$chromium_packageid_config'/' vanadium/android_config/config_apk_vars.gni;
-	#sed -i 's/min_sdk_version = 29/min_sdk_version = 27/' vanadium/android_config/config_apk.gni;
- #sed -E -i 's/^(\s+default_min_sdk_version\s+=\s+)[0-9]+$/\128/g' build/config/android/config.gni # set default minimum sdk to sdk 28 (A9)
- #sed -i -E 's/^(\s+)(_min_sdk_version = )(invoker\.min_sdk_version)/\1\2\3\n\1\2default_min_sdk_version/' build/config/android/rules.gni # enforce minimum sdk
+	sed -i 's/app.vanadium.config/'$chromium_packageid_config'/' vanadium/android_config/config_apk_vars.gni # config app rebranding
+	sed -i 's/min_sdk_version = .*/min_sdk_version = 29/' vanadium/android_config/config_apk.gni # set minimum sdk to A10 (A9 specific code has been removed since a while)
+    #sed -E -i 's/^(\s+default_min_sdk_version\s+=\s+)[0-9]+$/\128/g' build/config/android/config.gni # set default minimum sdk to sdk 28 (A9)
+    #sed -i -E 's/^(\s+)(_min_sdk_version = )(invoker\.min_sdk_version)/\1\2\3\n\1\2default_min_sdk_version/' build/config/android/rules.gni # enforce minimum sdk
 
 	#Prepare the filter lists
-	#python vanadium/android_config/filter_lists/filter_list_download.py --output vanadium/android_config/filter_lists/filter_lists.txt --urls https://easylist.to/easylist/easylist.txt https://easylist.to/easylist/easyprivacy.txt https://divested.dev/hosts-domains-wildcards https://filters.adtidy.org/extension/ublock/filters/11.txt https://filters.adtidy.org/extension/ublock/filters/17.txt https://filters.adtidy.org/extension/ublock/filters/18.txt https://filters.adtidy.org/extension/ublock/filters/19.txt https://filters.adtidy.org/extension/ublock/filters/20.txt https://filters.adtidy.org/extension/ublock/filters/21.txt https://filters.adtidy.org/extension/ublock/filters/22.txt https://filters.adtidy.org/extension/ublock/filters/2.txt https://filters.adtidy.org/extension/ublock/filters/3.txt https://filters.adtidy.org/extension/ublock/filters/4.txt https://malware-filter.gitlab.io/phishing-filter/phishing-filter.txt https://malware-filter.gitlab.io/urlhaus-filter/urlhaus-filter-ag-online.txt https://ublockorigin.github.io/uAssets/filters/annoyances-cookies.txt https://ublockorigin.github.io/uAssets/filters/badware.txt https://ublockorigin.github.io/uAssets/filters/filters.txt https://ublockorigin.github.io/uAssets/filters/lan-block.txt https://ublockorigin.github.io/uAssets/filters/privacy.txt https://ublockorigin.github.io/uAssets/filters/quick-fixes.txt https://ublockorigin.github.io/uAssets/filters/unbreak.txt
+	#python3 vanadium/android_config/filter_lists/filter_list_download.py --output vanadium/android_config/filter_lists/filter_lists.txt --urls https://easylist.to/easylist/easylist.txt https://easylist.to/easylist/easyprivacy.txt https://divested.dev/hosts-domains-wildcards https://filters.adtidy.org/extension/ublock/filters/11.txt https://filters.adtidy.org/extension/ublock/filters/17.txt https://filters.adtidy.org/extension/ublock/filters/18.txt https://filters.adtidy.org/extension/ublock/filters/19.txt https://filters.adtidy.org/extension/ublock/filters/20.txt https://filters.adtidy.org/extension/ublock/filters/21.txt https://filters.adtidy.org/extension/ublock/filters/22.txt https://filters.adtidy.org/extension/ublock/filters/2.txt https://filters.adtidy.org/extension/ublock/filters/3.txt https://filters.adtidy.org/extension/ublock/filters/4.txt https://malware-filter.gitlab.io/phishing-filter/phishing-filter.txt https://malware-filter.gitlab.io/urlhaus-filter/urlhaus-filter-ag-online.txt https://ublockorigin.github.io/uAssets/filters/annoyances-cookies.txt https://ublockorigin.github.io/uAssets/filters/badware.txt https://ublockorigin.github.io/uAssets/filters/filters.txt https://ublockorigin.github.io/uAssets/filters/lan-block.txt https://ublockorigin.github.io/uAssets/filters/privacy.txt https://ublockorigin.github.io/uAssets/filters/quick-fixes.txt https://ublockorigin.github.io/uAssets/filters/unbreak.txt
 	#wc -l vanadium/android_config/filter_lists/filter_lists.txt
 fi
 
@@ -383,7 +383,7 @@ args+=' enable_reporting=false' #Privacy
 args+=' use_v8_context_snapshot=false' # see https://github.com/uazo/cromite/pull/317 for context
 args+=' include_both_v8_snapshots=false' # see https://github.com/uazo/cromite/blob/c00bb4e191c836301b797f913b57a2c54f32b068/build/chromium.gn_args#L8-L9
 args+=' is_high_end_android=false' # optimize ressource usage for low-end Android devices (drawbacks in performance for high end?!)
-args+=' use_relr_relocations=true' # optimize speed+size, requires SDK28+ though!
+#args+=' use_relr_relocations=true' # not avail in latest chromium. optimize speed+size, requires SDK28+
 
 #args+=' config_apk_package="'$chromium_packageid_config'"' #Config app
 #args+=' config_apk_certdigest="'$chromium_cert_config'"'
