@@ -363,7 +363,7 @@ args+=' ffmpeg_branding="Chrome"' #Codec support
 args+=' proprietary_codecs=true'
 args+=' use_login_database_as_backend=true' #Enable password manager without GMS
 #args+=' enable_nacl=false' #Unncessary
-args+=' enable_resource_allowlist_generation=false'
+args+=' enable_resource_allowlist_generation=true'
 args+=' enable_remoting=false'
 args+=' enable_arcore=false'
 args+=' enable_openxr=false'
@@ -385,11 +385,11 @@ args+=' include_both_v8_snapshots=false' # see https://github.com/uazo/cromite/b
 args+=' is_high_end_android=false' # optimize ressource usage for low-end Android devices (drawbacks in performance for high end?!)
 #args+=' use_relr_relocations=true' # not avail in latest chromium. optimize speed+size, requires SDK28+
 
-#args+=' config_apk_package="'$chromium_packageid_config'"' #Config app
-#args+=' config_apk_certdigest="'$chromium_cert_config'"'
-#args+=' config_apk_version_name="'$chromium_code_config'"'
-#args+=' config_apk_version_code="'$chromium_code_config'"'
-#args+=' config_apk_is_debug=false'
+args+=' config_apk_package="'$chromium_packageid_config'"' #Config app
+args+=' config_apk_certdigest="'$chromium_cert_config'"'
+args+=' config_apk_version_name="'$chromium_code_config'"'
+args+=' config_apk_version_code="'$chromium_code_config'"'
+args+=' config_apk_is_debug=false'
 
 # Setup environment
 [ $clean -eq 1 ] && rm -rf out && tagmsg "Cleaned out"
