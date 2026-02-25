@@ -323,7 +323,7 @@ jobs:
           # AOSmium - The AXP.OS Browser
 
           Changelogs:
-          - [Chromium](https://chromestatus.com/features?q=browsers.chrome.android%253A${{ split(needs.build.outputs.APP_VERSION, '.'){{CITATION:0}} }})
+          - [Chromium](https://chromestatus.com/roadmap)
           - [Vanadium](https://github.com/GrapheneOS/Vanadium/releases/tag/${{ needs.build.outputs.APP_VERSION }}.0)
           - [AOSmium](https://codeberg.org/AXP-OS/app_aosmium/commits/branch/main)
 
@@ -357,7 +357,7 @@ jobs:
           # AOSmium - The AXP.OS Browser\n
           \n
           Changelogs:\n
-          - [Chromium](https://chromestatus.com/features?q=browsers.chrome.android%253A${{ split(needs.build.outputs.APP_VERSION, '.'){{CITATION:0}} }})\n
+          - [Chromium](https://chromestatus.com/roadmap)\n
           - [Vanadium](https://github.com/GrapheneOS/Vanadium/releases/tag/${{ needs.build.outputs.APP_VERSION }}.0)\n
           - [AOSmium](https://codeberg.org/AXP-OS/app_aosmium/commits/branch/main)\n
           \n
