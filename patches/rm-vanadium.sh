@@ -45,7 +45,6 @@ rm -fv *-Add-hooks-for-initializing-contents-of-VanadiumConfi.patch # req: enabl
 rm -fv *-Use-ruleset-from-config-apk-whenever-it-s-present.patch
 rm -fv *-Add-update-handling-of-subresource-filter-component-.patch
 #rm -fv *-Extension-of-build-system-for-static-library-deps-at.patch
-rm -fv *-Use-the-content-filtering-from-config-app-when-avail.patch
 rm -fv *-subresource-filter-rules-version-on-about-Vanadium-s.patch
 rm -fv *-don-t-show-subresource-filter-UI-for-site.patch
 rm -fv *-enable-subresource-filter-on-all-sites.patch
@@ -67,9 +66,7 @@ rm -fv *-config-Add-new-definitions-for-additional-components.patch
 rm -fv *-config-Add-support-for-generating-configs-with-addit.patch
 rm -fv *-config-parser-add-support-for-parsing-conditional-co.patch
 rm -fv *-Add-a-method-to-hook-at-Application.attachBaseContex.patch
-rm -fv *-Add-hooks-for-ChromeApplicationImpl-to-initialize-co.patch
 rm -fv *-content-filtering-Add-support-for-updating-content-f.patch
-rm -fv *-Add-support-for-conditional-content-filtering-compon.patch
 rm -fv *-add-support-for-german-specific-langauge-content-fil.patch
 rm -fv *-temp-config-generator-Forcibly-skip-checks-for-andro.patch
 rm -fv *-temp-config-generator-Forcibly-disable-translate-opt.patch
