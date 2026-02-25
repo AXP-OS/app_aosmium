@@ -1,4 +1,6 @@
 #!/bin/bash
+
+### START: Mulch excludes
 rm -fv *-Vanadium-branding.patch
 rm -fv *-Vanadium-branding-for-WebView.patch
 rm -fv *-Vanadium-string-rebranding.patch
@@ -22,92 +24,7 @@ rm -fv *-Android-U-rolling-DEPS-entries-to-start-using-Androi.patch
 rm -fv *-Use-GrapheneOS-connectivity-check-as-well-for-Help-a.patch
 rm -fv *-Add-support-to-forcibly-override-minimum-sdk-version.patch
 rm -fv *-Checkout-PGO-profiles.patch
-###
-rm -fv *-Add-an-easily-extensible-way-to-reference-targets-ea.patch
-rm -fv *-Add-a-new-config-like-apk-target-for-building.patch
-rm -fv *-config-Directly-reference-config-apk-build-target.patch
-rm -fv *-config-Generate-ConfigInfo-from-config-apk.patch
-rm -fv *-config-Provide-targets-for-linking-and-inclusion-of-.patch
-rm -fv *-config-Include-the-ConfigInfo-class-for-Monochrome-a.patch
-rm -fv *-config-Include-the-ConfigInfo-class-for-WebView-targ.patch
-rm -fv *-config-test-Add-ConfigInfo-on-necessary-integration-.patch
-rm -fv *-config-Add-protobuf-generator-parser-for-config-apk-.patch
-rm -fv *-config-Initial-configuration-for-config-apk.patch
-rm -fv *-config-Add-config-parser-for-browser-and-webview.patch
-rm -fv *-config-Helper-script-for-fetching-content-filtering-.patch
-rm -fv *-config-add-new-needed-deps-to-fetch-filter-lists.patch
-rm -fv *-config-Build-target-for-android-assets-including-the.patch
-rm -fv *-config-Build-target-for-android-assets-for-config-fi.patch
-rm -fv *-config-Add-the-needed-component-and-protobuf-file-fo.patch
-rm -fv *-Extension-of-build-system-for-java-files-in-base-lay.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
-rm -fv *-Add-hooks-for-LibraryLoader-on-early-initialization-.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
-rm -fv *-Add-hooks-for-initializing-contents-of-VanadiumConfi.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
-rm -fv *-Use-ruleset-from-config-apk-whenever-it-s-present.patch
-rm -fv *-Add-update-handling-of-subresource-filter-component-.patch
-#rm -fv *-Extension-of-build-system-for-static-library-deps-at.patch
-rm -fv *-subresource-filter-rules-version-on-about-Vanadium-s.patch
-rm -fv *-don-t-show-subresource-filter-UI-for-site.patch
-rm -fv *-enable-subresource-filter-on-all-sites.patch
-rm -fv *-Use-the-old-naming-convention-of-Ads-in-ads-site-set.patch
-rm -fv *-Always-enable-CredentialManager-APIs-for-all-apps.patch
-rm -fv *-Skip-checks-for-android-autofill-service-app-when-us.patch
-rm -fv *-config-generator-Initial-configuration-for-config-ap.patch
-rm -fv *-config-parser-Add-config-parser-for-browser-and-webv.patch
-rm -fv *-filter-lists-Helper-script-for-fetching-content-filt.patch
-rm -fv *-Add-hooks-for-applying-flags-features-at-runtime.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
-rm -fv *-config-generator-Always-enable-CredentialManager-API.patch
-rm -fv *-Enable-CredentialManager-APIs-for-all-apps-supportin.patch
-rm -fv *-Add-support-for-calling-added-APIs-from-custom-OS.patch
-rm -fv *-filter-lists-Update-script-to-also-include-saving-sh.patch
-rm -fv *-config-Remove-support-for-broadcast-receiver-for-fet.patch
-rm -fv *-config-generator-Skip-checks-for-android-autofill-se.patch
-rm -fv *-config-parser-Add-support-for-conditional-parsing-of.patch
-rm -fv *-config-Add-new-definitions-for-additional-components.patch
-rm -fv *-config-Add-support-for-generating-configs-with-addit.patch
-rm -fv *-config-parser-add-support-for-parsing-conditional-co.patch
-rm -fv *-Add-a-method-to-hook-at-Application.attachBaseContex.patch
-rm -fv *-content-filtering-Add-support-for-updating-content-f.patch
-rm -fv *-add-support-for-german-specific-langauge-content-fil.patch
-rm -fv *-temp-config-generator-Forcibly-skip-checks-for-andro.patch
-rm -fv *-temp-config-generator-Forcibly-disable-translate-opt.patch
-rm -fv *-temporary-config-disable-conditional-component-if-de.patch
-rm -fv *-Update-Resources-and-Configuration-generated-protobu.patch
-rm -fv *-Document-more-needed-removals-for-protobuf.patch
-rm -fv *-Android-V-Add-SDK-35-packages-to-CIPD.patch
-rm -fv *-Android-V-rolling-DEPS-entries-to-start-using-Androi.patch
-rm -fv *-tmp-config-generator-Backport-WebView-context-leak-f.patch
-rm -fv *-Include-a-java-port-of-atomic-file-and-scoped-file-d.patch
-rm -fv *-Add-support-for-upstream-file-based-parsing-of-unind.patch
-rm -fv *-fixup-Expose-fetching-config-state-for-content-filte.patch
-rm -fv *-fixup-Use-ruleset-from-config-apk-whenever-it-s-pres.patch
-rm -fv *-fixup-content-filtering-Add-update-handling-of-subre.patch
-rm -fv *-fixup-Use-the-content-filtering-from-config-app-when.patch
-rm -fv *-Use-64-bit-toolchain-by-default-for-generating-resou.patch
-rm -fv *-enable-stack-clash-protection-for-arm64-targets.patch
-rm -fv *-Always-start-child-processes-in-jitless-mode-when-ex.patch # req: enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
-rm -fv *-Use-fstack-protector-strong-with-shadow-call-stack-w.patch
-rm -fv *-config-Explicitly-declare-queries-to-config-package-.patch
-rm -fv *-add-support-for-german-specific-language-content-fil.patch
-rm -fv *-config-Compile-the-config-holder-app-with-forceQuery.patch
-rm -fv *-Reduce-user-agent-and-client-hints-for-webview.patch
-rm -fv *-config-disable-domain-reliability-feature.patch
-rm -fv *-config-Disable-fullscreen-exit-callback-for-picture-.patch
-rm -fv *-tmp-Disable-usage-of-new-checkServerTrusted-API-for-.patch
-rm -fv *-tmp-config-Enable-Local-Network-Permission-access-an.patch
-rm -fv *-fixup-config-parser-Add-config-parser-for-browser-an.patch
-rm -fv *-Add-VanadiumConfig-version-on-about-Vanadium-setting.patch
-rm -fv *-Increment-minSdk-to-33-trichrome-apk-build-targets.patch
-rm -fv *-Support-to-automatically-apply-patches-to-some-subpr.patch
-#rm -fv *-Restore-local-password-manager-UI.patch # fails due to wrong patch creation, fixed by build.sh on-the-fly
-rm -fv *-Sup*ort-applying-patches-to-v8-subproject.patch
-rm -fv *-Support-applying-patches-to-search-engine-data-resou.patch
-rm -fv *-enable-wasm-in-interprter-mode-when-OS-JIT-is-restri.patch
-rm -fv *-config-disable-additional-buttons-below-search-bar-i.patch
-rm -fv *-config-always-enable-autofill-screens-regardless-of-.patch
-rm -fv *-config-test-Add-ConfigInfo-on-necessary-test-targets.patch
-rm -fv *-config-always-reduce-user-agent-for-WebView.patch
-rm -fv *-config-disable-autofill-server-communication-by-defa.patch
-rm -fv *-config-disable-unsupported-HTTPS-first-dialog-UI-by-.patch
-rm -fv *-add-support-for-other-language-content-filtering-dep.patch # req adblocker
-rm -fv *-config-enable-permission-site-settings-radio-button-.patch
-rm -fv *-tmp-config-disable-broken-splitting-of-local-network.patch
+### END: Mulch excludes
+
+### START: AOSmium excludes
+### END: AOSmium excludes

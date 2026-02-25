@@ -113,12 +113,15 @@ copy_vanadium_patches(){
     mkdir $aosmiumPath/patches/0001-Vanadium/
     cp patches/* $aosmiumPath/patches/0001-Vanadium/
     
-    # AOSmium overwrites
+    # GrapheneOS generates dirty patches (i.e. creating them AFTER re-branding)
+    # and it is not planned by them to change that (https://github.com/GrapheneOS/Vanadium/issues/1021)
     AOS_ow_files=$(find "$aosmiumPath/patches/0001-Vanadium/" -type f | grep -E "Restore-local-password-manager-UI.patch|always-enable-autofill-screens-regardless-of-autofil.patch" | tr '\n' ' ')
     
     for ow in $AOS_ow_files;do
-        sed -i 's/Vanadium/Chrome/g' $ow # GrapheneOS generates patches AFTER re-branding and it is not planned to change that
+        sed -i 's/Vanadium/Chrome/g' $ow
     done
+
+    sed -i 's/Vanadium/Android/g' $aosmiumPath/patches/0001-Vanadium/*-config-Explicitly-declare-queries-to-config-package-.patch
 
     cd $aosmiumPath/patches/0001-Vanadium/
     bash ../rm-vanadium.sh
