@@ -268,7 +268,7 @@ jobs:
         if [ $CMTL -gt 0 ];then
           echo "starting git commit+push"
           git add patches
-          git commit -m "update patchset for ${{ step.vars.outputs.APP_VERSION }}"
+          git commit -m "update patchset for ${{ steps.vars.outputs.APP_VERSION }}"
           git push || exit 3
           git status
         else
