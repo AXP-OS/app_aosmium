@@ -15,10 +15,10 @@ Subject: [PATCH] webview: Hard no to persistent histograms
  1 file changed, 2 insertions(+)
 
 diff --git a/android_webview/browser/aw_field_trials.cc b/android_webview/browser/aw_field_trials.cc
-index eec32a4a84800..7d594f1fe86b5 100644
+index 7dd06216afb9b..8ae0ef0096c11 100644
 --- a/android_webview/browser/aw_field_trials.cc
 +++ b/android_webview/browser/aw_field_trials.cc
-@@ -35,12 +35,14 @@
+@@ -36,12 +36,14 @@
  #include "ui/gl/gl_switches.h"
  
  void AwFieldTrials::OnVariationsSetupComplete() {

@@ -20,10 +20,10 @@ removes the Media Integrity blink extension API feature flag.
  7 files changed, 114 insertions(+), 6 deletions(-)
 
 diff --git a/android_webview/browser/aw_content_browser_client_receiver_bindings.cc b/android_webview/browser/aw_content_browser_client_receiver_bindings.cc
-index 9ef39f6192263..e1ef09e03b5fe 100644
+index 9634fc6f2edc4..d3b10b68a1db8 100644
 --- a/android_webview/browser/aw_content_browser_client_receiver_bindings.cc
 +++ b/android_webview/browser/aw_content_browser_client_receiver_bindings.cc
-@@ -269,8 +269,13 @@ void AwContentBrowserClient::RegisterBrowserInterfaceBindersForFrame(
+@@ -268,8 +268,13 @@ void AwContentBrowserClient::RegisterBrowserInterfaceBindersForFrame(
    map->Add<spellcheck::mojom::SpellCheckHost>(
        create_spellcheck_host, content::GetUIThreadTaskRunner({}));
  #endif
@@ -40,22 +40,22 @@ index 9ef39f6192263..e1ef09e03b5fe 100644
      map->Add<payments::mojom::PaymentRequest>(
          &ForwardToJavaFrame<payments::mojom::PaymentRequest>);
 diff --git a/android_webview/common/aw_feature_map.cc b/android_webview/common/aw_feature_map.cc
-index 45b4f62fdfdfc..b06b3feb59123 100644
+index 4af2fde3cd318..7bb9976c6c494 100644
 --- a/android_webview/common/aw_feature_map.cc
 +++ b/android_webview/common/aw_feature_map.cc
-@@ -54,6 +54,7 @@ const base::Feature* const kFeaturesExposedToJava[] = {
+@@ -52,6 +52,7 @@ const base::Feature* const kFeaturesExposedToJava[] = {
      &features::kWebViewHyperlinkContextMenu,
      &features::kWebViewInvokeZoomPickerOnGSU,
      &features::kWebViewLazyFetchHandWritingIcon,
 +    &features::kWebViewMediaIntegrityApiBlinkExtension,
      &features::kWebViewMixedContentAutoupgrades,
      &features::kWebViewMoveWorkToProviderInit,
-     &features::kWebViewMuteAudio,
+     &features::kWebViewOptInToGmsBindServiceOptimization,
 diff --git a/android_webview/common/aw_features.cc b/android_webview/common/aw_features.cc
-index b18bf6fe4a63f..a5243c3ba6bd1 100644
+index 946cf40e6a7c4..73b535eef9f2e 100644
 --- a/android_webview/common/aw_features.cc
 +++ b/android_webview/common/aw_features.cc
-@@ -66,6 +66,11 @@ BASE_FEATURE(kWebViewIgnoreDuplicateNavs, base::FEATURE_DISABLED_BY_DEFAULT);
+@@ -47,6 +47,11 @@ BASE_FEATURE(kWebViewIgnoreDuplicateNavs, base::FEATURE_DISABLED_BY_DEFAULT);
  BASE_FEATURE(kWebViewLazyFetchHandWritingIcon,
               base::FEATURE_ENABLED_BY_DEFAULT);
  
@@ -64,26 +64,26 @@ index b18bf6fe4a63f..a5243c3ba6bd1 100644
 +BASE_FEATURE(kWebViewMediaIntegrityApiBlinkExtension,
 +             base::FEATURE_DISABLED_BY_DEFAULT);
 +
- // When enabled, passive mixed content (Audio/Video/Image subresources loaded
- // over HTTP on HTTPS sites) will be autoupgraded to HTTPS, and the load will be
- // blocked if the resource fails to load over HTTPS. This only affects apps that
+ // When enabled, cookie policy settings are captured at RestrictedCookieManager
+ // creation time and used throughout its lifetime. This enables shared memory
+ // cookie versioning to reduce IPC overhead.
 diff --git a/android_webview/common/aw_features.h b/android_webview/common/aw_features.h
-index 86863aea4b4bd..598142351ff92 100644
+index e1e2add9cedba..8fefbcd7ac4c1 100644
 --- a/android_webview/common/aw_features.h
 +++ b/android_webview/common/aw_features.h
-@@ -28,6 +28,7 @@ BASE_DECLARE_FEATURE(kWebViewFileSystemAccess);
- BASE_DECLARE_FEATURE(kWebViewIgnoreDuplicateNavs);
+@@ -25,6 +25,7 @@ BASE_DECLARE_FEATURE(kWebViewIgnoreDuplicateNavs);
  BASE_DECLARE_FEATURE(kWebViewInvokeZoomPickerOnGSU);
  BASE_DECLARE_FEATURE(kWebViewLazyFetchHandWritingIcon);
+ BASE_DECLARE_FEATURE(kWebViewLatchedCookiePolicy);
 +BASE_DECLARE_FEATURE(kWebViewMediaIntegrityApiBlinkExtension);
  BASE_DECLARE_FEATURE(kWebViewMixedContentAutoupgrades);
- BASE_DECLARE_FEATURE(kWebViewMuteAudio);
  BASE_DECLARE_FEATURE(kWebViewRenderDocument);
+ BASE_DECLARE_FEATURE(kWebViewTestFeature);
 diff --git a/android_webview/java/src/org/chromium/android_webview/common/ProductionSupportedFlagList.java b/android_webview/java/src/org/chromium/android_webview/common/ProductionSupportedFlagList.java
-index 7e153afa09daa..15e685cf0e0cf 100644
+index cb605ae82931f..61e42e6d56d0b 100644
 --- a/android_webview/java/src/org/chromium/android_webview/common/ProductionSupportedFlagList.java
 +++ b/android_webview/java/src/org/chromium/android_webview/common/ProductionSupportedFlagList.java
-@@ -646,6 +646,10 @@ public final class ProductionSupportedFlagList {
+@@ -633,6 +633,10 @@ public final class ProductionSupportedFlagList {
          Flag.baseFeature("V8ScavengerHigherCapacity"),
          Flag.baseFeature("V8IncrementalMarkingStartUserVisible"),
          Flag.baseFeature("V8ExternalMemoryAccountedInGlobalLimit"),
@@ -384,11 +384,11 @@ index 492b3c7a409fa..3a7cfab121ebf 100644
          MockTokenProvider mockTokenProvider = new MockTokenProvider();
          mPlatformBridge.addProviderResponse(
 diff --git a/android_webview/renderer/aw_content_renderer_client.cc b/android_webview/renderer/aw_content_renderer_client.cc
-index 57ccb24bc9e4b..bb1f6b4f6d40b 100644
+index 9a09c8c44c7d0..2207b8119b93c 100644
 --- a/android_webview/renderer/aw_content_renderer_client.cc
 +++ b/android_webview/renderer/aw_content_renderer_client.cc
-@@ -228,10 +228,13 @@ void AwContentRendererClient::
-     blink::WebRuntimeFeatures::EnableSharedAutofill(true);
+@@ -232,10 +232,13 @@ void AwContentRendererClient::
+     blink::WebRuntimeFeatures::EnableManualText(true);
    }
  
 -  // Enable the overall android.webview namespace.
