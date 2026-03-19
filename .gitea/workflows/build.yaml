@@ -29,7 +29,7 @@ on:
 
 jobs:
   build:
-    runs-on: docker-node-chromium
+    runs-on: aosmium:latest
     outputs:
       APP_VERSION: ${{ steps.vars.outputs.APP_VERSION }}
       BARM32: ${{ steps.vanco.outputs.BARM32 }}
