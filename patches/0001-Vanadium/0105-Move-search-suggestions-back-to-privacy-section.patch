@@ -24,7 +24,7 @@ index a352cd657b1b9..01e8c8217afed 100644
  </PreferenceScreen>
  
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
-index 37fc1f2b3bbf9..ecaab76637871 100644
+index 7fdd7a04b49b8..a781e51898fae 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 @@ -24,6 +24,8 @@ import org.chromium.components.user_prefs.UserPrefs;

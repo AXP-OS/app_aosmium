@@ -36,12 +36,12 @@ index d482be2d6cc06..84784f7ec174c 100644
          // clang-format on
      }
 diff --git a/chrome/android/chrome_ext_java_sources.gni b/chrome/android/chrome_ext_java_sources.gni
-index 598bfaf9cb860..dd9fae38f4152 100644
+index 8100031c4d36c..6ee7db3005a88 100644
 --- a/chrome/android/chrome_ext_java_sources.gni
 +++ b/chrome/android/chrome_ext_java_sources.gni
-@@ -5,4 +5,5 @@
+@@ -4,4 +4,5 @@
+ 
  chrome_ext_java_sources = [
-   "java/src/org/chromium/chrome/browser/settings/SettingsExtUtils.java",
    "java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java",
 +  "java/src/org/chromium/chrome/browser/TabPreferencesUtils.java",
  ]
@@ -103,7 +103,7 @@ index 0000000000000..57aae64057cfb
 +
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
-index ecaab76637871..a005f38213232 100644
+index a781e51898fae..588278f8cbbde 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 @@ -25,6 +25,7 @@ import org.chromium.components.user_prefs.UserPrefs;

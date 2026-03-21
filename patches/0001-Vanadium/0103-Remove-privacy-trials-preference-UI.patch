@@ -8,7 +8,7 @@ Subject: [PATCH] Remove privacy trials preference UI
  1 file changed, 2 insertions(+)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
-index ae580b12b1784..ed9b38ea9ba0b 100644
+index 693d6e2b8a241..79ce15fd74320 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 @@ -53,6 +53,8 @@ final class PrivacySettingsExt {

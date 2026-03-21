@@ -4,17 +4,28 @@ Date: Tue, 11 Apr 2023 07:55:52 +0000
 Subject: [PATCH] Utility class for modifying preferences at Privacy section
 
 ---
+ chrome/android/chrome_ext_deps.gni            |  1 +
  chrome/android/chrome_ext_java_resources.gni  |  1 +
  chrome/android/chrome_ext_java_sources.gni    |  1 +
  .../java/res/xml/privacy_preferences_ext.xml  |  9 +++
  .../privacy/settings/PrivacySettings.java     |  6 ++
  .../privacy/settings/PrivacySettingsExt.java  | 69 +++++++++++++++++++
- 5 files changed, 86 insertions(+)
+ 6 files changed, 87 insertions(+)
  create mode 100644 chrome/android/java/res/xml/privacy_preferences_ext.xml
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 
+diff --git a/chrome/android/chrome_ext_deps.gni b/chrome/android/chrome_ext_deps.gni
+index 45019569a0f78..4f777a949cfa0 100644
+--- a/chrome/android/chrome_ext_deps.gni
++++ b/chrome/android/chrome_ext_deps.gni
+@@ -3,4 +3,5 @@
+ # found in the LICENSE file.
+ 
+ chrome_ext_deps = [
++  "//base/downstream/android:base_settings_java",
+ ]
 diff --git a/chrome/android/chrome_ext_java_resources.gni b/chrome/android/chrome_ext_java_resources.gni
-index 4ce3232392871..99618ae9ac2f1 100644
+index 1f969c1ea46cf..19a2f10cdf41e 100644
 --- a/chrome/android/chrome_ext_java_resources.gni
 +++ b/chrome/android/chrome_ext_java_resources.gni
 @@ -3,4 +3,5 @@
@@ -24,13 +35,13 @@ index 4ce3232392871..99618ae9ac2f1 100644
 +  "java/res/xml/privacy_preferences_ext.xml",
  ]
 diff --git a/chrome/android/chrome_ext_java_sources.gni b/chrome/android/chrome_ext_java_sources.gni
-index b3fe144daf2d6..598bfaf9cb860 100644
+index db246a7ae06ce..8100031c4d36c 100644
 --- a/chrome/android/chrome_ext_java_sources.gni
 +++ b/chrome/android/chrome_ext_java_sources.gni
-@@ -4,4 +4,5 @@
+@@ -3,4 +3,5 @@
+ # found in the LICENSE file.
  
  chrome_ext_java_sources = [
-   "java/src/org/chromium/chrome/browser/settings/SettingsExtUtils.java",
 +  "java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java",
  ]
 diff --git a/chrome/android/java/res/xml/privacy_preferences_ext.xml b/chrome/android/java/res/xml/privacy_preferences_ext.xml
@@ -81,7 +92,7 @@ index 3ef624912c90b..7d3eb3179958e 100644
      /** Shows the advanced-protection-section if needed. */
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 new file mode 100644
-index 0000000000000..f7201968d6231
+index 0000000000000..a74de0c7fe721
 --- /dev/null
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 @@ -0,0 +1,69 @@
@@ -103,7 +114,7 @@ index 0000000000000..f7201968d6231
 +import org.chromium.chrome.browser.preferences.Pref;
 +import org.chromium.chrome.browser.profiles.Profile;
 +import org.chromium.chrome.browser.settings.ChromeManagedPreferenceDelegate;
-+import org.chromium.chrome.browser.settings.SettingsExtUtils;
++import org.chromium.base.settings.SettingsExtUtils;
 +import org.chromium.components.browser_ui.settings.ChromeSwitchPreference;
 +import org.chromium.components.browser_ui.settings.SettingsUtils;
 +import org.chromium.components.prefs.PrefService;

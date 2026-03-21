@@ -1,22 +1,22 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
-From: Daniel Micay <danielmicay@gmail.com>
-Date: Sat, 7 Aug 2021 15:01:54 -0400
-Subject: [PATCH] remove unwanted sync and services link
+From: quh4gko8 <88831734+quh4gko8@users.noreply.github.com>
+Date: Sat, 16 Dec 2023 00:25:55 +0000
+Subject: [PATCH] Remove privacy guides preference UI
 
 ---
  .../chrome/browser/privacy/settings/PrivacySettingsExt.java     | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
-index f7201968d6231..ae580b12b1784 100644
+index 79ce15fd74320..7fdd7a04b49b8 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
-@@ -51,6 +51,8 @@ final class PrivacySettingsExt {
- 
-     static void removeUnwantedPreferences(@NonNull PreferenceFragmentCompat prefFragment) {
-         ThreadUtils.checkUiThread();
+@@ -55,6 +55,8 @@ final class PrivacySettingsExt {
+                 prefFragment, PrivacySettings.PREF_SYNC_AND_SERVICES_LINK);
+         SettingsExtUtils.safelyRemovePreference(
+                 prefFragment, PrivacySettings.PREF_PRIVACY_SANDBOX);
 +        SettingsExtUtils.safelyRemovePreference(
-+                prefFragment, PrivacySettings.PREF_SYNC_AND_SERVICES_LINK);
++                prefFragment, PrivacySettings.PREF_PRIVACY_GUIDE);
      }
  
      static void initializePreferences(@NonNull PreferenceFragmentCompat prefFragment, @NonNull Profile profile) {

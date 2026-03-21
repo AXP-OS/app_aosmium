@@ -4,26 +4,12 @@ Date: Mon, 13 Mar 2023 10:29:53 +0000
 Subject: [PATCH] Utility class for adding shared preference keys
 
 ---
- base/BUILD.gn                                 |   3 +
  .../shared_preferences/SharedPrefsUtils.java  | 136 ++++++++++++++++++
  .../StrictPreferenceKeyChecker.java           |   4 +
- 3 files changed, 143 insertions(+)
+ ...se_shared_preferences_java_ext_sources.gni |   1 +
+ 3 files changed, 141 insertions(+)
  create mode 100644 base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
 
-diff --git a/base/BUILD.gn b/base/BUILD.gn
-index d0317b2920ca8..e1dca69f29cac 100644
---- a/base/BUILD.gn
-+++ b/base/BUILD.gn
-@@ -5474,6 +5474,9 @@ if (is_android) {
-       "android/java/src/org/chromium/base/shared_preferences/SharedPreferencesManager.java",
-       "android/java/src/org/chromium/base/shared_preferences/StrictPreferenceKeyChecker.java",
-     ]
-+    sources += [
-+      "android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java",
-+    ]
-   }
- 
-   android_library("flagged_apis_java") {
 diff --git a/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java b/base/android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java
 new file mode 100644
 index 0000000000000..d482be2d6cc06
@@ -181,3 +167,13 @@ index 4485af157d59a..a5a93c31bf779 100644
          // For non-dynamic legacy keys, a simple map check is enough.
          if (mRegistry.mLegacyFormatKeys.contains(key)) {
              return true;
+diff --git a/base/base_shared_preferences_java_ext_sources.gni b/base/base_shared_preferences_java_ext_sources.gni
+index 051e1ccc251ea..2a2be7be422da 100644
+--- a/base/base_shared_preferences_java_ext_sources.gni
++++ b/base/base_shared_preferences_java_ext_sources.gni
+@@ -3,4 +3,5 @@
+ # found in the LICENSE file.
+ 
+ base_shared_preferences_java_ext_sources = [
++  "android/java/src/org/chromium/base/shared_preferences/SharedPrefsUtils.java",
+ ]

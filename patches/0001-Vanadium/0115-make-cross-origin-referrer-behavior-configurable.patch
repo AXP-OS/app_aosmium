@@ -46,7 +46,7 @@ The chrome for the cross-origin referrer policy preference is based on
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/referrer/settings/CrossOriginReferrerPolicyUtils.java
 
 diff --git a/chrome/android/chrome_ext_java_resources.gni b/chrome/android/chrome_ext_java_resources.gni
-index 1bda063a93c68..dc123ccced70c 100644
+index 0671dc5bb59d5..a8aec44d39297 100644
 --- a/chrome/android/chrome_ext_java_resources.gni
 +++ b/chrome/android/chrome_ext_java_resources.gni
 @@ -6,4 +6,6 @@ chrome_ext_java_resources = [
@@ -57,10 +57,10 @@ index 1bda063a93c68..dc123ccced70c 100644
 +  "java/res/xml/cross_origin_referrer_policy_preferences.xml",
  ]
 diff --git a/chrome/android/chrome_ext_java_sources.gni b/chrome/android/chrome_ext_java_sources.gni
-index 674224b0c1c42..665aa79d55993 100644
+index c8f58da6e9264..18ff4e07f7a7e 100644
 --- a/chrome/android/chrome_ext_java_sources.gni
 +++ b/chrome/android/chrome_ext_java_sources.gni
-@@ -11,4 +11,7 @@ chrome_ext_java_sources = [
+@@ -10,4 +10,7 @@ chrome_ext_java_sources = [
    "java/src/org/chromium/chrome/browser/webrtc/settings/WebRtcPolicyPreference.java",
    "java/src/org/chromium/chrome/browser/webrtc/settings/WebRtcPolicySettings.java",
    "java/src/org/chromium/chrome/browser/webrtc/settings/WebRtcPolicyUtils.java",
@@ -149,7 +149,7 @@ index 6e955e33c0109..356e4204e1cd2 100644
  </PreferenceScreen>
  
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
-index 849ff47acac93..453b974955a70 100644
+index 79a27282a2e5a..8de9a255dafdc 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java
 @@ -15,6 +15,7 @@ import org.chromium.base.shared_preferences.SharedPrefsUtils.SharedPrefsExt;
@@ -158,7 +158,7 @@ index 849ff47acac93..453b974955a70 100644
  import org.chromium.chrome.browser.profiles.Profile;
 +import org.chromium.chrome.browser.referrer.settings.CrossOriginReferrerPolicySettings;
  import org.chromium.chrome.browser.settings.ChromeManagedPreferenceDelegate;
- import org.chromium.chrome.browser.settings.SettingsExtUtils;
+ import org.chromium.base.settings.SettingsExtUtils;
  import org.chromium.chrome.browser.webrtc.settings.WebRtcPolicySettings;
 @@ -30,6 +31,7 @@ final class PrivacySettingsExt {
      private static final String PREF_OPEN_LINKS_IN_INCOGNITO =
@@ -545,7 +545,7 @@ index a40900d5c12ec..4bc1a251f5cf1 100644
  inline constexpr char kEnableDoNotTrack[] = "enable_do_not_track";
  
 diff --git a/content/browser/renderer_host/navigation_request.cc b/content/browser/renderer_host/navigation_request.cc
-index 5b79df01e0a5e..af1a002cf9b40 100644
+index 7d101d40116bf..e720eb6cec63e 100644
 --- a/content/browser/renderer_host/navigation_request.cc
 +++ b/content/browser/renderer_host/navigation_request.cc
 @@ -399,6 +399,29 @@ void AddAdditionalRequestHeaders(

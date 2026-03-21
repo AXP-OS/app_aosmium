@@ -8,7 +8,7 @@ Subject: [PATCH] remove safety check menu
  1 file changed, 3 insertions(+)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index 4d69e20e266c4..98fd1229fe8b8 100644
+index 4d69e20e266c4..7e44ba5be0cef 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 @@ -378,6 +378,9 @@ public class MainSettings extends ChromeBaseSettingsFragment
@@ -16,8 +16,8 @@ index 4d69e20e266c4..98fd1229fe8b8 100644
                              });
          }
 +
-+        SettingsExtUtils.safelyRemovePreference(this, "safety_check");
-+        SettingsExtUtils.safelyRemovePreference(this, PREF_SAFETY_HUB);
++        org.chromium.base.settings.SettingsExtUtils.safelyRemovePreference(this, "safety_check");
++        org.chromium.base.settings.SettingsExtUtils.safelyRemovePreference(this, PREF_SAFETY_HUB);
      }
  
      private static boolean shouldShowAppearancePref() {

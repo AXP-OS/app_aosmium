@@ -11,10 +11,10 @@ Subject: [PATCH] Support opening external web search in incognito
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/searchwidget/SearchActivityHooks.java
 
 diff --git a/chrome/android/chrome_ext_java_sources.gni b/chrome/android/chrome_ext_java_sources.gni
-index 0d29c988b371e..b3a2278b2b251 100644
+index f0d99be43979f..6e63e69de469a 100644
 --- a/chrome/android/chrome_ext_java_sources.gni
 +++ b/chrome/android/chrome_ext_java_sources.gni
-@@ -7,4 +7,5 @@ chrome_ext_java_sources = [
+@@ -6,4 +6,5 @@ chrome_ext_java_sources = [
    "java/src/org/chromium/chrome/browser/privacy/settings/PrivacySettingsExt.java",
    "java/src/org/chromium/chrome/browser/TabPreferencesUtils.java",
    "java/src/org/chromium/chrome/browser/LaunchIntentDispatcherHooks.java",
