@@ -205,12 +205,14 @@ if [ $gsync -eq 1 ]; then
         git commit -m "build.sh: before-rebase" >> $LOG 2>&1|| true
         git rebase-update
         cd ..
+        # ensure we trigger checkout_android to fetch vanadium's filter lists
+        sed -i 's/"custom_vars": {}/"custom_vars": {\n      "checkout_android": True\n    }/' .gclient
         tagmsg "Syncing"
         yes | gclient sync --jobs=4 --force --delete_unversioned_trees --reset --revision="$chromium_version"
     else
         tagmsg "Initial source download"
         cd $chromiumPath
-        fetch --nohooks android || true
+        fetch android || true
         yes | gclient sync --force --delete_unversioned_trees --reset --revision="$chromium_version"
     fi
 
