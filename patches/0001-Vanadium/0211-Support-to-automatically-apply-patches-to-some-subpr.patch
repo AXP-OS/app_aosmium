@@ -10,7 +10,7 @@ Subject: [PATCH] Support to automatically apply patches to some subprojects
  create mode 100644 vanadium/common/apply_subprojects_patches.py
 
 diff --git a/DEPS b/DEPS
-index 80516179607ed..9cd15e3194920 100644
+index df9735634e934..2320d90f54a06 100644
 --- a/DEPS
 +++ b/DEPS
 @@ -5029,6 +5029,16 @@ hooks = [
