@@ -9,10 +9,10 @@ Subject: [PATCH] config: Include the ConfigInfo class for Monochrome and
  1 file changed, 6 insertions(+)
 
 diff --git a/chrome/android/chrome_public_apk_tmpl.gni b/chrome/android/chrome_public_apk_tmpl.gni
-index 6bd4fc5504337..35f4b3151460d 100644
+index 9f7fe934e456b..6fc8c56130958 100644
 --- a/chrome/android/chrome_public_apk_tmpl.gni
 +++ b/chrome/android/chrome_public_apk_tmpl.gni
-@@ -673,6 +673,12 @@ template("chrome_common_apk_or_module_tmpl") {
+@@ -694,6 +694,12 @@ template("chrome_common_apk_or_module_tmpl") {
  template("chrome_public_apk_or_module_tmpl") {
    chrome_common_apk_or_module_tmpl(target_name) {
      add_upstream_only_deps = true

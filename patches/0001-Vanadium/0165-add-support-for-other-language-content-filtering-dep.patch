@@ -12,10 +12,10 @@ Subject: [PATCH] add support for other language content filtering dependent on
  4 files changed, 535 insertions(+)
 
 diff --git a/DEPS b/DEPS
-index 0a610324d74bc..df9735634e934 100644
+index 30cfa8577c3fd..66d8e18682cf9 100644
 --- a/DEPS
 +++ b/DEPS
-@@ -4829,6 +4829,206 @@ hooks = [
+@@ -4862,6 +4862,206 @@ hooks = [
                'https://easylist.to/easylist/easylist.txt',
                'https://easylist.to/easylist/easyprivacy.txt']
    },

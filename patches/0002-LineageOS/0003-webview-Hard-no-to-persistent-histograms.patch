@@ -15,7 +15,7 @@ Subject: [PATCH] webview: Hard no to persistent histograms
  1 file changed, 2 insertions(+)
 
 diff --git a/android_webview/browser/aw_field_trials.cc b/android_webview/browser/aw_field_trials.cc
-index d654fc003655f..bd7a83aba634a 100644
+index d621f7d8d32b5..2d42e76911c21 100644
 --- a/android_webview/browser/aw_field_trials.cc
 +++ b/android_webview/browser/aw_field_trials.cc
 @@ -36,12 +36,14 @@

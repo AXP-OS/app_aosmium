@@ -9,7 +9,7 @@ Subject: [PATCH] Increment minSdk to 33 trichrome apk build targets
  2 files changed, 7 insertions(+)
 
 diff --git a/chrome/android/chrome_public_apk_tmpl.gni b/chrome/android/chrome_public_apk_tmpl.gni
-index cb182f9a1c9ba..dd80063792e9f 100644
+index 48786a6e12296..53112531e1fa2 100644
 --- a/chrome/android/chrome_public_apk_tmpl.gni
 +++ b/chrome/android/chrome_public_apk_tmpl.gni
 @@ -244,6 +244,8 @@ template("chrome_common_apk_or_module_tmpl") {

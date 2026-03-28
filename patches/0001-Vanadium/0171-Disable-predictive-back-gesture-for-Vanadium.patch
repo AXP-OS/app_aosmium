@@ -8,12 +8,12 @@ Subject: [PATCH] Disable predictive back gesture for Vanadium
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
-index 7c1d5a7175cc6..3659062c148ae 100644
+index b67aa94772bfe..2e1bab6ee53d3 100644
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
-@@ -231,7 +231,7 @@ by a child template that "extends" this file.
+@@ -233,7 +233,7 @@ by a child template that "extends" this file.
+         {% endif %}
          android:networkSecurityConfig="@xml/network_security_config"
-         android:allowAudioPlaybackCapture="false"
          android:appComponentFactory="org.chromium.chrome.browser.base.SplitCompatAppComponentFactory"
 -        android:enableOnBackInvokedCallback="true"
 +        android:enableOnBackInvokedCallback="false"

@@ -20,7 +20,7 @@ index 4c76245f15f45..34ce37bea69b4 100644
 +  include_crashpad = false
  }
 diff --git a/chrome/android/chrome_public_apk_tmpl.gni b/chrome/android/chrome_public_apk_tmpl.gni
-index 88b6ce011cfc6..cb182f9a1c9ba 100644
+index 02b41bfd7efb0..48786a6e12296 100644
 --- a/chrome/android/chrome_public_apk_tmpl.gni
 +++ b/chrome/android/chrome_public_apk_tmpl.gni
 @@ -9,6 +9,7 @@ import("//build/config/android/rules.gni")
@@ -31,7 +31,7 @@ index 88b6ce011cfc6..cb182f9a1c9ba 100644
  import("//chrome/android/modules/chrome_bundle_tmpl.gni")
  import("//chrome/android/modules/chrome_feature_modules.gni")
  import("//chrome/android/trichrome.gni")
-@@ -576,6 +577,9 @@ template("chrome_common_apk_or_module_tmpl") {
+@@ -597,6 +598,9 @@ template("chrome_common_apk_or_module_tmpl") {
      }
  
      # TODO(agrieve): Use Crashpad trampoline in chrome_public_apk.

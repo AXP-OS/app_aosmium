@@ -10,10 +10,10 @@ for adblocking.
  1 file changed, 12 insertions(+)
 
 diff --git a/DEPS b/DEPS
-index 3e10982ed36b7..0a610324d74bc 100644
+index d8d79f640f605..30cfa8577c3fd 100644
 --- a/DEPS
 +++ b/DEPS
-@@ -4817,6 +4817,18 @@ hooks = [
+@@ -4850,6 +4850,18 @@ hooks = [
                 '--input-public',
                 'src/chromeos/tast_control_disabled_tests_public_builders.txt'],
    },

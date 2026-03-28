@@ -31,10 +31,10 @@ index 56b1dcd70350e..1fa3a887eccb3 100644
       * @return Intent to query a list of installed home launchers.
       */
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
-index 1aef3a4966f40..7c1d5a7175cc6 100644
+index 5270a95ee7b87..b67aa94772bfe 100644
 --- a/chrome/android/java/AndroidManifest.xml
 +++ b/chrome/android/java/AndroidManifest.xml
-@@ -1011,6 +1011,11 @@ by a child template that "extends" this file.
+@@ -1028,6 +1028,11 @@ by a child template that "extends" this file.
                  <!-- Permits Chrome to act as a default handler for WEB_SEARCH intents. -->
                  <category android:name="android.intent.category.DEFAULT" />
              </intent-filter>
