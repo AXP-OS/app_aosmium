@@ -12,7 +12,7 @@ Subject: [PATCH] add support for other language content filtering dependent on
  4 files changed, 535 insertions(+)
 
 diff --git a/DEPS b/DEPS
-index 30cfa8577c3fd..66d8e18682cf9 100644
+index 786d28895b501..a0bf7bf00fbd5 100644
 --- a/DEPS
 +++ b/DEPS
 @@ -4862,6 +4862,206 @@ hooks = [
