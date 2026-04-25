@@ -10,7 +10,7 @@ Subject: [PATCH] webview: Disable autofill metadata uploads by default
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc b/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc
-index 348ccdec09abf..b6c77d5d552d0 100644
+index c778156d17d67..80c7ab2d87290 100644
 --- a/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc
 +++ b/components/autofill/core/browser/crowdsourcing/randomized_encoder.cc
 @@ -117,7 +117,7 @@ std::string GetEncodingSeed(PrefService* pref_service) {
