@@ -192,10 +192,10 @@ index fc4255c1803d8..98f6871cec4be 100644
  
      public static final String ANDROID_SPELLCHECK_FULL_API_BLINK = "AndroidSpellcheckFullApiBlink";
 diff --git a/content/public/common/content_features.cc b/content/public/common/content_features.cc
-index 4cab8c0a058f8..1a2cdc34fd052 100644
+index ff3f11daa3f0a..f25cfa54c2003 100644
 --- a/content/public/common/content_features.cc
 +++ b/content/public/common/content_features.cc
-@@ -1345,6 +1345,9 @@ const base::FeatureParam<int> kAndroidDesktopZoomScalingFactor{
+@@ -1352,6 +1352,9 @@ const base::FeatureParam<int> kAndroidDesktopZoomScalingFactor{
  const base::FeatureParam<int> kAndroidMonitorZoomScalingFactor{
      &kAndroidDesktopZoomScaling, "monitor-zoom-scaling-factor", 100};
  
@@ -206,10 +206,10 @@ index 4cab8c0a058f8..1a2cdc34fd052 100644
  // Android.
  BASE_FEATURE(kAndroidDisplayCursor,
 diff --git a/content/public/common/content_features.h b/content/public/common/content_features.h
-index 68ae2f6d225c4..336545ee1291a 100644
+index ef6260d7a5b04..6d72aa784a6b4 100644
 --- a/content/public/common/content_features.h
 +++ b/content/public/common/content_features.h
-@@ -372,6 +372,7 @@ CONTENT_EXPORT extern const base::FeatureParam<int>
+@@ -373,6 +373,7 @@ CONTENT_EXPORT extern const base::FeatureParam<int>
  CONTENT_EXPORT BASE_DECLARE_FEATURE(kAndroidDisplayCursor);
  CONTENT_EXPORT extern const base::FeatureParam<int>
      kAndroidMonitorZoomScalingFactor;

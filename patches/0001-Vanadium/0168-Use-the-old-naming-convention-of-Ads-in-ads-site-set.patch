@@ -42,10 +42,10 @@ index 7558180af3f65..d07f11f4debee 100644
              case ContentSettingsType.ANTI_ABUSE:
                  return new ResourceItem(
 diff --git a/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleWebsiteSettings.java b/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleWebsiteSettings.java
-index 76a8468578198..7c8a9246315a7 100644
+index 8278042cfa409..9a4ec4a9f52e1 100644
 --- a/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleWebsiteSettings.java
 +++ b/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SingleWebsiteSettings.java
-@@ -1259,10 +1259,8 @@ public class SingleWebsiteSettings extends BaseSiteSettingsFragment
+@@ -1261,10 +1261,8 @@ public class SingleWebsiteSettings extends BaseSiteSettingsFragment
                          && findPreference(assumeNonNull(getPreferenceKey(ContentSettingsType.ADS)))
                                  != null;
  
@@ -59,7 +59,7 @@ index 76a8468578198..7c8a9246315a7 100644
  
      @RequiresNonNull({"mSite"})
 diff --git a/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SiteSettings.java b/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SiteSettings.java
-index 6843ee392312a..a6d9838d520ac 100644
+index 753ef31a70968..1594e8b1e3849 100644
 --- a/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SiteSettings.java
 +++ b/components/browser_ui/site_settings/android/java/src/org/chromium/components/browser_ui/site_settings/SiteSettings.java
 @@ -175,8 +175,6 @@ public class SiteSettings extends BaseSiteSettingsFragment
